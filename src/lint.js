@@ -1,4 +1,4 @@
-import { readFile, stat } from 'node:fs/promises';
+import { open } from 'node:fs/promises';
 import { relative } from 'node:path';
 import {
   collectSourceFiles,
@@ -20,6 +20,34 @@ function compilePattern(pattern) {
   return new RegExp(pattern.source, [...flags].join(''));
 }
 
+async function readBoundedFile(file) {
+  const handle = await open(file, 'r');
+  try {
+    const info = await handle.stat();
+    if (!info.isFile()) {
+      return {
+        info,
+        text: null,
+        reason: 'Path is no longer a regular file.'
+      };
+    }
+    if (info.size > MAX_SOURCE_FILE_BYTES) {
+      return {
+        info,
+        text: null,
+        reason: `File exceeds ${MAX_SOURCE_FILE_BYTES} byte scan limit.`
+      };
+    }
+    return {
+      info,
+      text: await handle.readFile({ encoding: 'utf8' }),
+      reason: null
+    };
+  } finally {
+    await handle.close();
+  }
+}
+
 export async function lintPath({ path, profile: profileName }) {
   const [catalog, profile, files] = await Promise.all([
     loadCatalog(),
@@ -33,17 +61,16 @@ export async function lintPath({ path, profile: profileName }) {
   const skipped = [];
 
   outer: for (const file of files) {
-    const info = await stat(file);
-    if (info.size > MAX_SOURCE_FILE_BYTES) {
+    const { info, text, reason } = await readBoundedFile(file);
+    if (reason) {
       skipped.push({
         file: relative(process.cwd(), file),
-        reason: `File exceeds ${MAX_SOURCE_FILE_BYTES} byte scan limit.`,
+        reason,
         bytes: info.size
       });
       continue;
     }
 
-    const text = await readFile(file, 'utf8');
     for (const rule of rules) {
       for (const pattern of rule.detect.patterns) {
         const regex = compilePattern(pattern);

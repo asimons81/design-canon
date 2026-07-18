@@ -9,6 +9,7 @@ All notable changes are documented here.
 - Added strict catalog and profile validation.
 - Blocked unsafe profile names and path traversal.
 - Added deterministic source traversal, symlink avoidance, directory exclusions, file-size limits, and a global finding cap.
+- Eliminated the source-file stat/read race by inspecting and reading through one open file handle.
 - Added strict CLI option parsing with fail-closed behavior.
 - Added package publication allowlisting and provenance configuration.
 - Pinned GitHub Actions to immutable commit SHAs.
