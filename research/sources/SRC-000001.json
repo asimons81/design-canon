@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000001",
+  "sourceType": "open-standard",
+  "title": "Web Content Accessibility Guidelines (WCAG) 2.2",
+  "publicLocation": "https://www.w3.org/TR/WCAG22/",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "CC-BY-4.0",
+  "summary": "W3C recommendation for web accessibility covering contrast, focus, motion, and readable text requirements.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "public-knowledge"
+}

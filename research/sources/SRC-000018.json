@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000018",
+  "sourceType": "original-observation",
+  "title": "AI Navigation: Collapsed Hamburger on Desktop",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "AI agents hide navigation behind hamburger menus on all viewport sizes, even when space permits.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000023",
+  "sourceType": "original-observation",
+  "title": "AI Error State: Generic 'Something Went Wrong' with Retry",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Error states use vague language and single retry action without context or troubleshooting.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

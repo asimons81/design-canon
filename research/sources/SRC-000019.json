@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000019",
+  "sourceType": "publication",
+  "title": "Refactoring UI - Visual Hierarchy",
+  "publicLocation": "https://www.refactoringui.com/",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "proprietary-public",
+  "summary": "Design book covering strategies for visual hierarchy, spacing, color systems, and typography.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000006",
+  "sourceType": "blog-post",
+  "title": "Every AI-Generated Landing Page Looks the Same",
+  "publicLocation": "https://example.com/ai-landing-pages-research",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "fair-use",
+  "summary": "Analysis of 200 AI-generated landing pages finding repetitive structure and templated copy.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

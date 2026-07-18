@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000030",
+  "sourceType": "original-observation",
+  "title": "AI Mobile Marketing: Stacked Sections with Parallax Scroll",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Mobile marketing pages default to full-viewport stacked sections with parallax scrolling effects.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

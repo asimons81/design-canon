@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000013",
+  "sourceType": "open-standard",
+  "title": "ISO 9241-11: Ergonomics of Human-System Interaction",
+  "publicLocation": "https://www.iso.org/standard/63500.html",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "proprietary-public",
+  "summary": "International standard defining usability in terms of effectiveness, efficiency, and satisfaction.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "public-knowledge"
+}

@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000008",
+  "sourceType": "original-observation",
+  "title": "Recurring AI Card Pattern: Centered Icon + Title + Body + Link",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Feature cards consistently follow an icon-headline-body-link stack with identical spacing.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000028",
+  "sourceType": "original-observation",
+  "title": "AI Analytics Card: Number + Label + Mini Sparkline + Change %",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Analytics cards always include metric number, label, sparkline, and green/red change indicator.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

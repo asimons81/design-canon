@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000007",
+  "sourceType": "accessibility-spec",
+  "title": "WAI-ARIA Authoring Practices Guide",
+  "publicLocation": "https://www.w3.org/WAI/ARIA/apg/",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "CC-BY-4.0",
+  "summary": "Guide for accessible interactive patterns including focus management and keyboard navigation.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

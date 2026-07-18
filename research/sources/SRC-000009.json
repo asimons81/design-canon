@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000009",
+  "sourceType": "design-system-doc",
+  "title": "USWDS - Typography",
+  "publicLocation": "https://designsystem.digital.gov/components/typography/",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "CC0-1.0",
+  "summary": "Government design system guidance on type scale, reading measure, line height, and responsive type.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

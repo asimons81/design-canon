@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000002",
+  "sourceType": "publication",
+  "title": "NN Group: The Peak-End Rule in UX",
+  "publicLocation": "https://www.nngroup.com/articles/peak-end-rule/",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "proprietary-public",
+  "summary": "Users judge experiences largely based on peak moments and endings, informing loading and error state design.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

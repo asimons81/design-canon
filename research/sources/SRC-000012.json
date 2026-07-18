@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000012",
+  "sourceType": "original-observation",
+  "title": "AI Form Pattern: Full-Width Inputs with Centered Submit",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Forms consistently use full-width single-column inputs with a centered primary action button.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

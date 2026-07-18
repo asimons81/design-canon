@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000004",
+  "sourceType": "design-system-doc",
+  "title": "HIG - Navigation",
+  "publicLocation": "https://developer.apple.com/design/human-interface-guidelines/navigation",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "proprietary-public",
+  "summary": "Apple's guidance on navigation structure, hierarchy clarity, and predictable wayfinding.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

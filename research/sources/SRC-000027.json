@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000027",
+  "sourceType": "original-observation",
+  "title": "AI Onboarding: Step Progress Bar with Skip/Next",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Onboarding flows default to horizontal step indicators with back/skip/next buttons regardless of complexity.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

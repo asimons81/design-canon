@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000024",
+  "sourceType": "original-observation",
+  "title": "AI Badge Pattern: Decorative Status Dots Without Meaning",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Interfaces add colored badges and status indicators decoratively without consistent system state mapping.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

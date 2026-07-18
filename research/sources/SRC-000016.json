@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000016",
+  "sourceType": "original-observation",
+  "title": "AI Loading State: Generic Spinner Centered in Page",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Loading states default to a single centered spinner without skeleton screens or progress indication.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

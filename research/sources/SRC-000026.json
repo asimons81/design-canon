@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000026",
+  "sourceType": "original-observation",
+  "title": "AI Testimonial: Quote + Avatar + Name + Title + Company",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Testimonial sections consistently stack quote-avatar-name-title-company with identical spacing.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}

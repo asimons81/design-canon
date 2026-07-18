@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000020",
+  "sourceType": "open-standard",
+  "title": "CSS Color Module Level 4",
+  "publicLocation": "https://www.w3.org/TR/css-color-4/",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "CC-BY-4.0",
+  "summary": "W3C specification for CSS color functions including rgb, hsl, lch, oklch, and color-mix.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "public-knowledge"
+}

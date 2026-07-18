@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000014",
+  "sourceType": "research-report",
+  "title": "Baymard Institute: Form Usability Research",
+  "publicLocation": "https://baymard.com/research/form-usability",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "proprietary-public",
+  "summary": "Large-scale usability research on web forms covering label placement, error handling, and input design.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "independently-discovered"
+}

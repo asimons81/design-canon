@@ -1,0 +1,13 @@
+{
+  "sourceId": "SRC-000029",
+  "sourceType": "original-observation",
+  "title": "AI Command Palette: Spotlight-Style Modal with Fuzzy Search",
+  "publicLocation": "",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "public-domain",
+  "summary": "Command palettes replicate Spotlight pattern with fuzzy search even when simpler navigation suffices.",
+  "supportingClaims": [
+    "Publicly documented design guideline."
+  ],
+  "cleanRoomAttestation": "original-observation"
+}
