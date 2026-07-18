@@ -4,9 +4,16 @@ All notable changes are documented here.
 
 ## Unreleased
 
+### Added
+
+- Added project-local `design-canon.config.json` support.
+- Added rationale-required, scope-limited suppressions with optional approver and expiration metadata.
+- Added JSON reporting for suppressed findings and unused exceptions.
+- Added a public configuration schema and configuration guide.
+
 ### Security
 
-- Added strict catalog and profile validation.
+- Added strict catalog, profile, and configuration validation.
 - Blocked unsafe profile names and path traversal.
 - Added deterministic source traversal, symlink avoidance, directory exclusions, file-size limits, and a global finding cap.
 - Eliminated the source-file stat/read race by inspecting and reading through one open file handle.

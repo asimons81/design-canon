@@ -9,6 +9,7 @@
     "./rules": "./rules/core.json",
     "./profiles/*": "./profiles/*.json",
     "./schema": "./schema/rule.schema.json",
+    "./config-schema": "./schema/config.schema.json",
     "./skill": "./skills/design-canon/SKILL.md"
   },
   "bin": {
@@ -21,6 +22,7 @@
     "profiles/",
     "schema/",
     "skills/",
+    "docs/CONFIGURATION.md",
     "README.md",
     "LICENSE",
     "SECURITY.md",

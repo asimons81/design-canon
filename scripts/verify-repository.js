@@ -11,6 +11,7 @@ const REQUIRED_PACKAGE_FILES = [
   'profiles/',
   'schema/',
   'skills/',
+  'docs/CONFIGURATION.md',
   'README.md',
   'LICENSE',
   'SECURITY.md',
@@ -30,7 +31,10 @@ const REQUIRED_REPOSITORY_FILES = [
   '.github/workflows/dependency-review.yml',
   'CONTRIBUTING.md',
   'SECURITY.md',
+  'docs/CONFIGURATION.md',
   'docs/RELEASING.md',
+  'examples/config/design-canon.config.json',
+  'schema/config.schema.json',
   'package-lock.json'
 ];
 
@@ -46,6 +50,7 @@ assert.equal(packageJson.publishConfig?.provenance, true);
 assert.deepEqual(packageJson.files, REQUIRED_PACKAGE_FILES);
 assert.equal(packageJson.repository?.url, 'git+https://github.com/asimons81/design-canon.git');
 assert.equal(packageJson.bin?.['design-canon'], './bin/design-canon.js');
+assert.equal(packageJson.exports?.['./config-schema'], './schema/config.schema.json');
 assert.equal(packageJson.scripts?.prepack, 'npm run check && npm test');
 
 assert.equal(packageLock.name, packageJson.name);
