@@ -81,19 +81,106 @@ function hasAttribute(tagText, attributeName) {
 
 /**
  * Remove HTML comments and script/style block bodies from text.
- * Prevents treating HTML-like markup inside them as real controls.
+ * Uses a bounded deterministic state machine instead of regex replacement
+ * to avoid regex-based sanitization issues flagged by static analysis.
+ *
+ * Preserves line structure so source line numbers remain stable — content
+ * inside stripped blocks is replaced with spaces, not removed entirely.
+ *
+ * States:
+ *   NORMAL     — outside any block
+ *   IN_COMMENT — inside <!-- -->
+ *   IN_SCRIPT  — inside <script> ... </script>
+ *   IN_STYLE   — inside <style> ... </style>
  */
 function stripNonContent(text) {
-  let result = text.replace(/<!--[\s\S]*?-->/g, '');
-  // Strip <script>...</script> bodies (preserve line structure)
-  result = result.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, (match) => {
-    return match.replace(/[^\n]/g, ' ');
-  });
-  // Strip <style>...</style> bodies
-  result = result.replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, (match) => {
-    return match.replace(/[^\n]/g, ' ');
-  });
-  return result;
+  const STATE = { NORMAL: 0, IN_COMMENT: 1, IN_SCRIPT: 2, IN_STYLE: 3 };
+  let state = STATE.NORMAL;
+  const out = [];
+  let i = 0;
+
+  while (i < text.length) {
+    if (state === STATE.NORMAL) {
+      // Check for <!-- comment start
+      if (text[i] === '<' && text.slice(i, i + 4) === '<!--') {
+        out.push('<!--');
+        i += 4;
+        state = STATE.IN_COMMENT;
+        continue;
+      }
+      // Check for <script start
+      if (text[i] === '<' && text.slice(i, i + 7).toLowerCase() === '<script') {
+        // Find the end of the opening tag
+        const tagEnd = text.indexOf('>', i);
+        if (tagEnd !== -1) {
+          out.push(text.slice(i, tagEnd + 1).replace(/[^\n]/g, ' '));
+          i = tagEnd + 1;
+          state = STATE.IN_SCRIPT;
+          continue;
+        }
+      }
+      // Check for <style start
+      if (text[i] === '<' && text.slice(i, i + 6).toLowerCase() === '<style') {
+        const tagEnd = text.indexOf('>', i);
+        if (tagEnd !== -1) {
+          out.push(text.slice(i, tagEnd + 1).replace(/[^\n]/g, ' '));
+          i = tagEnd + 1;
+          state = STATE.IN_STYLE;
+          continue;
+        }
+      }
+      out.push(text[i]);
+      i += 1;
+
+    } else if (state === STATE.IN_COMMENT) {
+      // Check for --> comment end
+      if (text[i] === '-' && text.slice(i, i + 3) === '-->') {
+        out.push('-->');
+        i += 3;
+        state = STATE.NORMAL;
+      } else {
+        out.push(text[i] === '\n' ? '\n' : ' ');
+        i += 1;
+      }
+
+    } else if (state === STATE.IN_SCRIPT) {
+      // Check for </script closing tag (case-insensitive)
+      if (text[i] === '<' && text.slice(i, i + 8).toLowerCase() === '</script') {
+        // Find the closing >
+        const closeBracket = text.indexOf('>', i);
+        if (closeBracket !== -1) {
+          out.push(text.slice(i, closeBracket + 1).replace(/[^\n]/g, ' '));
+          i = closeBracket + 1;
+          state = STATE.NORMAL;
+        } else {
+          out.push(text[i]);
+          i += 1;
+        }
+      } else {
+        out.push(text[i] === '\n' ? '\n' : ' ');
+        i += 1;
+      }
+
+    } else if (state === STATE.IN_STYLE) {
+      // Check for </style closing tag (case-insensitive)
+      if (text[i] === '<' && text.slice(i, i + 7).toLowerCase() === '</style') {
+        const closeBracket = text.indexOf('>', i);
+        if (closeBracket !== -1) {
+          out.push(text.slice(i, closeBracket + 1).replace(/[^\n]/g, ' '));
+          i = closeBracket + 1;
+          state = STATE.NORMAL;
+        } else {
+          out.push(text[i]);
+          i += 1;
+        }
+      } else {
+        out.push(text[i] === '\n' ? '\n' : ' ');
+        i += 1;
+      }
+    }
+  }
+
+  return out.join('');
 }
 
 /**

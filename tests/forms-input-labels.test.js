@@ -530,3 +530,96 @@ test('regression: catalog uses bounded wording in detect message', async () => {
     'Catalog message should use bounded wording'
   );
 });
+
+// ── CodeQL Regression Tests ──────────────────────────────────────────
+
+test('codeql: malformed comment does not break state machine', () => {
+  // A comment start without proper end should not hang the machine
+  const input = '<!-- <input placeholder="bad"> <input placeholder="good">';
+  const result = scanFormControls(input);
+  // Everything after <!-- is treated as inside comment, so only the
+  // first <input before <!-- should... wait, the input starts with <!--
+  // Actually this tests that the machine doesn't crash
+  assert.ok(Array.isArray(result));
+});
+
+test('codeql: script closing tag with whitespace variants', () => {
+  // Whitespace and newlines between /script and >
+  const variants = [
+    '<script>var x = 1;</script>',
+    '<script>var x = 1;</script >',
+    '<script>var x = 1;</script\t>',
+    '<script>var x = 1;</script\n>',
+    '<script>var x = 1;</script  \t\n>',
+    '<SCRIPT>var x = 1;</SCRIPT>',
+    '<Script>var x = 1;</Script>'
+  ];
+  for (const v of variants) {
+    const html = v + '<input placeholder="real">';
+    const results = scanFormControls(html);
+    assert.equal(results.length, 1, `Failed for: ${v}`);
+    assert.equal(results[0].hasPlaceholder, true);
+  }
+});
+
+test('codeql: style closing tag with whitespace variants', () => {
+  const variants = [
+    '<style>body { color: red; }</style>',
+    '<style>body { color: red; }</style >',
+    '<style>body { color: red; }</style\t>',
+    '<style>body { color: red; }</style\n>',
+    '<STYLE>body {}</STYLE>'
+  ];
+  for (const v of variants) {
+    const html = v + '<input placeholder="real">';
+    const results = scanFormControls(html);
+    assert.equal(results.length, 1, `Failed for: ${v}`);
+    assert.equal(results[0].hasPlaceholder, true);
+  }
+});
+
+test('codeql: script opening tag with whitespace attributes', () => {
+  const html = '<script type="text/javascript">var x = "<input>";</script><input placeholder="real">';
+  const results = scanFormControls(html);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasPlaceholder, true);
+});
+
+test('codeql: comment with dashes inside', () => {
+  const html = '<!-- <input placeholder="hidden"> -- -- --><input placeholder="real">';
+  const results = scanFormControls(html);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasPlaceholder, true);
+});
+
+test('codeql: line numbers stable after stripping', async () => {
+  const { mkdtemp, rm, writeFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const dir = await mkdtemp(join(tmpdir(), 'f016-lines-'));
+  // Multi-line content with comments and scripts
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<script>
+var x = "<input>";
+</script>
+<style>
+/* <input> */
+</style>
+</head>
+<body>
+<form>
+<input placeholder="test">
+</form>
+</body>
+</html>`;
+  const htmlPath = join(dir, 'test.html');
+  await writeFile(htmlPath, html, 'utf8');
+  const result = await lintPath({ path: htmlPath, profile: 'marketing' });
+  const f016 = result.findings.filter(f => f.rule === 'forms.input-labels-required');
+  assert.equal(f016.length, 1, 'Should find exactly one unlabeled control');
+  // The <input placeholder="test"> is on line 15 (1-indexed in the fixture above)
+  assert.equal(f016[0].line, 13, 'Line number should be stable after stripping');
+  await rm(dir, { recursive: true, force: true });
+});
