@@ -1,0 +1,86 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.badges.decorative-live-state",
+  "proposedRuleId": "badges.truthful-live-state",
+  "title": "Reserve live-status badges for literal live states",
+  "status": "review-ready",
+  "category": "badges",
+  "surfaces": ["universal", "marketing", "product-app"],
+  "summary": "Flag decorative live-status badges when the surrounding interface does not represent a real-time, active, or currently broadcasting state.",
+  "instruction": "Use live-status badges only for a literal active process, real-time feed, production state, or broadcast that can be verified from the interface context.",
+  "rationale": "A live badge communicates operational truth. Using it as generic decoration creates false urgency, weakens trust, and makes genuine system states harder to distinguish from marketing ornament.",
+  "claimType": "original-observation",
+  "sourceIds": ["source.original-observation.decorative-live-badge"],
+  "examples": {
+    "violations": [
+      "A static SaaS hero displays a green LIVE badge above an ordinary product screenshot.",
+      "A pricing card labels the annual plan LIVE without any active process or event."
+    ],
+    "controls": [
+      "A streaming page marks the currently broadcasting channel Live.",
+      "A deployment dashboard marks the production service Live after a successful health check."
+    ],
+    "borderline": [
+      "A dashboard labels a data feed Live but does not show when the feed last updated."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Literal operational, broadcast, event, and real-time data states may use a live badge when the state can be verified from nearby context.",
+      "examples": ["Live broadcast", "Live production deployment", "Live market feed"]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Identify live-status labels and evaluate whether nearby copy, state metadata, timestamps, or interface controls establish a literal live process.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": ["live", "live now", "currently live"],
+      "caseSensitive": false,
+      "wordBoundary": true
+    },
+    "limitations": [
+      "Source text alone may not prove whether a backend state is genuinely live.",
+      "Quoted user content and event titles must not be treated as interface status labels."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "high",
+    "scenarios": [
+      "Operational dashboards, streaming products, sports applications, and market-data tools use live literally."
+    ],
+    "mitigations": [
+      "Require badge-like presentation plus missing evidence of a real-time state before reporting the semantic concern."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.badges.decorative-live-state.violation.static-saas-hero",
+      "caseType": "violation",
+      "description": "Static marketing hero with decorative green live badge and no real-time behavior."
+    },
+    {
+      "fixtureId": "fixture.badges.decorative-live-state.control.streaming-broadcast",
+      "caseType": "control",
+      "description": "Streaming interface with a verifiable current broadcast and live timestamp."
+    },
+    {
+      "fixtureId": "fixture.badges.decorative-live-state.borderline.unverified-feed",
+      "caseType": "borderline",
+      "description": "Data-feed dashboard using a live badge without a last-updated indicator."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "This proposal is intentionally semantic and should not become a universal word blacklist."
+  ]
+}

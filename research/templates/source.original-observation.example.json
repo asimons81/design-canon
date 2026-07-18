@@ -1,0 +1,23 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.decorative-live-badge",
+  "sourceType": "original-observation",
+  "title": "Decorative live badges on static marketing surfaces",
+  "sourceLocation": "Independent review of synthetic and publicly visible AI-generated landing-page samples",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "Static marketing pages frequently use a green LIVE badge as generic technological decoration even when no live process, broadcast, or real-time state exists.",
+  "supportingClaims": [
+    "The design problem is the mismatch between the displayed state and the product behavior, not the word live by itself.",
+    "Literal live states require control examples so a detector does not suppress valid operational status information."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true,
+    "notes": "Original observation recorded for clean-room proposal development."
+  }
+}
