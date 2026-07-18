@@ -6,34 +6,56 @@
       "category": "direction",
       "title": "Name the visual direction",
       "severity": "error",
-      "appliesTo": ["*"],
+      "appliesTo": [
+        "*"
+      ],
       "instruction": "Before implementation, state the visual direction in one concrete sentence. It must describe composition, typography, color behavior, and emotional register. Avoid mood-word soup.",
       "rationale": "A named direction prevents the model from blending unrelated trends into a generic interface.",
-      "verify": ["The direction could guide a second designer without screenshots.", "Every major visual choice supports the same direction."]
+      "verify": [
+        "The direction could guide a second designer without screenshots.",
+        "Every major visual choice supports the same direction."
+      ]
     },
     {
       "id": "tokens.establish-system",
       "category": "tokens",
       "title": "Establish a small token system",
       "severity": "error",
-      "appliesTo": ["*"],
+      "appliesTo": [
+        "*"
+      ],
       "instruction": "Define reusable tokens for type scale, spacing, color roles, radius, and depth before multiplying components. Prefer a deliberate small system over scattered one-off values.",
-      "verify": ["Repeated values are represented by tokens.", "Token names describe roles rather than raw appearance."]
+      "verify": [
+        "Repeated values are represented by tokens.",
+        "Token names describe roles rather than raw appearance."
+      ]
     },
     {
       "id": "typography.generic-primary-font",
       "category": "typography",
       "title": "Do not default to the model's favorite font",
       "severity": "warning",
-      "appliesTo": ["marketing", "editorial"],
+      "appliesTo": [
+        "marketing",
+        "editorial"
+      ],
       "instruction": "Do not choose Inter, Roboto, Arial, or system-ui as the primary display face without an explicit reason. Select typography that supports the content and brand, then pair it with a readable text face.",
       "rationale": "The problem is unexamined defaulting, not the fonts themselves.",
-      "verify": ["Display typography has a documented role.", "Body text remains readable across target viewports."],
+      "verify": [
+        "Display typography has a documented role.",
+        "Body text remains readable across target viewports."
+      ],
       "detect": {
         "message": "Generic primary font detected. Keep it only when the design rationale explicitly calls for it.",
         "patterns": [
-          { "source": "font-family\\s*:\\s*['\\\"]?(Inter|Roboto|Arial|system-ui)", "flags": "gi" },
-          { "source": "fontFamily\\s*:\\s*['\\\"](Inter|Roboto|Arial|system-ui)", "flags": "gi" }
+          {
+            "source": "font-family\\s*:\\s*['\\\"]?(Inter|Roboto|Arial|system-ui)",
+            "flags": "gi"
+          },
+          {
+            "source": "fontFamily\\s*:\\s*['\\\"](Inter|Roboto|Arial|system-ui)",
+            "flags": "gi"
+          }
         ]
       }
     },
@@ -42,14 +64,25 @@
       "category": "color",
       "title": "Reject decorative purple-gradient defaulting",
       "severity": "warning",
-      "appliesTo": ["marketing", "product-app"],
+      "appliesTo": [
+        "marketing",
+        "product-app"
+      ],
       "instruction": "Do not use a purple or indigo gradient as generic technological decoration. A gradient is acceptable only when it carries brand meaning, hierarchy, state, or spatial function.",
-      "verify": ["The gradient has a stated job beyond making the interface look 'AI'."],
+      "verify": [
+        "The gradient has a stated job beyond making the interface look 'AI'."
+      ],
       "detect": {
         "message": "Purple or indigo gradient heuristic matched. Confirm that it serves a real design function.",
         "patterns": [
-          { "source": "(linear|radial)-gradient\\([^)]*(#7c3aed|#8b5cf6|#6366f1|purple|indigo)", "flags": "gi" },
-          { "source": "from-(purple|violet|indigo)-\\d+[^\\n]*to-(purple|violet|indigo)-\\d+", "flags": "gi" }
+          {
+            "source": "(linear|radial)-gradient\\([^)]*(#7c3aed|#8b5cf6|#6366f1|purple|indigo)",
+            "flags": "gi"
+          },
+          {
+            "source": "from-(purple|violet|indigo)-\\d+[^\\n]*to-(purple|violet|indigo)-\\d+",
+            "flags": "gi"
+          }
         ]
       }
     },
@@ -58,13 +91,22 @@
       "category": "layout",
       "title": "Do not center every decision",
       "severity": "warning",
-      "appliesTo": ["marketing", "editorial"],
+      "appliesTo": [
+        "marketing",
+        "editorial"
+      ],
       "instruction": "Avoid stacking a centered headline, centered paragraph, centered buttons, and centered decorative art by reflex. Choose alignment and asymmetry based on reading flow and focal hierarchy.",
-      "verify": ["The composition has an intentional reading path.", "Alignment changes are structural, not random."],
+      "verify": [
+        "The composition has an intentional reading path.",
+        "Alignment changes are structural, not random."
+      ],
       "detect": {
         "message": "Repeated centered-layout utilities detected. Review whether the whole composition has collapsed into a template.",
         "patterns": [
-          { "source": "text-center[^\\n]{0,200}mx-auto[^\\n]{0,200}(justify-center|items-center)", "flags": "gi" }
+          {
+            "source": "text-center[^\\n]{0,200}mx-auto[^\\n]{0,200}(justify-center|items-center)",
+            "flags": "gi"
+          }
         ]
       }
     },
@@ -73,14 +115,27 @@
       "category": "depth",
       "title": "Use one depth language",
       "severity": "warning",
-      "appliesTo": ["*"],
+      "appliesTo": [
+        "*"
+      ],
       "instruction": "Do not combine large soft shadows, glows, glass blur, borders, and floating cards on every surface. Choose one dominant depth language and reserve stronger elevation for meaningful hierarchy.",
-      "verify": ["Elevation levels map to semantic importance.", "Most surfaces remain visually quiet."],
+      "verify": [
+        "Elevation levels map to semantic importance.",
+        "Most surfaces remain visually quiet."
+      ],
       "detect": {
         "message": "Large shadow or glow heuristic matched. Verify that depth is scarce and hierarchical.",
         "patterns": [
-          { "source": "box-shadow\\s*:[^;]*(0\\s+20px|0\\s+24px|0\\s+30px|rgba\\([^)]*,\\s*0\\.[4-9])", "flags": "gi", "multiple": true },
-          { "source": "shadow-(2xl|\\[0_[^\\]]+\\])", "flags": "gi", "multiple": true }
+          {
+            "source": "box-shadow\\s*:[^;]*(0\\s+20px|0\\s+24px|0\\s+30px|rgba\\([^)]*,\\s*0\\.[4-9])",
+            "flags": "gi",
+            "multiple": true
+          },
+          {
+            "source": "shadow-(2xl|\\[0_[^\\]]+\\])",
+            "flags": "gi",
+            "multiple": true
+          }
         ]
       }
     },
@@ -89,14 +144,27 @@
       "category": "shape",
       "title": "Do not turn every surface into a pill",
       "severity": "warning",
-      "appliesTo": ["*"],
+      "appliesTo": [
+        "*"
+      ],
       "instruction": "Use radius as part of the product's shape language. Avoid large rounded corners on every card, control, image, panel, and badge unless the direction explicitly demands it.",
-      "verify": ["Radius values come from tokens.", "Different component roles do not all collapse into the same blob shape."],
+      "verify": [
+        "Radius values come from tokens.",
+        "Different component roles do not all collapse into the same blob shape."
+      ],
       "detect": {
         "message": "Large-radius utility detected. Review aggregate usage across the page.",
         "patterns": [
-          { "source": "rounded-(2xl|3xl|full)", "flags": "gi", "multiple": true },
-          { "source": "border-radius\\s*:\\s*(2[4-9]|[3-9]\\d)px", "flags": "gi", "multiple": true }
+          {
+            "source": "rounded-(2xl|3xl|full)",
+            "flags": "gi",
+            "multiple": true
+          },
+          {
+            "source": "border-radius\\s*:\\s*(2[4-9]|[3-9]\\d)px",
+            "flags": "gi",
+            "multiple": true
+          }
         ]
       }
     },
@@ -105,14 +173,27 @@
       "category": "motion",
       "title": "Animate named properties",
       "severity": "warning",
-      "appliesTo": ["*"],
+      "appliesTo": [
+        "*"
+      ],
       "instruction": "Do not animate every property. Name the properties that communicate state, preserve reduced-motion behavior, and keep motion subordinate to interaction.",
-      "verify": ["Animations have a user-facing purpose.", "prefers-reduced-motion is respected where motion is nonessential."],
+      "verify": [
+        "Animations have a user-facing purpose.",
+        "prefers-reduced-motion is respected where motion is nonessential."
+      ],
       "detect": {
         "message": "transition-all or transition: all detected. Animate only the properties that should move.",
         "patterns": [
-          { "source": "transition-all", "flags": "gi", "multiple": true },
-          { "source": "transition\\s*:\\s*all", "flags": "gi", "multiple": true }
+          {
+            "source": "transition-all",
+            "flags": "gi",
+            "multiple": true
+          },
+          {
+            "source": "transition\\s*:\\s*all",
+            "flags": "gi",
+            "multiple": true
+          }
         ]
       }
     },
@@ -121,14 +202,27 @@
       "category": "accessibility",
       "title": "Preserve visible keyboard focus",
       "severity": "error",
-      "appliesTo": ["*"],
+      "appliesTo": [
+        "*"
+      ],
       "instruction": "Never remove focus indication without replacing it with an equally visible focus-visible treatment that meets contrast requirements.",
-      "verify": ["Every interactive element can be located with keyboard focus.", "Focus treatment is visible in light and dark contexts."],
+      "verify": [
+        "Every interactive element can be located with keyboard focus.",
+        "Focus treatment is visible in light and dark contexts."
+      ],
       "detect": {
         "message": "Focus outline is disabled. Add an explicit, visible :focus-visible replacement.",
         "patterns": [
-          { "source": "outline\\s*:\\s*(none|0)", "flags": "gi", "multiple": true },
-          { "source": "outline-none", "flags": "gi", "multiple": true }
+          {
+            "source": "outline\\s*:\\s*(none|0)",
+            "flags": "gi",
+            "multiple": true
+          },
+          {
+            "source": "outline-none",
+            "flags": "gi",
+            "multiple": true
+          }
         ]
       }
     },
@@ -137,13 +231,22 @@
       "category": "content",
       "title": "Ban placeholder hero language",
       "severity": "warning",
-      "appliesTo": ["marketing"],
+      "appliesTo": [
+        "marketing"
+      ],
       "instruction": "Replace abstract claims with a concrete promise, mechanism, or proof. Avoid interchangeable hero phrases that could headline any AI startup.",
-      "verify": ["The headline identifies a specific outcome or tension.", "The supporting copy explains how the product earns the claim."],
+      "verify": [
+        "The headline identifies a specific outcome or tension.",
+        "The supporting copy explains how the product earns the claim."
+      ],
       "detect": {
         "message": "Generic hero phrase detected. Replace it with product-specific language and proof.",
         "patterns": [
-          { "source": "(revolutionize your|unlock the power of|elevate your|supercharge your|future of innovation|next generation of)", "flags": "gi", "multiple": true }
+          {
+            "source": "(revolutionize your|unlock the power of|elevate your|supercharge your|future of innovation|next generation of)",
+            "flags": "gi",
+            "multiple": true
+          }
         ]
       }
     },
@@ -152,27 +255,68 @@
       "category": "typography",
       "title": "Protect reading measure",
       "severity": "error",
-      "appliesTo": ["editorial"],
+      "appliesTo": [
+        "editorial"
+      ],
       "instruction": "Keep long-form body text within a deliberate reading measure, generally near 55 to 75 characters per line, and provide enough line-height for sustained reading.",
-      "verify": ["Article paragraphs do not span the full viewport.", "Body size and leading remain comfortable on mobile and desktop."]
+      "verify": [
+        "Article paragraphs do not span the full viewport.",
+        "Body size and leading remain comfortable on mobile and desktop."
+      ]
     },
     {
       "id": "product-app.density-by-task",
       "category": "layout",
       "title": "Set density from task frequency",
       "severity": "error",
-      "appliesTo": ["product-app"],
+      "appliesTo": [
+        "product-app"
+      ],
       "instruction": "Choose spacing and control density from task frequency and information load. Do not apply spacious marketing-page rhythm to operational interfaces or cram occasional workflows into permanent dashboard density.",
-      "verify": ["Primary repeated tasks are fast to scan and operate.", "Low-frequency actions do not dominate permanent space."]
+      "verify": [
+        "Primary repeated tasks are fast to scan and operate.",
+        "Low-frequency actions do not dominate permanent space."
+      ]
     },
     {
       "id": "marketing.single-primary-action",
       "category": "hierarchy",
       "title": "Protect one primary action",
       "severity": "error",
-      "appliesTo": ["marketing"],
+      "appliesTo": [
+        "marketing"
+      ],
       "instruction": "Each major section should have one obvious primary action. Secondary links may exist, but competing button styles must not flatten the hierarchy.",
-      "verify": ["A first-time visitor can identify the intended next step within seconds.", "Primary action styling remains consistent across the page."]
+      "verify": [
+        "A first-time visitor can identify the intended next step within seconds.",
+        "Primary action styling remains consistent across the page."
+      ]
+    },
+    {
+      "id": "forms.input-labels-required",
+      "category": "forms",
+      "title": "Form controls must have an accessible name",
+      "severity": "error",
+      "appliesTo": [
+        "marketing",
+        "product-app"
+      ],
+      "instruction": "Every input, textarea, and select element must have an accessible name. Provide it via a <label> element, aria-label, or aria-labelledby. Do not rely on placeholder text as the sole identifier.",
+      "rationale": "Placeholder text disappears on input, leaving users without a referent. WCAG requires every interactive control to have an accessible name. A label element is preferred because it provides both a visible label and an accessible name.",
+      "verify": [
+        "Every form control has a <label for=\"\"> association, wrapping label, aria-label, or aria-labelledby.",
+        "Controls labeled by placeholder text alone are not compliant."
+      ],
+      "detect": {
+        "message": "Form control with no accessible name detected. Use a <label>, aria-label, or aria-labelledby.",
+        "patterns": [
+          {
+            "source": "forms\\.input-labels-required",
+            "flags": "gi",
+            "multiple": false
+          }
+        ]
+      }
     }
   ]
 }

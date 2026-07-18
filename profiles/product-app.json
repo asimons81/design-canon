@@ -2,5 +2,17 @@
   "id": "product-app",
   "name": "Product Applications",
   "intent": "Create an operational interface that makes repeated work fast, legible, and predictable. Distinctiveness should come from coherent product character, not reduced usability or ornamental friction.",
-  "includeCategories": ["accessibility", "color", "depth", "direction", "layout", "motion", "shape", "tokens"]
+  "includeCategories": [
+    "accessibility",
+    "color",
+    "depth",
+    "direction",
+    "layout",
+    "motion",
+    "shape",
+    "tokens"
+  ],
+  "includeRules": [
+    "forms.input-labels-required"
+  ]
 }
