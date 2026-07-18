@@ -1,1 +1,0 @@
-# Anti-Slop Fixture Suite
