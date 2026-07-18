@@ -1,201 +1,192 @@
-# Design Canon — Agent Compatibility Matrix
+# Design Canon Agent Compatibility Matrix
 
-> **Research date:** 2026-07-18
-> Every claim tagged with one of: `verified fact`, `research finding`, `assumption`, `proposal`.
-> Conflicting or undocumented behavior is flagged explicitly. Where documentation was unavailable or ambiguous, the limitation is stated rather than guessed.
+> **Status:** Maintainer-reviewed research, 2026-07-18
+> **Scope:** Persistent project instructions and portable design-policy delivery.
+> **Evidence rule:** Claims marked **verified** are supported by the linked primary documentation. Claims marked **proposal** describe a Design Canon integration decision that has not been implemented.
 
----
+## Important distinction
 
-## How to Read This Matrix
+Design Canon currently has a `design` compilation target that conventionally writes `DESIGN.md`. That output is a markdown policy document. It is **not yet guaranteed to conform to Google Labs' structured DESIGN.md specification**, whose optional YAML frontmatter carries machine-readable design tokens.
 
-Each tool is evaluated across 12 attributes. After the tool table, a **cross-cutting comparison** summarizes key differences, and a **conflicts & unknowns** section flags behaviors that are contradictory or undocumented.
+Until a dedicated Google DESIGN.md adapter exists and passes the upstream validator, documentation must describe these as separate formats:
 
----
+- **Design Canon policy document:** compiled contextual rules and verification guidance.
+- **Google DESIGN.md:** an open visual-identity format with an optional token-bearing YAML frontmatter and ordered markdown sections.
+
+## Compatibility summary
+
+| Target | Native project instruction format | Nested or scoped behavior | Recommended Design Canon delivery | Confidence |
+|---|---|---|---|---|
+| Hermes Agent | `.hermes.md` / `HERMES.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.cursor/rules/*.mdc` | `.hermes.md` can be found up to the git root; nested context can be discovered progressively. Only one top-level project-context type wins by priority. | Root `AGENTS.md` managed block for portable always-on policy; optional `SKILL.md` for on-demand workflow | verified |
+| OpenAI Codex | `AGENTS.md` | Directory-scoped; deeper files apply to their subtree and take precedence for conflicting instructions | Root or package-level `AGENTS.md` managed block | verified |
+| Claude Code | `CLAUDE.md`, `.claude/CLAUDE.md`, `CLAUDE.local.md`, `.claude/rules/*.md` | Parent files load at launch; subdirectory files load when Claude works there; instruction layers are additive | Root `CLAUDE.md` managed block or a generated file imported from `CLAUDE.md` | verified |
+| Cursor | `.cursor/rules/*.mdc`, root `AGENTS.md`, legacy `.cursorrules`; Cursor CLI also reads root `CLAUDE.md` | Project rules can be scoped by rule type and path patterns; current documented `AGENTS.md` support is root-level | `.cursor/rules/design-canon.mdc`, with `AGENTS.md` as the simple portable alternative | verified |
+| Windsurf | `.windsurf/rules/*.md`, `AGENTS.md`, legacy workspace rules | Root `AGENTS.md` is always on; nested `AGENTS.md` is automatically scoped to its directory; workspace rules support explicit activation modes | `.windsurf/rules/design-canon.md` or `AGENTS.md` | verified |
+| Generic AGENTS.md consumers | `AGENTS.md` | Scope and precedence vary by consumer | Root `AGENTS.md`; package-level files only when the target tool's behavior is known | verified convention, tool-dependent behavior |
+| Google DESIGN.md consumers | `DESIGN.md` | The specification defines file structure, not universal auto-discovery behavior | Dedicated future adapter validated with `@google/design.md`; do not claim current compiler output conforms | verified format, proposal adapter |
+| Agent Skills consumers | `SKILL.md` plus optional supporting files | Loaded according to the host tool's skill system, not repository directory inheritance | Existing Design Canon skill or generated profile-specific skill | verified format, tool-dependent placement |
 
 ## 1. Hermes Agent
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | `.hermes.md` / `HERMES.md` (highest priority project context), `AGENTS.md` (primary), `CLAUDE.md` (cross-tool), `.cursorrules` (legacy Cursor compat), `.cursor/rules/*.mdc` (Cursor rule modules), `SOUL.md` (global identity, loaded from `HERMES_HOME` only). Skills use `SKILL.md` with YAML frontmatter via the skill system. | `verified fact` |
-| **Expected file locations** | Project context files: CWD at startup, walks to git root. `SOUL.md`: `~/.hermes/SOUL.md` or `$HERMES_HOME/SOUL.md` only. Skills: `~/.hermes/skills/<category>/<name>/SKILL.md` or external skill dirs via `skills.external_dirs` config. | `verified fact` |
-| **Frontmatter requirements** | Project context files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `.cursorrules`): **none**. Skills (`SKILL.md`): requires YAML frontmatter with at least `name` and `description`. `.mdc` files: requires YAML frontmatter with `description` and optional `globs`. | `verified fact` |
-| **Precedence rules** | Project context priority (first match wins): `.hermes.md` → `AGENTS.md` → `CLAUDE.md` → `.cursorrules`. Skills are on-demand (loaded via `/skill` command or `skill_view` tool). `SOUL.md` is always loaded independently as slot #1 in the system prompt. If the working directory changes mid-session, progressive discovery loads context from subdirectories on access. | `verified fact` |
-| **Directory inheritance** | **Yes — progressive subdirectory discovery.** At startup, Hermes loads `AGENTS.md` from CWD (or git root). As the agent navigates into subdirectories (via `read_file`, `terminal`, `search_files`), it discovers `AGENTS.md`/`CLAUDE.md`/`.cursorrules` in those directories and injects them into context. Also walks **up to 5 parent directories** from any file path the agent touches. Each directory checked at most once per session. | `verified fact` |
-| **Size / context limitations** | Default `context_file_max_chars` = **20,000 chars** (~7,000 tokens). Truncation: 70% head / 20% tail / 10% marker. Progressive discovery files capped at **8,000 chars** each. | `verified fact` |
-| **Installation procedure** | Context files: create file at project root or target directory. Skills: `skill_manage(action='create', name='...')` tool call, or `/learn` command, or place manually in `~/.hermes/skills/`. | `verified fact` |
-| **Uninstall procedure** | Context files: delete the file. Skills: `skill_manage(action='delete', name='...')`. | `verified fact` |
-| **Refresh / reload behavior** | Context files are read at **session start** and during **progressive subdirectory discovery** (live). Change a project-root `AGENTS.md` mid-session? It is **not re-read** unless the user triggers a new session. Skills load on-demand per invocation. After `/compact`, project-root context files survive and are re-read from disk; nested ones reload lazily when files in that subdirectory are accessed. | `verified fact` |
-| **Known limitations** | Only **one** project context file type loads per session (the first found in priority order). Progressive discovery only checks subdirectories the agent actually visits. YAML frontmatter in context files is **not parsed** — it's treated as plain markdown (only `.mdc` files get frontmatter parsing). Prompt injection scanner can falsely block benign content. | `verified fact` |
-| **Official source links** | [Context Files docs](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files/), [Skills docs](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills), [Personality/SOUL.md](https://hermes-agent.nousresearch.com/docs/user-guide/features/personality/), [Config reference](https://hermes-agent.nousresearch.com/docs/user-guide/configuration) | `verified fact` |
+### Verified behavior
 
----
+- Startup project-context priority is `.hermes.md` / `HERMES.md`, then `AGENTS.md`, then `CLAUDE.md`, then Cursor-compatible rules. The first matching project-context type is used.
+- `SOUL.md` is separate global identity, not a project policy file.
+- The default automatic context-file limit is 20,000 characters with head/tail truncation.
+- Nested project context may be discovered progressively as files and directories are accessed.
+- `SKILL.md` is suitable for an on-demand Design Canon procedure.
 
-## 2. OpenAI Codex (CLI)
+### Design Canon implication
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | `AGENTS.md` (primary), `CLAUDE.md` (cross-compat), `.cursorrules` (cross-compat). Also reads `AGENTS.override.md` from global scope. | `research finding` |
-| **Expected file locations** | **Multiple search locations in order:** (1) global: `~/.codex/AGENTS.override.md` (if exists) or `~/.codex/AGENTS.md`, (2) repo root `AGENTS.md`, (3) CWD `AGENTS.md`, (4) subdirectory `AGENTS.md` (nested, closest to edited file wins). | `research finding` |
-| **Frontmatter requirements** | **None.** Plain markdown. Standard `AGENTS.md` convention (no YAML frontmatter). | `verified fact` |
-| **Precedence rules** | **Closest `AGENTS.md` to the edited file wins.** Explicit user chat prompts override everything. If a monorepo has 88 `AGENTS.md` files (as the main OpenAI repo does), the one nearest the current file takes precedence for conflicting instructions. Global (`~/.codex/`) files are lowest priority. | `verified fact` |
-| **Directory inheritance** | **Yes — nested `AGENTS.md` support.** More-deeply-nested files take precedence for conflicting instructions. Different tools implement this differently: Codex reads the nearest `AGENTS.md` to the file being edited. | `research finding` |
-| **Size / context limitations** | Not explicitly documented by OpenAI. `project_doc_max_bytes` config setting controls AGENTS.md reading. Setting `project_doc_max_bytes=0` suppresses AGENTS.md loading entirely. Practical limit derived from context window (~100K-200K tokens depending on model). | `research finding` |
-| **Installation procedure** | Create `AGENTS.md` at project root (or desired scope). Codex CLI auto-discovers it. No registration needed. | `verified fact` |
-| **Uninstall procedure** | Delete the `AGENTS.md` file. | `verified fact` |
-| **Refresh / reload behavior** | Codex reads `AGENTS.md` at **session start**. Changes mid-session are **not re-read** unless a new session starts. After context compaction, AGENTS.md content may be lost or partially re-injected (observed in bug reports: issue #25792). | `research finding` |
-| **Known limitations** | Documentation for AGENTS.md behavior is sparse (the official docs/agents_md.md simply redirects to `developers.openai.com/codex/guides/agents-md`). Exact merging behavior when multiple AGENTS.md files exist is documented at the agents.md ecosystem level but not in OpenAI's own docs. `AGENTS.override.md` global file behavior partially documented on learn.chatgpt.com but not in primary docs. | `research finding` |
-| **Official source links** | [Codex GitHub — AGENTS.md redirect](https://github.com/openai/codex/blob/main/docs/agents_md.md), [Introducing Codex](https://openai.com/index/introducing-codex/), [Codex CLI Guide](https://openaicli.com/docs), [AGENTS.md standard](https://agents.md/) | `verified fact` |
+Use `AGENTS.md` when portability matters. Use `.hermes.md` only for Hermes-specific behavior. Avoid generating both at the same level because Hermes will select the higher-priority file rather than merge both.
 
----
+### Primary sources
 
-## 3. Claude Code (CLI)
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files/
+- https://hermes-agent.nousresearch.com/docs/developer-guide/prompt-assembly/
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/skills
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | `CLAUDE.md` (primary), `CLAUDE.local.md` (user-local overrides, gitignored), `AGENTS.md` (cross-compat). Also reads `.claude/rules/*.md` (path-scoped modular rules), `.claude/commands/*.md` (custom slash commands), `.claude/settings.json` / `.claude/settings.local.json` (config). Auto memory: `MEMORY.md` + topic files under `~/.claude/projects/<project>/memory/`. | `verified fact` |
-| **Expected file locations** | `CLAUDE.md`: any directory in project tree (including root, subdirectories). `CLAUDE.local.md`: same directories as CLAUDE.md. `.claude/rules/`: project root or any subdirectory. Managed CLAUDE.md (organization): deployed via settings policy. Settings files: in `.claude/` directory at any scope. Global scope: `~/.claude/`. | `verified fact` |
-| **Frontmatter requirements** | `CLAUDE.md`: **none** (plain markdown). `.claude/rules/*.md`: **YAML frontmatter** with required `paths` (glob patterns that determine when the rule activates). `CLAUDE.local.md`: plain markdown, no frontmatter needed. `settings.json`: JSON format. | `verified fact` |
-| **Precedence rules** | **Layered hierarchy:** Global (~/.claude/) → Project root → Subdirectory → `.claude/rules/*.md` (path-scoped) → Managed policy (organization-level, cannot be excluded). Later/more specific locations override broader ones. File scope precedence: `CLAUDE.local.md` > `CLAUDE.md` at the same level. Settings layers: user → project → local → policy → command-line (`--settings`). Managed CLAUDE.md is the highest priority and cannot be excluded. | `verified fact` |
-| **Directory inheritance** | **Yes — walks up the directory tree** from CWD toward repo root, collecting every `CLAUDE.md` it encounters. Files higher in the tree load first; more specific (deeper) files take precedence for conflicting instructions. Subdirectory `CLAUDE.md` files are loaded **lazily** — when Claude reads a file in that subdirectory. Use `claudeMdExcludes` in settings to skip specific `CLAUDE.md` files by path or glob pattern. | `verified fact` |
-| **Size / context limitations** | `CLAUDE.md`: loaded **in full** regardless of length, but shorter files produce better adherence. Docs recommend keeping under ~200 lines. Auto memory: `MEMORY.md` capped at first **200 lines or 25 KB** (whichever comes first). YAML frontmatter and HTML comments are stripped before counting. Topic files loaded on demand — no startup cap. | `verified fact` |
-| **Installation procedure** | Create `CLAUDE.md` at desired location in project tree. Claude Code auto-discovers it. `/memory` command lets you view/edit files. `InstructionsLoaded` hook logs which files loaded. Managed CLAUDE.md deployed by org admins via settings. | `verified fact` |
-| **Uninstall procedure** | Delete the `CLAUDE.md` file. Remove via `/memory` UI. Managed files cannot be excluded by users. | `verified fact` |
-| **Refresh / reload behavior** | `CLAUDE.md` is read **at session start**. Project-root `CLAUDE.md` **survives `/compact`** — Claude re-reads it from disk and re-injects. Nested `CLAUDE.md` files are **not re-injected automatically** after compaction; they reload the next time Claude reads a file in that subdirectory. After editing a settings file, run `/status` to confirm it was loaded. Auto memory is read/written throughout the session. | `verified fact` |
-| **Known limitations** | `CLAUDE.md` content is delivered as a **user message** after the system prompt, not as part of the system prompt itself — Claude tries to follow it but there's no hard enforcement. Vague or conflicting instructions across multiple `CLAUDE.md` files may cause arbitrary selection. The `--bare` flag explicitly skips `CLAUDE.md`. Auto memory is machine-local and not shared across machines. | `verified fact` |
-| **Official source links** | [Claude Code Memory docs](https://code.claude.com/docs/en/memory), [CLAUDE.md hierarchy guide](https://agentfactory.panaversity.org/docs/General-Agents-Foundations/claude-code-teams-cicd/claude-md-configuration-hierarchy), [.claude directory docs](https://code.claude.com/docs/en/claude-directory), [Claude Code Settings](https://code.claude.com/docs/en/settings) | `verified fact` |
+## 2. OpenAI Codex
 
----
+### Verified behavior
 
-## 4. Cursor IDE
+- Codex uses `AGENTS.md` for repository instructions.
+- An `AGENTS.md` applies to the directory tree rooted where the file lives.
+- More deeply nested `AGENTS.md` files take precedence when instructions conflict.
+- Direct system, developer, and user instructions outrank `AGENTS.md`.
+- Project document loading is bounded and configurable. Adapter output should remain concise and must not assume the model's full context window is available for project instructions.
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | **Current:** `.cursor/rules/*.mdc` (modular rule files with YAML frontmatter), `AGENTS.md` (cross-IDE standard, project root). **Global:** User Rules (in Cursor settings). **Automated:** Memories (automatically generated rules from chat). **Legacy (still supported, deprecated):** `.cursorrules`. | `verified fact` |
-| **Expected file locations** | `.cursor/rules/`: project root. `AGENTS.md`: project root. `.cursorrules`: project root (legacy). User Rules: Cursor settings UI (global). | `verified fact` |
-| **Frontmatter requirements** | `.mdc` files: yes — YAML frontmatter with `description` (required) and `globs` (optional, determines which files the rule applies to). `AGENTS.md`: **none**. `.cursorrules`: **none** (plain text). | `verified fact` |
-| **Precedence rules** | Priority: **User Rules** (global, always apply) → **Project Rules** (`.cursor/rules/*.mdc`) → **AGENTS.md** → **Memories** (auto-generated). Within `.cursor/rules/`: all `.mdc` files loaded, with `globs` field determining applicability to specific files. `.cursorrules` (legacy) treated as a single monolithic rule file. | `research finding` |
-| **Directory inheritance** | **Yes — glob-scoped rules.** `.mdc` files can have a `globs` field that restricts them to specific file patterns. Rules apply when files matching the glob are accessed. Without a `globs` field, the rule applies globally. `AGENTS.md` at project root applies globally. | `research finding` |
-| **Size / context limitations** | Not explicitly documented. Context window dependent. Practical guidance: keep rules focused and modular. `.mdc` modular approach naturally limits per-file size. | `assumption` |
-| **Installation procedure** | Create `.cursor/rules/design-canon.mdc` with required frontmatter and rule content. Or create `AGENTS.md` at project root. Or use legacy `.cursorrules`. Rules can also be added through Cursor's UI. | `verified fact` |
-| **Uninstall procedure** | Delete the rule file(s). Remove from Cursor's UI if added there. | `verified fact` |
-| **Refresh / reload behavior** | Requires **IDE reload** (`Developer: Reload Window`) for changes to take effect. No hot-reload. AGENTS.md changes may take effect on new Cursor chat/session without full reload (undocumented — behavior varies). | `research finding` |
-| **Known limitations** | `.cursorrules` is deprecated but still functional. `.mdc` rules require specific YAML frontmatter format. All project rules in `.cursor/rules/` are loaded at startup — no lazy loading per subdirectory. AGENTS.md support is a later addition and may not be as deeply integrated as `.mdc`. | `verified fact` |
-| **Official source links** | [Cursor Rules docs](https://docs.cursor.com/context/rules), [Cursor Docs](https://cursor.com/docs/rules) | `verified fact` |
+### Corrections to the original draft
 
----
+Codex should **not** be documented as automatically reading `CLAUDE.md` or `.cursorrules`. Those are not Codex-native project instruction files.
 
-## 5. Windsurf IDE (now Devin Desktop)
+### Design Canon implication
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | **Current:** `.devin/rules/*.md` (post-June 2026 rebrand to Devin Desktop). **Legacy:** `.windsurf/rules/*.md` (kept as fallback), `.windsurfrules` (legacy single file, still read). Also: `AGENTS.md` (cross-IDE recognition), `prompts.md` (for named prompt shortcuts, accessed via `/` in Cascade). | `research finding` |
-| **Expected file locations** | `.devin/rules/` or `.windsurf/rules/`: project root. `.windsurfrules`: project root (legacy). `AGENTS.md`: project root. | `research finding` |
-| **Frontmatter requirements** | Not publicly documented for `.devin/rules/*.md` files. Likely follows similar pattern to Cursor's `.mdc`. `AGENTS.md`: none. `.windsurfrules`: none (plain markdown). | `assumption` |
-| **Precedence rules** | Priority order: **Global Rules** (user settings) → **`.windsurfrules` or `.devin/rules/`** → **Memories** (auto-accumulated from chat) → **User prompt**. Exact precedence between `.windsurfrules` and `.devin/rules/*.md` when both exist is undocumented. | `research finding` |
-| **Directory inheritance** | Not documented. Based on industry patterns, likely root-level rules apply globally. The directory-based approach (`.windsurf/rules/`) suggests potential for glob-scoped rules similar to Cursor, but unconfirmed. | `assumption` |
-| **Size / context limitations** | Not documented. Context window dependent. | `assumption` |
-| **Installation procedure** | Create `.windsurfrules` at project root, or create rule files under `.windsurf/rules/` or `.devin/rules/`. | `research finding` |
-| **Uninstall procedure** | Delete the rule file(s) or directory. | `research finding` |
-| **Refresh / reload behavior** | Not documented. Most IDEs in this category require restart/reload. | `assumption` |
-| **Known limitations** | **Documentation is sparse.** The product recently rebranded from Windsurf to Devin Desktop (June 2026), which may cause further documentation churn. Exact rule format, frontmatter requirements, and loading behavior should be verified against actual product behavior. `prompts.md` is a Windsurf-specific feature not shared with other tools. | `research finding` |
-| **Official source links** | [Windsurf Cascade docs](https://docs.windsurf.com/plugins/cascade/cascade-overview), [Windsurf Rules guide (third-party)](https://design.dev/guides/windsurf-rules/), [Devin Desktop docs](https://docs.devin.ai/desktop/cascade/memories) | `research finding` |
+Generate or update a managed section in `AGENTS.md`. A monorepo adapter may generate nested files only when the maintainer explicitly selects package scopes.
 
----
+### Primary sources
 
-## 6. Generic AGENTS.md (Cross-IDE Standard)
+- https://github.com/openai/codex/blob/main/docs/agents_md.md
+- https://github.com/openai/codex/blob/main/codex-rs/protocol/src/prompts/base_instructions/default.md
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | `AGENTS.md` (standardized), `AGENT.md` (alias, can symlink to AGENTS.md for backward compat). | `verified fact` |
-| **Expected file locations** | Repository root (primary). Also recognized in `.github/` by GitHub UI. Nested: subdirectory `AGENTS.md` files for monorepo packages. | `verified fact` |
-| **Frontmatter requirements** | **None.** Pure markdown. No YAML frontmatter, no required fields. AGENTS.md is "just standard Markdown." | `verified fact` |
-| **Precedence rules** | **Closest AGENTS.md to the edited file wins.** Explicit user chat prompts override everything. The standard does not prescribe a single precedence algorithm — each tool implements it differently (Codex uses nearest-file, Claude Code walks directory tree, etc.). | `verified fact` |
-| **Directory inheritance** | **Yes — nested support.** Tools that implement the standard should read the nearest AGENTS.md in the directory tree. OpenAI's repo has 88 nested AGENTS.md files as a reference. | `verified fact` |
-| **Size / context limitations** | No hard limit defined by the standard. Tool-dependent. Practical guidance: keep concise (models follow shorter instructions better). | `verified fact` |
-| **Installation procedure** | Create `AGENTS.md` at project root. Most agents auto-discover it. | `verified fact` |
-| **Uninstall procedure** | Delete `AGENTS.md`. | `verified fact` |
-| **Refresh / reload behavior** | Tool-dependent. Most CLI tools read at session start; most IDEs require restart/reload. | `verified fact` |
-| **Known limitations** | Not all coding agents recognize AGENTS.md yet. The standard does not define a machine-readable metadata format (no frontmatter). Behavior when both AGENTS.md and tool-specific files (CLAUDE.md, .cursorrules, .windsurfrules) exist is tool-dependent and often undocumented. | `verified fact` |
-| **Official source links** | [agents.md](https://agents.md/) — stewarded by Agentic AI Foundation under Linux Foundation, [GitHub AGENTS.md search (60k+ repos)](https://github.com/search?q=path%3AAGENTS.md+NOT+is%3Afork+NOT+is%3Aarchived&type=code) | `verified fact` |
+## 3. Claude Code
 
----
+### Verified behavior
 
-## 7. DESIGN.md-Compatible Agents
+- Claude Code reads `CLAUDE.md`, `.claude/CLAUDE.md`, and `CLAUDE.local.md`.
+- Claude Code does **not** automatically read `AGENTS.md`. A `CLAUDE.md` can import it using `@AGENTS.md`, or a symlink can be used where practical.
+- Instruction files are concatenated into context. They are not a hard override chain.
+- Parent files load at session start. Subdirectory files load when Claude reads files in those directories.
+- Project rules live under `.claude/rules/*.md` and may be path-scoped.
+- Claude recommends concise instruction files, generally under about 200 lines.
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | `DESIGN.md` (standardized by Google Labs spec). | `verified fact` |
-| **Expected file locations** | Project root (by convention). Not a spec requirement but the de facto standard. | `research finding` |
-| **Frontmatter requirements** | **Yes — YAML frontmatter** is the core of the spec. Defines design tokens: `colors`, `typography`, `spacing`, `rounded`, `components`. Followed by markdown body sections (Overview, Colors, Typography, Layout, Elevation & Depth, Shapes, Components, Do's and Don'ts). Frontmatter must begin/end with `---`. | `verified fact` |
-| **Precedence rules** | Not standardized — tool-dependent. DESIGN.md is a data format, not a runtime instruction system. Tools that consume it may merge it with other instruction files. | `research finding` |
-| **Directory inheritance** | Not defined by the spec. Tool-dependent. By convention, one DESIGN.md per project/product. | `research finding` |
-| **Size / context limitations** | No hard limit in spec. Practical constraint: design system tokens typically 200-500 lines. | `verified fact` |
-| **Installation procedure** | Create `DESIGN.md` at project root with YAML frontmatter + markdown body. Explicit tool support required. | `verified fact` |
-| **Uninstall procedure** | Delete `DESIGN.md`. | `verified fact` |
-| **Refresh / reload behavior** | Tool-dependent. No standardized refresh mechanism. | `assumption` |
-| **Known limitations** | **Not universally recognized.** Requires explicit tool support. Currently compatible with: Claude Code, Cursor, Kiro, Windsurf (per designmd.app). Original Google Stitch integration. The spec is in "alpha" version. Consumer behavior for unknown content is documented (see spec), but actual tool implementations may vary. | `verified fact` |
-| **Official source links** | [DESIGN.md spec](https://github.com/google-labs-code/design.md/blob/main/docs/spec.md), [DESIGN.md library (461+ files)](https://designmd.app/), [Google Stitch announcement](https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/) | `verified fact` |
+### Design Canon implication
 
----
+The safest portable strategy is:
 
-## 8. Agent Skills System (agentskills.io)
+```markdown
+@.design-canon/claude.md
+```
 
-| Attribute | Detail | Confidence |
-|-----------|--------|------------|
-| **Supported instruction filenames** | `SKILL.md` (primary), with supporting files in `references/`, `templates/`, `scripts/`, `examples/`, `assets/` directories. | `verified fact` |
-| **Expected file locations** | Hermes: `~/.hermes/skills/<category>/<name>/SKILL.md`. Agent Skills Hub: centralized registry. External dirs configurable via `skills.external_dirs`. | `verified fact` |
-| **Frontmatter requirements** | **Yes — YAML frontmatter required.** Minimum: `name` (string) and `description` (string, ≤60 chars recommended). Optional: `version`, `author`, `license`, `platforms`, `metadata.hermes` (tags, category, fallback/requires toolsets, config settings), `required_environment_variables`. | `verified fact` |
-| **Precedence rules** | Skills are **on-demand** — loaded explicitly via `/skill-name` command, `skill_view()` tool, or skill bundles. Not automatically injected into every session. Local skills shadow external dir skills with the same name. Bundle names take precedence over individual skill names. | `verified fact` |
-| **Directory inheritance** | **Not applicable.** Skills are loaded by name, not by directory tree position. Categories are organizational only. | `verified fact` |
-| **Size / context limitations** | Skills use **progressive disclosure:** `skills_list()` shows ~3K tokens of all skill names/descriptions, `skill_view(name)` loads full content on demand. No hard per-skill size limit, but practical constraints apply. | `verified fact` |
-| **Installation procedure** | Hermes: `skill_manage(action='create', ...)`, `/learn` command, manual placement in skills directory, or install from Skills Hub. | `verified fact` |
-| **Uninstall procedure** | Hermes: `skill_manage(action='delete', name='...')`, or delete the skill directory. | `verified fact` |
-| **Refresh / reload behavior** | Skills loaded **per-invocation** (every `/skill` command re-reads the SKILL.md). Changes take effect immediately for the next invocation. No session restart needed. | `verified fact` |
-| **Known limitations** | Primarily a **Hermes Agent** feature — other tools (OpenCode, Goose) may have similar but incompatible skill systems. The agentskills.io standard is emerging but not universally adopted. Skills with `platforms` restriction are hidden on incompatible OS. Write-approval gate (`skills.write_approval`) can require human review for skill changes. | `verified fact` |
-| **Official source links** | [Hermes Skills docs](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills), [Hermes Creating Skills](https://hermes-agent.nousresearch.com/docs/developer-guide/creating-skills), [agentskills.io spec](https://agentskills.io/specification) | `verified fact` |
+inside an existing root `CLAUDE.md`, or a marker-managed Design Canon section when imports are not desired. Do not overwrite the user's existing file.
 
----
+### Primary sources
 
-## Cross-Cutting Comparison
+- https://code.claude.com/docs/en/memory
+- https://code.claude.com/docs/en/claude-directory
 
-| Aspect | Hermes | Codex CLI | Claude Code | Cursor | Windsurf | AGENTS.md std | DESIGN.md | Skills |
-|--------|--------|-----------|-------------|--------|----------|---------------|-----------|--------|
-| **Primary filename** | `.hermes.md` | `AGENTS.md` | `CLAUDE.md` | `.cursor/rules/*.mdc` | `.windsurfrules` → `.devin/rules/` | `AGENTS.md` | `DESIGN.md` | `SKILL.md` |
-| **Frontmatter needed?** | No (ctx) / Yes (skills) | No | No | Yes (.mdc) | Undocumented | No | Yes | Yes |
-| **Nested file support?** | Yes (progressive) | Yes (nearest wins) | Yes (tree walk + lazy) | Yes (globs) | Undocumented | Yes (tool-dependent) | No | N/A |
-| **Auto-loaded?** | Yes (ctx files) | Yes | Yes | Yes | Yes | Yes (if supported) | No | On-demand |
-| **Size limit** | 20K chars | `project_doc_max_bytes` | ~200 lines suggested | Undocumented | Undocumented | N/A | N/A | N/A |
-| **Hot-reload?** | Partial (progressive) | No | Partial (compact) | No (reload required) | Undocumented | Tool-dependent | Tool-dependent | Yes (next invocation) |
+## 4. Cursor
 
----
+### Verified behavior
 
-## Conflicts & Unknowns
+- Project Rules live in `.cursor/rules` as `.mdc` files.
+- Rules can be always included, auto-attached by path pattern, requested by the agent, or manually invoked.
+- Cursor supports a root-level plain-markdown `AGENTS.md` as a simpler alternative.
+- `.cursorrules` remains supported but is legacy.
+- Cursor CLI reads root `AGENTS.md` and `CLAUDE.md` alongside `.cursor/rules`.
 
-1. **Hermes + AGENTS.md**: Hermes reads AGENTS.md as project context, BUT only when no `.hermes.md` is present. If a project has both, AGENTS.md is ignored. This is unusual compared to other tools that merge or layer multiple files.
+### Design Canon implication
 
-2. **Claude Code + AGENTS.md**: Officially, Claude Code reads AGENTS.md. But its primary format is CLAUDE.md. The exact merging behavior when both AGENTS.md and CLAUDE.md exist at the same level is **undocumented** — does one take precedence, or are both loaded?
+Prefer `.cursor/rules/design-canon.mdc` for Cursor-specific scoping. Prefer root `AGENTS.md` when one portable file is more valuable than Cursor-specific activation controls.
 
-3. **Codex AGENTS.override.md**: The global `~/.codex/AGENTS.override.md` vs `~/.codex/AGENTS.md` hierarchy is documented on learn.chatgpt.com but NOT in the primary Codex docs. This may change.
+The original draft's claims about a mandatory IDE reload and a fixed precedence order were not sufficiently supported and have been removed.
 
-4. **Windsurf → Devin Desktop rebrand**: June 2026 rebrand means documentation is in flux. `.devin/rules/` is the new path, but `.windsurf/rules/` and `.windsurfrules` still work. Exact format for rule files in the new directory is undocumented.
+### Primary sources
 
-5. **DESIGN.md agent support**: designmd.app claims compatibility with Claude Code, Cursor, Kiro, and Windsurf, but actual testing is needed to verify that these tools load DESIGN.md automatically vs needing explicit instruction.
+- https://docs.cursor.com/context/rules-for-ai
+- https://docs.cursor.com/en/cli/using
 
-6. **"Design Canon" name collision**: The DESIGN.md spec from Google Labs and this "Design Canon" project are complementary but distinct. The canon may compile to DESIGN.md as one output target, but DESIGN.md is a data format, not a policy compiler.
+## 5. Windsurf
 
----
+### Verified behavior
 
-## Research Methodology
+- Workspace rules live in `.windsurf/rules/*.md` and use frontmatter to select activation behavior.
+- Workspace rule files are limited to 12,000 characters each.
+- Windsurf automatically discovers `AGENTS.md` or `agents.md` in any workspace directory.
+- Root `AGENTS.md` is treated as always active.
+- Nested `AGENTS.md` files are automatically scoped to their directory tree.
+- Global rules use `~/.codeium/windsurf/memories/global_rules.md` and have a 6,000-character limit.
 
-- **Primary sources**: Official documentation pages, GitHub READMEs, spec documents
-- **Secondary sources**: Community blog posts, issue trackers (for behavioral details not in docs)
-- **Confidence tagging**: Each claim is tagged as:
-  - `verified fact` — confirmed by official documentation or primary source
-  - `research finding` — found through research but official docs are limited/unclear
-  - `assumption` — reasonable inference from available evidence, not confirmed
-  - `proposal` — recommendation for Design Canon, not a description of existing behavior
-- **Blockers**: Claude Code memory docs were only available via HTML (1.3M chars), extracted with regex. Codex AGENTS.md docs were a redirect to a non-loading page. Some URL extracts failed (DuckDuckGo was search-only, not an extraction backend).
+### Corrections to the original draft
 
----
+The speculative `.devin/rules/` migration and "Devin Desktop" replacement path have been removed. Current primary Windsurf documentation describes `.windsurf/rules/` and directory-scoped `AGENTS.md`.
 
-*Generated 2026-07-18 for the Design Canon project research/agent-compatibility branch.*
+### Design Canon implication
+
+Use `.windsurf/rules/design-canon.md` for explicit activation controls, or `AGENTS.md` for simple directory-based behavior.
+
+### Primary sources
+
+- https://docs.windsurf.com/windsurf/cascade/memories
+- https://docs.windsurf.com/windsurf/cascade/agents-md
+
+## 6. Generic AGENTS.md
+
+`AGENTS.md` is plain markdown with no required frontmatter. It is the best default when the target is unknown, but consumers differ in discovery, inheritance, merging, size limits, and refresh behavior.
+
+Design Canon must not promise identical semantics across agents. The adapter should report the selected target and its known scope rules.
+
+Primary source: https://agents.md/
+
+## 7. Google DESIGN.md
+
+### Verified behavior
+
+- A Google DESIGN.md file has a markdown body and may include YAML frontmatter containing machine-readable design tokens.
+- If frontmatter is present, it must be fenced with `---` and conform to the upstream schema.
+- The specification defines token groups such as colors, typography, spacing, rounded values, and components.
+- The format is currently alpha and evolving.
+- The format itself does not guarantee that every coding agent automatically discovers or injects the file.
+
+### Design Canon implication
+
+A conforming adapter cannot be produced from the current rule catalog alone because many profiles do not contain concrete color, typography, spacing, radius, and component token values. A future adapter needs one of:
+
+1. project token extraction,
+2. explicit token input in configuration, or
+3. a validated token profile format.
+
+Until then, keep the current Design Canon policy document distinct from Google DESIGN.md compatibility claims.
+
+### Primary sources
+
+- https://github.com/google-labs-code/design.md/blob/main/docs/spec.md
+- https://github.com/google-labs-code/design.md
+- https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/
+
+## 8. Agent Skills
+
+`SKILL.md` is an open, progressively disclosed capability format. Required frontmatter and installation paths depend on the host implementation. The existing Design Canon skill is appropriate for procedural use, while project instruction files are better for policy that should always be present.
+
+Primary sources:
+
+- https://agentskills.io/specification
+- https://hermes-agent.nousresearch.com/docs/user-guide/features/skills
+
+## Maintainer decisions produced by this review
+
+1. `AGENTS.md` is the default portable adapter target.
+2. Native adapters must be non-destructive and preview changes before writing.
+3. Claude Code support must use `CLAUDE.md` or an import from it, not an unsupported direct `AGENTS.md` claim.
+4. Google DESIGN.md conformance is a separate future adapter, not a property of the current `design` target.
+5. Tool-specific behavior must be verified with primary documentation and integration tests before the adapter is marked stable.
