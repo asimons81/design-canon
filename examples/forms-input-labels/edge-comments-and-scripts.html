@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Edge cases</title></head>
+<body>
+  <!-- <input type="text" placeholder="This is in a comment"> -->
+  <script>var x = '<input type="text" placeholder="in script">';</script>
+  <style>input { display: block; } /* <input type="text" placeholder="in style"> */</style>
+  <form>
+    <input type="text" placeholder="Real field">
+    <label for="realfield">Real label</label>
+    <input id="realfield" type="email">
+  </form>
+</body>
+</html>
