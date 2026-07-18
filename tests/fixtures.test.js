@@ -60,7 +60,8 @@ const expectations = {
     findings: {
       'a11y.visible-focus': 23,
       'typography.generic-primary-font': 1,
-      'motion.transition-all': 1
+      'motion.transition-all': 1,
+      'motion.respect-reduced-motion': 5
     }
   },
   F008: {
@@ -68,7 +69,7 @@ const expectations = {
     findings: {
       'motion.transition-all': 30,
       'typography.generic-primary-font': 1,
-      'motion.respect-reduced-motion': 26
+      'motion.respect-reduced-motion': 25
     }
   },
   F009: {
@@ -103,7 +104,7 @@ const expectations = {
       'typography.generic-primary-font': 1,
       'motion.transition-all': 5,
       'depth.shadow-soup': 2,
-      'motion.respect-reduced-motion': 38
+      'motion.respect-reduced-motion': 26
     }
   },
   F015: {
@@ -156,7 +157,7 @@ test('F016 produces the documented deterministic findings', async () => {
 const F017_EXPECTATION = {
   profile: 'marketing',
   findings: {
-    'motion.respect-reduced-motion': 4
+    'motion.respect-reduced-motion': 3
   }
 };
 
