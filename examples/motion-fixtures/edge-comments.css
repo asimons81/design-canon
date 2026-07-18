@@ -1,0 +1,3 @@
+/* .card { animation: fade 1s; } */
+.card { animation: fadeIn 1s; }
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } }

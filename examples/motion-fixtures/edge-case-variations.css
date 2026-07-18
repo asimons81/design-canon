@@ -1,0 +1,3 @@
+.Card { animation: fade 1s; }
+@media (prefers-reduced-motion: reduce) { .card { animation: none; } }
+.CARD { animation: slideIn 1s; }

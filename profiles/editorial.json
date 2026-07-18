@@ -2,5 +2,18 @@
   "id": "editorial",
   "name": "Editorial and Long-Form",
   "intent": "Create a reading experience with strong typographic hierarchy, controlled measure, expressive pacing, and restrained interface chrome. The content is the primary visual material.",
-  "includeCategories": ["accessibility", "content", "depth", "direction", "layout", "motion", "shape", "tokens", "typography"]
+  "includeCategories": [
+    "accessibility",
+    "content",
+    "depth",
+    "direction",
+    "layout",
+    "motion",
+    "shape",
+    "tokens",
+    "typography"
+  ],
+  "includeRules": [
+    "motion.respect-reduced-motion"
+  ]
 }

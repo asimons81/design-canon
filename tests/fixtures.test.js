@@ -16,7 +16,8 @@ const expectations = {
       'radius.everything-pill': 1,
       'motion.transition-all': 1,
       'depth.shadow-soup': 1,
-      'copy.generic-hero': 2
+      'copy.generic-hero': 2,
+      'motion.respect-reduced-motion': 2
     }
   },
   F002: {
@@ -66,7 +67,8 @@ const expectations = {
     profile: 'marketing',
     findings: {
       'motion.transition-all': 30,
-      'typography.generic-primary-font': 1
+      'typography.generic-primary-font': 1,
+      'motion.respect-reduced-motion': 26
     }
   },
   F009: {
@@ -100,7 +102,8 @@ const expectations = {
     findings: {
       'typography.generic-primary-font': 1,
       'motion.transition-all': 5,
-      'depth.shadow-soup': 2
+      'depth.shadow-soup': 2,
+      'motion.respect-reduced-motion': 38
     }
   },
   F015: {
@@ -148,4 +151,25 @@ test('F016 produces the documented deterministic findings', async () => {
   }
 
   assert.deepEqual(actual, F016_EXPECTATION.findings);
+});
+
+const F017_EXPECTATION = {
+  profile: 'marketing',
+  findings: {
+    'motion.respect-reduced-motion': 4
+  }
+};
+
+test('F017 produces the documented deterministic findings', async () => {
+  const result = await lintPath({
+    path: `${fixturesDirectory}F017-index.html`,
+    profile: F017_EXPECTATION.profile
+  });
+
+  const actual = {};
+  for (const finding of result.findings) {
+    actual[finding.rule] = (actual[finding.rule] ?? 0) + 1;
+  }
+
+  assert.deepEqual(actual, F017_EXPECTATION.findings);
 });
