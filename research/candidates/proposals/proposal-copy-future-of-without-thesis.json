@@ -1,0 +1,97 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.future-of-without-thesis",
+  "proposedRuleId": "copy.future-of-without-thesis",
+  "title": "'The future of [X]' requires a thesis about the present",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated copy claims to represent 'the future of [category]' without articulating what is wrong with the present or the specific thesis for change.",
+  "instruction": "When claiming 'the future of [X]', articulate the thesis: what is changing, why the present state is insufficient, and how the product addresses that gap.",
+  "rationale": "'The future of work' without a thesis about what is wrong with current work is an interchangeable phrase that could headline any product. A specific thesis ('The future of documentation: AI-generated that stays current with your codebase') gives the reader a concrete claim to evaluate.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'The future of collaboration' with no thesis about what's wrong with current collaboration.",
+      "'Built for the future of design' without describing the future state."
+    ],
+    "controls": [
+      "'The future of documentation: automatically generated docs that stay synced with your code.'",
+      "'The future of hiring: skills-based matching that removes resume bias.'"
+    ],
+    "borderline": [
+      "A well-known futurist speaker or publication using 'the future of [X]' as a category descriptor \u2014 the speaker's thesis is the content, not a product claim."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Conference or publication titles where 'the future of [X]' describes the content area. Futurist analysis where the thesis is the product. Academic forecasting.",
+      "examples": [
+        "'The Future of Work' conference",
+        "Futurist research publication"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "manual-only",
+    "signalDescription": "Find 'the future of' or 'future of' patterns. Check for thesis statements or specific change descriptions nearby.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "future of"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Conference titles and publication names legitimately use 'future of' as a category descriptor.",
+      "The thesis may be in a subtitle or hero body text rather than the headline."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "high",
+    "scenarios": [
+      "Conference or event names ('The Future of Web Design 2026').",
+      "Academic or journalistic writing about future trends.",
+      "A detailed thesis with the 'future of' headline backed by body copy \u2014 may not be detectable as having a thesis."
+    ],
+    "mitigations": [
+      "Check the 200 characters following 'future of' for thesis indicators (specific change, technology, methodology). Exclude event names and publication titles."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "business-abstraction",
+    "replacementStrategy": "Replace 'The future of [X]' with a specific thesis statement: what is changing, why the present approach is insufficient, and how the product addresses the gap."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.future.violation.without-thesis",
+      "caseType": "violation",
+      "description": "A landing page with 'The future of project management' as the headline and no supporting thesis."
+    },
+    {
+      "fixtureId": "fixture.copy.future.control.with-thesis",
+      "caseType": "control",
+      "description": "Same page with 'The future of project management: AI that anticipates bottlenecks before they happen.'"
+    },
+    {
+      "fixtureId": "fixture.copy.future.borderline.conference",
+      "caseType": "borderline",
+      "description": "A conference website titled 'The Future of Design' where the content is the thesis."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

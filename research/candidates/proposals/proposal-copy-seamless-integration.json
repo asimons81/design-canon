@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.seamless-integration",
+  "proposedRuleId": "copy.seamless-integration",
+  "title": "Specify what makes an integration seamless",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated copy describes every integration as 'seamless' without specifying what eliminates the seam: one-click setup, automatic mapping, or no configuration.",
+  "instruction": "When describing an integration, specify the seam it eliminates: 'One-click import with automatic field mapping' rather than 'Seamless integration'.",
+  "rationale": "'Seamless' is a reflexive modifier that communicates no specific benefit. Users need to know what makes the integration easy: no config, auto-mapping, live sync, or single sign-on. The term itself passes the evaluation to the reader.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'Seamless integration with your existing tools' without specifics about how.",
+      "'Seamless CRM sync' without describing sync frequency or conflict resolution."
+    ],
+    "controls": [
+      "'Seamless Stripe integration: connect your account in one click with automatic tax calculation, receipt generation, and subscription management.'",
+      "'Pre-built Jira integration with automatic field mapping and bidirectional sync.'"
+    ],
+    "borderline": [
+      "'Seamless' in clothing ('seamless socks') has a literal physical meaning \u2014 product copy using the same word in a different context may be confusing."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Landing pages where multiple integrations are listed in a grid and each opens to a detailed page with specifics \u2014 the grid itself may use 'seamless' as a category header.",
+      "examples": [
+        "Integration marketplace directory",
+        "App store listing page"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Match 'seamless' in feature/integration descriptions. Check for specific integration details within the same section (one-click, auto, setup, sync, import).",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "seamless"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Does not apply to literal 'seamless' usage in non-software contexts.",
+      "Integration detail may be on a linked page rather than inline."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "A textile/clothing context where 'seamless' is literal.",
+      "An integration marketplace where each integration card says 'Seamless integration' but clicking opens detailed setup docs."
+    ],
+    "mitigations": [
+      "Check for actionable integration detail (click-to-connect buttons, setup docs) nearby. Flag only when 'seamless' is the only descriptor."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "empty-adjective",
+    "replacementStrategy": "Describe the specific integration mechanism instead of 'seamless': one-click setup, automatic field mapping, no-code connection, bidirectional sync, or SSO authentication."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.seamless.violation.vague",
+      "caseType": "violation",
+      "description": "A page listing 'Seamless integration with Salesforce, HubSpot, and Slack' with no setup details."
+    },
+    {
+      "fixtureId": "fixture.copy.seamless.control.specific",
+      "caseType": "control",
+      "description": "Same page with 'Connect Salesforce in one click with automatic contact and deal mapping.'"
+    },
+    {
+      "fixtureId": "fixture.copy.seamless.borderline.marketplace",
+      "caseType": "borderline",
+      "description": "An integration marketplace where grid items say 'Seamless integration' but each links to detailed setup docs."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

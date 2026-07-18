@@ -1,0 +1,107 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.ten-x-without-baseline",
+  "proposedRuleId": "copy.ten-x-without-baseline",
+  "title": "Quantify '10x' productivity claims or remove them",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated copy uses '10x' multiplier claims without defining the baseline or measurement methodology.",
+  "instruction": "When claiming a performance multiplier, state the baseline and measurement: 'Teams review code 3x faster (from 4 hours to 80 minutes average)' rather than unqualified '10x productivity.'",
+  "rationale": "A '10x' claim without a baseline is meaningless \u2014 10x of what? Zero? Industry average? The previous tool? Unsupported multiplier claims erode credibility when users test them against reality. A specific before/after comparison is both more honest and more persuasive.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'10x your team's productivity' with no baseline or measurement methodology.",
+      "'5x faster deployment' compared to nothing specified."
+    ],
+    "controls": [
+      "'Teams using our tool complete code reviews 3x faster (from 4 hours to 80 minutes on average, based on 500+ teams).'",
+      "'2x revenue growth for e-commerce merchants using our checkout optimization (source: merchant analytics, n=1,200 stores).'"
+    ],
+    "borderline": [
+      "A 10x improvement over a known industry baseline that does not need restating (e.g., '10x faster than disk I/O' is meaningful to the audience)."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Performance claims against well-known industry baselines where the baseline is implicit. Scientific or engineering contexts where '10x' has a defined meaning.",
+      "examples": [
+        "'10x faster than traditional HDD' (baseline known)",
+        "'10x improvement in signal-to-noise ratio' (engineering context)"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find 'Nx' or 'N-times' productivity or performance claims. Check for comparative baselines ('than', 'vs', 'from') or measurement methodology nearby.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "0x",
+        "1x",
+        "2x",
+        "3x",
+        "4x",
+        "5x",
+        "6x",
+        "7x",
+        "8x",
+        "9x",
+        "10x",
+        "100x"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot verify the accuracy of baseline claims.",
+      "Some well-known industry baselines are implicit and legitimately do not need restating."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A well-known comparison where the baseline is standard knowledge (e.g., '10x faster than TCP').",
+      "Academic or engineering contexts where multiplier claims have defined methodologies."
+    ],
+    "mitigations": [
+      "Accept 'than [known baseline]' patterns as sufficient. Flag only standalone multiplier claims without any comparison reference."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "unsupported-superlative",
+    "replacementStrategy": "Replace unqualified 'Nx' claims with specific before/after comparisons: 'From [baseline] to [result] \u2014 an Nx improvement measured by [methodology].'"
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.ten-x.violation.no-baseline",
+      "caseType": "violation",
+      "description": "A landing page claiming '10x your productivity' with no baseline or methodology."
+    },
+    {
+      "fixtureId": "fixture.copy.ten-x.control.with-baseline",
+      "caseType": "control",
+      "description": "Same page with 'Teams ship features 3x faster \u2014 from bi-weekly to daily deployments (based on 200+ team survey).'"
+    },
+    {
+      "fixtureId": "fixture.copy.ten-x.borderline.known-baseline",
+      "caseType": "borderline",
+      "description": "A dev tool claiming '10x faster than git' where git performance is a known baseline."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}
