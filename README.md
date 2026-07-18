@@ -1,6 +1,18 @@
-# Design Canon
+<p align="center">
+  <img src="assets/design-canon-header.webp" alt="Design Canon transforms generic AI-generated interface chaos into disciplined, ship-ready design systems." width="100%" />
+</p>
 
-**Stop shipping the model's favorite UI.**
+<p align="center">
+  <a href="https://x.com/tonysimons_"><img src="https://img.shields.io/static/v1?label=X&message=%40tonysimons_&color=000000&style=for-the-badge&logo=x&logoColor=white" alt="Follow @tonysimons_ on X" /></a>
+  <a href="https://github.com/asimons81/design-canon/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/asimons81/design-canon/test.yml?branch=main&style=for-the-badge&label=build" alt="Build status" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/asimons81/design-canon?style=for-the-badge" alt="MIT License" /></a>
+  <img src="https://img.shields.io/static/v1?label=Node.js&message=20%2B&color=339933&style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js 20 or newer" />
+  <img src="https://img.shields.io/static/v1?label=runtime%20deps&message=zero&color=2563EB&style=for-the-badge" alt="Zero runtime dependencies" />
+</p>
+
+<h1 align="center">Design Canon</h1>
+
+<p align="center"><strong>Stop shipping the model's favorite UI.</strong></p>
 
 Design Canon is an open design-policy compiler, linter, and visual-QA project for AI coding agents. It turns a structured catalog of contextual design rules into compact instructions for the interface you are actually building, then checks the result for detectable violations.
 
