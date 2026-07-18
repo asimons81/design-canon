@@ -1,0 +1,259 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F011 — poor-dashboard-density
+  profile: product-app
+  anti-pattern: Marketing spacing on data interface, wasted space, low information density
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airy Dashboard — Spacious Data</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fafafa;
+      color: #171717;
+      padding: 48px;
+    }
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    /* Marketing-style spacing on a dashboard — massive gaps everywhere */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 40px 48px;
+      background: #fff;
+      border-radius: 24px;
+      margin-bottom: 64px;
+    }
+    .logo { font-size: 28px; font-weight: 700; }
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 9999px;
+      background: #e5e5e5;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+      margin-bottom: 64px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .stat-card .value {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .stat-card .label {
+      font-size: 16px;
+      color: #737373;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .trend {
+      font-size: 14px;
+      margin-top: 16px;
+      padding: 8px 20px;
+      border-radius: 9999px;
+      display: inline-block;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 40px;
+      margin-bottom: 64px;
+    }
+    .panel {
+      background: #fff;
+      border-radius: 24px;
+      padding: 48px;
+    }
+    .panel h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 32px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+      font-size: 14px;
+      color: #737373;
+      font-weight: 600;
+      padding: 20px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    td {
+      padding: 24px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 16px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-failed { background: #fee2e2; color: #991b1b; }
+    .recent-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .recent-item:last-child { border-bottom: none; }
+    .activity-text { font-size: 15px; }
+    .activity-time { font-size: 13px; color: #a3a3a3; }
+    .filters-bar {
+      display: flex;
+      gap: 20px;
+      padding: 32px 0;
+      margin-bottom: 32px;
+    }
+    .filter-btn {
+      padding: 14px 32px;
+      border: 1px solid #e5e5e5;
+      border-radius: 9999px;
+      background: #fff;
+      font-size: 15px;
+      color: #525252;
+      cursor: pointer;
+    }
+    .search-input {
+      padding: 16px 24px;
+      border: 1px solid #e5e5e5;
+      border-radius: 9999px;
+      font-size: 16px;
+      width: 320px;
+    }
+    .actions-bar {
+      display: flex;
+      gap: 16px;
+      justify-content: flex-end;
+      padding: 40px 0;
+    }
+    .btn {
+      padding: 16px 36px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary { background: #171717; color: #fff; }
+    .btn-secondary { background: #f5f5f5; color: #171717; }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .sidebar-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px;
+    }
+    .sidebar-card h3 { font-size: 18px; margin-bottom: 20px; }
+    .metric {
+      padding: 20px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .metric:last-child { border-bottom: none; }
+    .metric-name { font-size: 14px; color: #737373; }
+    .metric-value { font-size: 24px; font-weight: 700; }
+    footer { text-align: center; padding: 48px; color: #a3a3a3; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">AiryDashboard</div>
+      <div style="display:flex;align-items:center;gap:32px;">
+        <span style="color:#737373;">Welcome back, Alex</span>
+        <div class="user-avatar"></div>
+      </div>
+    </header>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="value">$284.5K</div>
+        <div class="label">Total Revenue</div>
+        <span class="trend" style="background:#dcfce7;color:#166534;">↑ 12.3%</span>
+      </div>
+      <div class="stat-card">
+        <div class="value">1,847</div>
+        <div class="label">Active Users</div>
+        <span class="trend" style="background:#dcfce7;color:#166534;">↑ 8.1%</span>
+      </div>
+      <div class="stat-card">
+        <div class="value">93.2%</div>
+        <div class="label">Retention Rate</div>
+        <span class="trend" style="background:#fef3c7;color:#92400e;">→ 0.4%</span>
+      </div>
+      <div class="stat-card">
+        <div class="value">42</div>
+        <div class="label">Open Tickets</div>
+        <span class="trend" style="background:#fee2e2;color:#991b1b;">↓ 5</span>
+      </div>
+    </div>
+    <div class="filters-bar">
+      <input class="search-input" type="text" placeholder="Search transactions...">
+      <button class="filter-btn">All Status</button>
+      <button class="filter-btn">Today</button>
+      <button class="filter-btn">Export</button>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <h2>Recent Transactions</h2>
+        <table>
+          <tr><th>ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+          <tr><td>#2841</td><td>Acme Corp</td><td>$2,400.00</td><td><span class="status-badge status-active">Completed</span></td><td>Jul 18</td></tr>
+          <tr><td>#2840</td><td>Globex Inc</td><td>$850.00</td><td><span class="status-badge status-pending">Pending</span></td><td>Jul 18</td></tr>
+          <tr><td>#2839</td><td>Initech</td><td>$3,200.00</td><td><span class="status-badge status-active">Completed</span></td><td>Jul 17</td></tr>
+          <tr><td>#2838</td><td>Umbrella Co</td><td>$1,100.00</td><td><span class="status-badge status-failed">Failed</span></td><td>Jul 17</td></tr>
+        </table>
+        <div class="actions-bar">
+          <button class="btn btn-secondary">View All</button>
+          <button class="btn btn-primary">New Transaction</button>
+        </div>
+      </div>
+      <div class="sidebar">
+        <div class="sidebar-card">
+          <h3>Recent Activity</h3>
+          <div class="recent-item">
+            <div><div class="activity-text">New user registered</div><div class="activity-time">2 min ago</div></div>
+          </div>
+          <div class="recent-item">
+            <div><div class="activity-text">Invoice #2841 paid</div><div class="activity-time">15 min ago</div></div>
+          </div>
+          <div class="recent-item">
+            <div><div class="activity-text">Server deployment completed</div><div class="activity-time">1 hr ago</div></div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3>Quick Metrics</h3>
+          <div class="metric"><div class="metric-name">Avg Response Time</div><div class="metric-value">142ms</div></div>
+          <div class="metric"><div class="metric-name">Error Rate</div><div class="metric-value">0.02%</div></div>
+          <div class="metric"><div class="metric-name">API Calls Today</div><div class="metric-value">28.4K</div></div>
+        </div>
+      </div>
+    </div>
+    <footer>&copy; 2026 AiryDashboard. Spacious by design.</footer>
+  </div>
+</body>
+</html>

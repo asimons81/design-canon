@@ -1,0 +1,319 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F015 — weak-mobile-hierarchy
+  profile: marketing
+  anti-pattern: Desktop layout breaks on mobile, no responsive consideration
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeskTopOnly — Fixed Width Forever</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fff;
+      color: #171717;
+    }
+    /* Fixed-width container — no responsive breakpoints, no max-width adaptation */
+    .page {
+      width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .logo { font-size: 28px; font-weight: 800; }
+    nav { display: flex; gap: 40px; }
+    nav a {
+      text-decoration: none;
+      color: #525252;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .nav-cta {
+      background: #171717;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Hero section with fixed positioning assumptions */
+    .hero {
+      display: flex;
+      gap: 60px;
+      padding: 60px 0;
+      align-items: center;
+    }
+    .hero-content { flex: 1; }
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .hero p {
+      font-size: 20px;
+      color: #737373;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .hero-image {
+      width: 500px;
+      height: 400px;
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      border-radius: 24px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6366f1;
+      font-size: 18px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+    }
+    .btn-primary, .btn-secondary {
+      padding: 18px 40px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: #171717; color: #fff; }
+    .btn-secondary { background: #f5f5f5; color: #171717; }
+
+    /* Features section with side-by-side layout that won't wrap */
+    .features {
+      display: grid;
+      grid-template-columns: 280px 280px 280px;
+      gap: 30px;
+      padding: 60px 0;
+      justify-content: space-between;
+    }
+    .feature-card {
+      padding: 32px 24px;
+      background: #fafafa;
+      border-radius: 16px;
+    }
+    .feature-card h3 { font-size: 20px; margin-bottom: 8px; }
+    .feature-card p { font-size: 15px; color: #737373; line-height: 1.5; }
+
+    /* Side-by-side testimonial + CTA that won't stack */
+    .bottom-section {
+      display: flex;
+      gap: 40px;
+      padding: 40px 0;
+    }
+    .testimonial {
+      flex: 1;
+      padding: 40px;
+      background: #fafafa;
+      border-radius: 20px;
+    }
+    .testimonial blockquote {
+      font-size: 18px;
+      font-style: italic;
+      color: #525252;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .cta-box {
+      flex: 1;
+      padding: 40px;
+      background: #171717;
+      color: #fff;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .cta-box h2 { font-size: 28px; margin-bottom: 12px; }
+    .cta-box p { color: #a3a3a3; margin-bottom: 24px; }
+    .cta-box button {
+      background: #fff;
+      color: #171717;
+      border: none;
+      padding: 16px 36px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Pricing table: fixed columns that won't adapt */
+    .pricing {
+      display: flex;
+      gap: 24px;
+      padding: 40px 0;
+    }
+    .plan {
+      flex: 1;
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .plan h3 { font-size: 22px; margin-bottom: 8px; }
+    .plan .price { font-size: 40px; font-weight: 800; }
+    .plan ul { list-style: none; padding: 24px 0; }
+    .plan li { padding: 10px 0; font-size: 15px; color: #525252; border-bottom: 1px solid #f5f5f5; }
+    .plan button {
+      width: 100%;
+      padding: 14px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Newsletter form with horizontal layout */
+    .newsletter {
+      display: flex;
+      gap: 16px;
+      padding: 40px 0;
+      justify-content: center;
+    }
+    .newsletter input {
+      padding: 16px 24px;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 400px;
+    }
+    .newsletter button {
+      padding: 16px 32px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: #a3a3a3;
+      font-size: 14px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    /* NO media queries anywhere — completely unresponsive */
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">DeskTopOnly</div>
+      <nav>
+        <a href="#">Product</a>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+      </nav>
+      <a href="#" class="nav-cta">Get Started</a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Built for Large Screens Only</h1>
+        <p>Our platform delivers the best experience on 1920x1080 displays. Mobile users? We'll get to it someday.</p>
+        <div class="hero-actions">
+          <button class="btn-primary">Start Free Trial</button>
+          <button class="btn-secondary">Learn More</button>
+        </div>
+      </div>
+      <div class="hero-image">
+        Desktop Preview
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="feature-card">
+        <h3>Feature One</h3>
+        <p>Three fixed-width columns that will overflow on anything smaller than 1200px. Perfectly fine on a 27-inch monitor.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Feature Two</h3>
+        <p>No media queries needed when you assume everyone uses a widescreen display. Mobile is just a smaller desktop, right?</p>
+      </div>
+      <div class="feature-card">
+        <h3>Feature Three</h3>
+        <p>Our 1200px fixed container ensures pixel-perfect consistency. Responsive design is just extra maintenance.</p>
+      </div>
+    </section>
+
+    <section class="pricing">
+      <div class="plan">
+        <h3>Starter</h3>
+        <div class="price">$19</div>
+        <ul>
+          <li>5 projects</li>
+          <li>10GB storage</li>
+          <li>Email support</li>
+          <li>Basic analytics</li>
+        </ul>
+        <button>Get Started</button>
+      </div>
+      <div class="plan">
+        <h3>Professional</h3>
+        <div class="price">$49</div>
+        <ul>
+          <li>Unlimited projects</li>
+          <li>100GB storage</li>
+          <li>Priority support</li>
+          <li>Advanced analytics</li>
+        </ul>
+        <button>Get Started</button>
+      </div>
+      <div class="plan">
+        <h3>Enterprise</h3>
+        <div class="price">$149</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Custom integrations</li>
+          <li>Dedicated manager</li>
+          <li>SLA guarantee</li>
+        </ul>
+        <button>Contact Sales</button>
+      </div>
+    </section>
+
+    <div class="bottom-section">
+      <div class="testimonial">
+        <blockquote>"This product looks amazing on my 34-inch ultrawide. I wouldn't know about mobile because it doesn't work there."</blockquote>
+        <p style="font-weight:600;">— Desktop User</p>
+      </div>
+      <div class="cta-box">
+        <h2>Ready on Desktop?</h2>
+        <p>Our platform requires a minimum viewport width of 1200px. Tablets and phones are not currently supported.</p>
+        <button>Get Started</button>
+      </div>
+    </div>
+
+    <div class="newsletter">
+      <input type="email" placeholder="Enter your email for desktop-only updates">
+      <button>Subscribe</button>
+    </div>
+
+    <footer>&copy; 2026 DeskTopOnly. Desktop-first. Desktop-only.</footer>
+  </div>
+</body>
+</html>

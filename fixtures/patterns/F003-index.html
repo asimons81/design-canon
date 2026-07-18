@@ -1,0 +1,236 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F003 — excessive-pills
+  profile: marketing
+  anti-pattern: Every surface has rounded-3xl or border-radius 30px+, collapsing shape variety
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PillUI — Soft Rounded Everything</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 24px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    /* EVERYTHING is a pill — no shape differentiation */
+    header {
+      background: #fff;
+      border-radius: 9999px;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .logo { font-weight: 800; font-size: 22px; }
+    nav { display: flex; gap: 28px; }
+    nav a { text-decoration: none; color: #475569; font-size: 15px; border-radius: 9999px; padding: 8px 20px; }
+    nav a:hover { background: #f1f5f9; }
+    .hero {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #fff;
+      border-radius: 9999px;
+      padding: 80px 60px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
+    .hero p { font-size: 18px; color: #cbd5e1; max-width: 600px; margin: 0 auto 32px; border-radius: 9999px; }
+    .hero button {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: 18px 48px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 9999px;
+      padding: 36px 28px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .card h3 { font-size: 20px; margin-bottom: 8px; border-radius: 9999px; }
+    .card p { font-size: 14px; color: #64748b; line-height: 1.5; border-radius: 9999px; }
+    .badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1d4ed8;
+      border-radius: 9999px;
+      padding: 6px 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    img.avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      display: inline-block;
+    }
+    .tag-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .tag {
+      background: #f1f5f9;
+      border-radius: 9999px;
+      padding: 6px 18px;
+      font-size: 13px;
+      color: #475569;
+    }
+    input[type="text"] {
+      border: 2px solid #e2e8f0;
+      border-radius: 9999px;
+      padding: 14px 24px;
+      font-size: 16px;
+      width: 100%;
+    }
+    input[type="text"]:focus { outline: none; border-color: #3b82f6; }
+    button.subscribe {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .progress {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 65%;
+      background: #3b82f6;
+      border-radius: 9999px;
+    }
+    .toggle {
+      width: 48px;
+      height: 24px;
+      background: #cbd5e1;
+      border-radius: 9999px;
+      position: relative;
+    }
+    .toggle-knob {
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 9999px;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    th, td {
+      padding: 16px 24px;
+      text-align: left;
+      background: #fff;
+    }
+    th:first-child { border-radius: 9999px 0 0 0; }
+    th:last-child { border-radius: 0 9999px 0 0; }
+    td:first-child { border-radius: 0 0 0 9999px; }
+    td:last-child { border-radius: 0 0 9999px 0; }
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: #94a3b8;
+      border-radius: 9999px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">PillUI</div>
+      <nav>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">Docs</a>
+      </nav>
+      <button style="background:#0f172a;color:#fff;border:none;border-radius:9999px;padding:10px 28px;font-weight:600;">Get Started</button>
+    </header>
+    <section class="hero">
+      <span class="badge">Now in Public Beta</span>
+      <h1>Build Faster with PillUI</h1>
+      <p>The component library where every surface is perfectly rounded. No hard edges, no decisions.</p>
+      <button>Start Building Free</button>
+    </section>
+    <div class="tag-group">
+      <span class="tag">React</span>
+      <span class="tag">Vue</span>
+      <span class="tag">Svelte</span>
+      <span class="tag">Angular</span>
+    </div>
+    <input type="text" placeholder="Search the docs...">
+    <div class="card-grid">
+      <div class="card">
+        <img class="avatar" alt="avatar">
+        <h3>Alex Chen</h3>
+        <p>Product designer using PillUI in production.</p>
+        <div class="tag-group" style="margin-top:12px;">
+          <span class="tag">Design</span>
+          <span class="tag">UI</span>
+        </div>
+      </div>
+      <div class="card">
+        <img class="avatar" alt="avatar">
+        <h3>Sarah Kim</h3>
+        <p>Frontend engineer who loves rounded corners.</p>
+        <div class="tag-group" style="margin-top:12px;">
+          <span class="tag">React</span>
+          <span class="tag">CSS</span>
+        </div>
+      </div>
+      <div class="card">
+        <img class="avatar" alt="avatar">
+        <h3>Jordan Lee</h3>
+        <p>Full-stack developer and open-source contributor.</p>
+        <div class="tag-group" style="margin-top:12px;">
+          <span class="tag">Full-Stack</span>
+          <span class="tag">OSS</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress"><div class="progress-fill"></div></div>
+    <div class="toggle"><div class="toggle-knob"></div></div>
+    <table>
+      <tr><th>Feature</th><th>Free</th><th>Pro</th></tr>
+      <tr><td>Users</td><td>5</td><td>Unlimited</td></tr>
+      <tr><td>Storage</td><td>1GB</td><td>100GB</td></tr>
+    </table>
+    <footer>&copy; 2026 PillUI Inc. All pill shapes reserved.</footer>
+  </div>
+</body>
+</html>

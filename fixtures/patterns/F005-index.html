@@ -1,0 +1,145 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F005 — shadow-soup
+  profile: marketing
+  anti-pattern: Multiple large shadows, glows, glass effects combined with no depth hierarchy
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShadowBox — Layers of Depth</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #f8f9fc;
+      padding: 40px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    /* Every element has a different large shadow — no coherence */
+    .card-1 {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .card-2 {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow: 0 30px 80px rgba(59,130,246,0.2), 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .card-3 {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow: 0 24px 70px rgba(124,58,237,0.18), inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .card-4 {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 48px;
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+    .card-5 {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02), 0 20px 48px rgba(0,0,0,0.12), 0 40px 80px rgba(0,0,0,0.06);
+    }
+    .glow-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow:
+        0 0 40px rgba(99,102,241,0.3),
+        0 0 80px rgba(99,102,241,0.15),
+        0 20px 60px rgba(0,0,0,0.1);
+    }
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3));
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 20px;
+      padding: 48px;
+      border: 1px solid rgba(255,255,255,0.4);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.12);
+    }
+    .multi-shadow {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.02),
+        0 8px 16px rgba(0,0,0,0.04),
+        0 16px 32px rgba(0,0,0,0.06),
+        0 32px 64px rgba(0,0,0,0.08);
+    }
+    .elevated-button {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 18px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 20px 30px rgba(15,23,42,0.25);
+    }
+    h2 { font-size: 28px; margin-bottom: 16px; }
+    p { color: #64748b; line-height: 1.6; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card-1">
+      <h2>Standard Card Shadow</h2>
+      <p>Just a basic 20px shadow. Nothing special here but it's already large enough to trigger depth.shadow-soup.</p>
+    </div>
+    <div class="row">
+      <div class="card-2">
+        <h2>Blue Glow Shadow</h2>
+        <p>Blue-tinted double shadow for no particular reason. Just making things glow.</p>
+      </div>
+      <div class="card-3">
+        <h2>Purple Inner Glow</h2>
+        <p>Purple shadow with an inset highlight. Every card needs its own shadow personality.</p>
+      </div>
+    </div>
+    <div class="card-4">
+      <h2>Frosted Glass</h2>
+      <p>Glassmorphism with backdrop-filter blur. Because transparency and blur make everything look premium, right?</p>
+    </div>
+    <div class="card-5">
+      <h2>Triple Stacked Shadow</h2>
+      <p>Three different box-shadows on one card. The more shadows, the more depth. That's how it works.</p>
+    </div>
+    <div class="glow-box">
+      <h2>Glowing CTA Container</h2>
+      <p>This box has a purple glow effect. Because everything needs a soft ethereal backlight.</p>
+    </div>
+    <div class="glass-card">
+      <h2>Another Glass Card</h2>
+      <p>Second glass card with maximum blur. Frosted glass looks great on every surface.</p>
+    </div>
+    <div class="multi-shadow">
+      <h2>Four-Layer Shadow</h2>
+      <p>Four progressively larger shadows stacked. Subtlety is overrated when you can have a shadow cascade.</p>
+      <button class="elevated-button">Learn More</button>
+    </div>
+  </div>
+</body>
+</html>

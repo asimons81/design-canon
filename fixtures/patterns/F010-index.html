@@ -1,0 +1,179 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F010 — unreadable-measure
+  profile: editorial
+  anti-pattern: Body text spanning full viewport width with no reading-measure constraint
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Long Read — Full Width Edition</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+    /* No max-width on body text — spans the full viewport */
+    article {
+      padding: 80px 40px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+    .byline {
+      color: #666;
+      margin-bottom: 48px;
+      font-size: 16px;
+      width: 100%;
+    }
+    /* Body paragraphs have NO max-width constraint — full viewport width */
+    p {
+      font-size: 18px;
+      margin-bottom: 24px;
+      width: 100%;
+      line-height: 1.5;
+    }
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 48px 0 16px;
+      width: 100%;
+    }
+    h3 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 36px 0 12px;
+      width: 100%;
+    }
+    blockquote {
+      border-left: 4px solid #ddd;
+      padding-left: 20px;
+      margin: 32px 0;
+      font-style: italic;
+      color: #555;
+      font-size: 20px;
+      width: 100%;
+    }
+    figure {
+      margin: 40px 0;
+      width: 100%;
+    }
+    figure img {
+      width: 100%;
+      height: 300px;
+      background: #f0f0f0;
+      display: block;
+    }
+    figcaption {
+      font-size: 14px;
+      color: #888;
+      margin-top: 8px;
+    }
+    ul, ol {
+      margin: 24px 0;
+      padding-left: 24px;
+      width: 100%;
+    }
+    li {
+      font-size: 18px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .code-block {
+      background: #f5f5f5;
+      padding: 24px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      margin: 24px 0;
+      overflow-x: auto;
+      width: 100%;
+    }
+    .related-links {
+      border-top: 1px solid #eee;
+      margin-top: 48px;
+      padding-top: 32px;
+    }
+    .related-links a {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 12px;
+      color: #1a1a1a;
+    }
+    footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid #eee;
+      color: #888;
+      font-size: 14px;
+    }
+    .ad-unit {
+      background: #fafafa;
+      padding: 32px;
+      margin: 40px 0;
+      text-align: center;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <article>
+    <h1>The Complete Guide to Understanding Modern Web Design Principles and Why Reading Measure Matters for Long-Form Content Across Every Device</h1>
+    <div class="byline">By Alex Thompson · July 18, 2026 · 15 min read</div>
+
+    <p>This is a long-form article designed to demonstrate what happens when body text has no reading-measure constraint. On a modern widescreen monitor, each line of text can exceed 200 characters. This makes sustained reading incredibly difficult because the reader's eyes must travel an enormous distance from the end of one line to the beginning of the next. The reading experience becomes exhausting very quickly, which is exactly why editorial designers should always constrain their measure to roughly 55-75 characters per line. But this fixture intentionally ignores that principle to verify that the editorial.reading-measure rule correctly flags the violation.</p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. This paragraph continues to demonstrate how the lack of a constrained measure creates an unreadable wall of text across the full width of a large viewport.</p>
+
+    <h2>The Physics of Reading and Line Length</h2>
+
+    <p>Research has consistently shown that reading speed and comprehension decrease significantly when lines exceed approximately 75 characters. The human eye has a finite saccade span, and longer lines require more frequent head movements or cause the reader to lose their place when returning to the next line. On a standard 1920px-wide viewport, an 18px body font without a max-width constraint will render roughly 40-50 words per line, which is far beyond the comfortable reading threshold. This is not merely an aesthetic concern but a genuine usability and accessibility problem that directly impacts how long users will stay engaged with written content.</p>
+
+    <h3>Saccadic Eye Movement and Fatigue</h3>
+
+    <p>When reading long lines, the eyes make larger saccadic jumps, which increases the cognitive load associated with tracking text. After several paragraphs of excessive measure, readers experience measurable fatigue. This is why print publications have used columns for centuries and why the web adopted CSS max-width conventions. Designers who ignore measure constraints are sacrificing readability for the sake of filling available space, which undermines the fundamental purpose of editorial content: communication.</p>
+
+    <blockquote>"The measure is the single most important typographic decision for readable text. Get it wrong and nothing else matters because nobody will read far enough to appreciate your other choices." — Robert Bringhurst, The Elements of Typographic Style</blockquote>
+
+    <p>Bringhurst recommends a measure between 45 and 75 characters for single-column text. On a typical widescreen display, an unconstrained 18px paragraph can easily exceed 120 characters per line. This fixture deliberately exceeds that by a factor of two or more across all paragraph text, making it an ideal test case for the editorial.reading-measure rule detector. Every single paragraph element on this page intentionally lacks any form of width constraint to maximize the violation surface area.</p>
+
+    <h2>Common Approaches to Measure Control</h2>
+
+    <p>The standard solution for controlling reading measure on the web is to apply a max-width to the article container or directly to paragraph elements. Common choices range from 600px to 720px for body text, depending on the font size and line-height. Some designers use ch units (e.g., max-width: 70ch) because they directly relate to character count. Others use a combination of padding and max-width on the parent container. The key principle is that the measure must be deliberate and consistent throughout the reading experience. This fixture, by design, applies none of these techniques.</p>
+
+    <ul>
+      <li>Recommended max-width for body text: 600-720px (or 60-75ch)</li>
+      <li>Optimal line length for print: 45-75 characters per line depending on column count and font size</li>
+      <li>Accessibility consideration: users with low vision who zoom in benefit from shorter measures</li>
+      <li>Responsive design: measure should adapt at breakpoints but never exceed comfortable reading range</li>
+      <li>Line-height compensation: longer measures typically require more leading (line-height) to maintain readability</li>
+    </ul>
+
+    <figure>
+      <div style="width:100%;height:300px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;">[Diagram: Reading measure comparison chart]</div>
+      <figcaption>Figure 1: Comparison of reading speeds at different measure widths. Wider measures consistently reduce comprehension.</figcaption>
+    </figure>
+
+    <p>In conclusion, this article fixture demonstrates the importance of reading-measure constraints for editorial content. Every paragraph, heading, list, and blockquote spans the full viewport width with no max-width, max-inline-size, or ch-unit constraint. This creates an intentionally poor reading experience that should be flagged by any competent editorial design linter. The design-canon editorial.reading-measure rule exists precisely to catch this kind of oversight in long-form content production.</p>
+
+    <div class="related-links">
+      <a href="#">Related: Typographic Hierarchy for Long-Form Reading</a>
+      <a href="#">Related: Responsive Measure Techniques</a>
+      <a href="#">Related: Accessibility in Editorial Design</a>
+    </div>
+
+    <footer>
+      <p>This is a generated fixture for the Design Canon anti-slop suite. It deliberately violates editorial.reading-measure by omitting any constraint on line length. &copy; 2026 Design Canon Project.</p>
+    </footer>
+  </article>
+</body>
+</html>

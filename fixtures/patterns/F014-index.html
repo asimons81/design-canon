@@ -1,0 +1,310 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F014 — decorative-animation-overload
+  profile: marketing
+  anti-pattern: Animations everywhere with no purpose, no reduced-motion respect
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animania — Everything Moves</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    /* Each element has transition:all plus a separate keyframe animation — maximal overload */
+    * { transition: all 200ms ease; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-20px); }
+      50% { transform: translateY(0); }
+      70% { transform: translateY(-10px); }
+    }
+    @keyframes wobble {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+    }
+    @keyframes colorCycle {
+      0% { color: #60a5fa; }
+      33% { color: #a78bfa; }
+      66% { color: #f472b6; }
+      100% { color: #60a5fa; }
+    }
+    @keyframes breathe {
+      0%, 100% { box-shadow: 0 0 20px rgba(96,165,250,0.2); }
+      50% { box-shadow: 0 0 60px rgba(96,165,250,0.6); }
+    }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 32px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      margin-bottom: 48px;
+      animation: float 3s ease-in-out infinite;
+      backdrop-filter: blur(12px);
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      animation: colorCycle 4s linear infinite;
+    }
+    nav a {
+      margin-left: 24px;
+      text-decoration: none;
+      color: #94a3b8;
+      font-size: 15px;
+      animation: pulse 2s ease-in-out infinite;
+      display: inline-block;
+    }
+    nav a:nth-child(2) { animation-delay: 0.5s; }
+    nav a:nth-child(3) { animation-delay: 1s; }
+
+    .hero {
+      text-align: center;
+      padding: 64px 0;
+      animation: slideIn 1s ease-out;
+    }
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      animation: wobble 2s ease-in-out infinite;
+      display: inline-block;
+    }
+    .hero p {
+      font-size: 18px;
+      color: #94a3b8;
+      animation: bounce 3s ease-in-out infinite;
+    }
+
+    .decorative-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(96,165,250,0.2);
+      border-top-color: #60a5fa;
+      border-radius: 9999px;
+      margin: 0 auto 32px;
+      animation: spin 1.5s linear infinite;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 48px 0;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      animation: float 4s ease-in-out infinite;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 300ms;
+    }
+    .card:nth-child(1) { animation-delay: 0s; }
+    .card:nth-child(2) { animation-delay: 0.5s; }
+    .card:nth-child(3) { animation-delay: 1s; }
+    .card:nth-child(4) { animation-delay: 1.5s; }
+    .card:hover { animation: pulse 0.5s ease-in-out infinite; }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      border-radius: 9999px;
+      animation: spin 3s linear infinite;
+    }
+    .card h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      animation: colorCycle 5s linear infinite;
+    }
+    .card p { font-size: 14px; color: #94a3b8; animation: breathe 3s ease-in-out infinite; }
+
+    .cta-section {
+      text-align: center;
+      padding: 64px 0;
+      animation: float 3.5s ease-in-out infinite;
+    }
+    .cta-section h2 {
+      font-size: 36px;
+      animation: colorCycle 3s linear infinite;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 20px 48px;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      color: #fff;
+      border: none;
+      border-radius: 9999px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 24px;
+      animation: pulse 2s ease-in-out infinite;
+      transition: all 300ms;
+    }
+    .cta-button:hover {
+      animation: wobble 0.5s ease-in-out infinite;
+    }
+    .cta-button:active {
+      animation: bounce 0.3s ease-in-out;
+    }
+
+    .particle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: #60a5fa;
+      border-radius: 9999px;
+      animation: float 6s ease-in-out infinite;
+      opacity: 0.3;
+    }
+    .particle:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+    .particle:nth-child(2) { top: 30%; left: 90%; animation-delay: 1s; width: 12px; height: 12px; }
+    .particle:nth-child(3) { top: 60%; left: 10%; animation-delay: 2s; }
+    .particle:nth-child(4) { top: 80%; left: 85%; animation-delay: 3s; width: 6px; height: 6px; }
+    .particle:nth-child(5) { top: 50%; left: 50%; animation-delay: 4s; }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      margin: 24px 0;
+      transition: all 300ms;
+    }
+    .progress-fill {
+      width: 70%;
+      height: 100%;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      background-size: 200% auto;
+      animation: shimmer 2s linear infinite;
+      border-radius: 2px;
+    }
+
+    .logo-scroll {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      padding: 32px 0;
+      animation: float 2.5s ease-in-out infinite;
+    }
+    .logo-item {
+      font-size: 14px;
+      color: #475569;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    footer {
+      text-align: center;
+      padding: 48px;
+      color: #475569;
+      font-size: 14px;
+      animation: wobble 4s ease-in-out infinite;
+    }
+
+    /* No prefers-reduced-motion media query — accessibility ignored */
+  </style>
+</head>
+<body>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+
+  <div class="container">
+    <header>
+      <div class="logo">Animania</div>
+      <nav>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">About</a>
+      </nav>
+    </header>
+
+    <div class="decorative-spinner"></div>
+
+    <section class="hero">
+      <h1>Motion Overload</h1>
+      <p>Every element on this page is animating simultaneously. Why have a static interface when everything can bounce, spin, pulse, and wobble?</p>
+    </section>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Floating Cards</h3>
+        <p>Each card has its own float animation cycle. They never settle.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Spinning Icons</h3>
+        <p>Every icon rotates continuously because rotation looks dynamic.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Color Cycling</h3>
+        <p>Headings cycle through colors continuously for no good reason.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Breathe Effect</h3>
+        <p>Paragraphs have a breathing glow effect. Because text needs atmosphere.</p>
+      </div>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+
+    <section class="cta-section">
+      <h2>Start Your Animated Journey</h2>
+      <p style="color:#94a3b8;margin-top:12px;">Every button wobbles when you hover. Nothing stays still.</p>
+      <button class="cta-button">Get Started — It Moves!</button>
+    </section>
+
+    <div class="logo-scroll">
+      <span class="logo-item">Company A</span>
+      <span class="logo-item">Company B</span>
+      <span class="logo-item">Company C</span>
+      <span class="logo-item">Company D</span>
+    </div>
+
+    <footer>&copy; 2026 Animania. If it doesn't move, it's not done.</footer>
+  </div>
+</body>
+</html>
