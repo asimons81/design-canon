@@ -9,11 +9,12 @@
   "surfaces": [
     "mobile"
   ],
-  "summary": "AI-generated mobile interfaces fail to use CSS env(safe-area-inset-*) variables, placing interactive elements behind notches, rounded corners, and home indicators.",
-  "instruction": "On mobile viewports, use CSS env(safe-area-inset-*) variables to ensure interactive content is not placed behind device notches, rounded corners, or the home indicator. Apply safe-area padding to fixed-position elements and full-bleed backgrounds.",
-  "rationale": "Modern mobile devices have non-rectangular viewports with notches, Dynamic Island, rounded corners, and software home indicators. Without safe-area handling, interactive elements can be obscured or unreachable. The CSS environment variables (safe-area-inset-top, safe-area-inset-right, safe-area-inset-bottom, safe-area-inset-left) provide the device's actual insets.",
+  "summary": "AI-generated mobile interfaces with fixed-position elements or full-bleed content fail to use CSS env(safe-area-inset-*) variables, placing interactive content behind device notches, rounded corners, and home indicators.",
+  "instruction": "On mobile viewports with edge-to-edge content or fixed-position elements, use CSS env(safe-area-inset-*) variables to keep interactive content clear of device notches, rounded corners, and the home indicator. Apply safe-area padding to fixed navigation bars, bottom sheets, and full-bleed backgrounds.",
+  "rationale": "The CSS Environment Variables specification defines env(safe-area-inset-*) as standard viewport-relative insets that adapt to each device's physical display shape. Without them, fixed-position bottom bars can sit behind the iOS home indicator, and full-bleed headers can have content obscured by the notch or status bar. The specification is supported in Safari since iOS 11 and in Chromium-based mobile browsers.",
   "claimType": "original-observation",
   "sourceIds": [
+    "source.official-guidance.css-env-safe-area",
     "source.original-observation.mobile-safe-areas"
   ],
   "examples": {

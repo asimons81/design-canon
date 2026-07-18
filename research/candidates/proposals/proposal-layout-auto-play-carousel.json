@@ -11,8 +11,8 @@
   ],
   "summary": "AI-generated marketing pages frequently use auto-advancing hero carousels where slides rotate before users finish reading, reducing content comprehension and user control.",
   "instruction": "If using a carousel, do not auto-advance slides. Let users navigate via explicit arrows, dots, or swipe gestures. If auto-advance is required, provide a visible pause button and respect prefers-reduced-motion.",
-  "rationale": "NN Group research shows auto-advancing carousels are largely ignored \u2014 fewer than 1% of users interact with hero carousel content. Auto-advance creates accessibility barriers, motion issues, and often advances before users finish reading the current slide.",
-  "claimType": "research-backed",
+  "rationale": "Auto-advancing carousels advance before users finish reading the current slide, reducing content comprehension and user control. The rotating element can also trigger motion sensitivity. Manual navigation ensures users control their reading pace.",
+  "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.carousel-auto-advance"
   ],

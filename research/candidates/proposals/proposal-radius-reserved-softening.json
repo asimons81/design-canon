@@ -11,7 +11,7 @@
     "universal"
   ],
   "summary": "AI agents generating business/professional interfaces default to 0px border-radius on all elements, overcorrecting from the pill-radius reflex and creating harsh interfaces.",
-  "instruction": "Use border-radius as part of the product's shape language. Interactive elements (buttons, inputs, cards) benefit from slight rounding (2-6px) for visual approachability. Reserve zero-radius for data containers where precision communicates functionality.",
+  "instruction": "Use border-radius as part of the product's shape language. Interactive elements (buttons, inputs, cards) benefit from slight rounding for visual approachability. Reserve zero-radius for data containers where precision communicates functionality. Choose specific radius values from the project's design tokens rather than defaulting to zero.",
   "rationale": "Sharp corners on every surface is the opposite reflex of pill-radius on everything -- both are defaults that should be replaced with intentional choice. Interactive elements with slight rounding are more approachable and communicate clickability. Data containers (tables, code blocks) appropriately use sharp corners to signal precision.",
   "claimType": "original-observation",
   "sourceIds": [

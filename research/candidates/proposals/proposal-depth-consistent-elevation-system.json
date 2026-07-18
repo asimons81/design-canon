@@ -10,8 +10,8 @@
     "universal"
   ],
   "summary": "AI-generated interfaces apply shadows at varying intensities without a clear elevation system, making depth feel arbitrary rather than hierarchical.",
-  "instruction": "Define 2-4 elevation levels mapped to semantic component roles (rest, interactive, overlay). Apply the same shadow values to all components at the same level. Most surfaces should have no elevation.",
-  "rationale": "Shadows communicate what users can interact with and what is above the surface. When every element has a different shadow intensity, depth loses meaning and the interface feels visually chaotic. Material Design defines elevation as a semantic system, not a decorative effect.",
+  "instruction": "Define a small set of elevation levels \u2014 Design Canon recommends 2-4 \u2014 mapped to semantic component roles (rest, interactive, overlay). Apply the same shadow values to all components at the same level. Most surfaces should have no elevation.",
+  "rationale": "Shadows communicate what users can interact with and what is above the surface. When every element has a different shadow intensity, depth loses meaning. Material Design demonstrates elevation as a semantic system with defined levels; the specific number of levels should fit the project's complexity. Design Canon recommends keeping the elevation system small enough that each level has a distinct role.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.public-design-system.material-design-elevation",

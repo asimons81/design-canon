@@ -11,8 +11,8 @@
     "documentation"
   ],
   "summary": "AI-generated tables apply alternating row colors to every table by default, even when the table has few rows or clear column separation.",
-  "instruction": "Use zebra striping (alternating row background colors) only when a table has enough rows and columns that tracking across rows is difficult without it. Tables with fewer than 10 rows or strong column separators do not need zebra striping.",
-  "rationale": "Zebra striping adds visual noise that can counteract its intended benefit in small tables. A 4-row table with clear column headers and adequate row spacing is more readable without alternating backgrounds. Zebra striping is most effective in wide tables (6+ columns) with 15+ rows where the eye needs help tracking horizontally.",
+  "instruction": "Use zebra striping (alternating row background colors) only when the table has enough rows and columns that tracking across the table is difficult without it. Small tables with clear column separation do not benefit from alternating backgrounds.",
+  "rationale": "Zebra striping adds visual noise that can counteract its intended benefit when few rows or well-separated columns already make tracking easy. The decision should be based on whether the table's dimensions and density genuinely require the extra tracking aid, not on a reflex to stripe every table.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.table-zebra-defaults"
@@ -42,7 +42,7 @@
   "universalBan": false,
   "detector": {
     "feasibility": "semantic",
-    "signalDescription": "Detect nth-child background color CSS rules on table rows. Count rows in HTML. Flag if fewer than 10 rows AND zebra striping is detected. Exclude tables with 8+ columns (where striping is more justified).",
+    "signalDescription": "Detect nth-child background color CSS rules on table rows. Compare row count (from HTML or runtime) against column count. Flag small tables where zebra striping is likely unnecessary.",
     "matcherProposal": {
       "kind": "css-property",
       "patterns": [
