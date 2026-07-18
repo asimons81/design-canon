@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.accessibility.skip-navigation-link",
+  "proposedRuleId": "accessibility.skip-navigation-link",
+  "title": "Provide a skip-to-content link",
+  "status": "review-ready",
+  "category": "accessibility",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated interfaces lack skip-navigation links, forcing keyboard users to tab through every navigation item before reaching main content.",
+  "instruction": "Include a visible-on-focus skip-to-content link as the first focusable element on every page. The link must become visible when focused via keyboard navigation.",
+  "rationale": "WCAG 2.4.1 (Bypass Blocks) requires a mechanism to skip repeated content. On a page with 10 navigation links, a keyboard user must tab through every one on every page visit. The standard solution is a skip link, which benefits screen reader users, keyboard navigators, and power users.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-standard.wcag-bypass-blocks"
+  ],
+  "examples": {
+    "violations": [
+      "A marketing page with 8 nav links plus search before main content and no skip link.",
+      "A dashboard with a 15-item sidebar and no skip-link at the top of the page."
+    ],
+    "controls": [
+      "A page with <a href='#main-content' class='skip-link'>Skip to content</a> as the first focusable element, visible on focus.",
+      "A page with a skip-link visually hidden via clip/position but visible on keyboard focus."
+    ],
+    "borderline": [
+      "Single-page applications where content regions load dynamically - the skip link should target the content container that updates."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Pages with no repeated navigation blocks (single-content landing pages) and screen-reader-only applications where navigation order is managed by ARIA landmarks.",
+      "examples": [
+        "A single-section landing page with no navigation",
+        "An ARIA-managed SPA with proper landmark navigation"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Check if the first focusable element in the DOM is a skip-link (anchor with href targeting a main-content region, or a button with skip text). Verify a target main element or id='content' exists.",
+    "matcherProposal": {
+      "kind": "dom-structure",
+      "patterns": [
+        "a[href^='#']:first-of-type",
+        "[role='main']",
+        "#content",
+        "#main-content",
+        ".skip-link"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Skip links added by JavaScript after page load may not appear in static DOM.",
+      "Some frameworks manage focus programmatically, making skip links unnecessary."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Pages with no navigation (single-content landing pages where there's nothing to skip).",
+      "SPA frameworks that programmatically manage focus on route change."
+    ],
+    "mitigations": [
+      "Check for navigation blocks before flagging. Accept framework-based focus management as an alternative approach."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.accessibility.skip-link.violation.no-skip",
+      "caseType": "violation",
+      "description": "A page with 10 navigation links followed by main content, no skip link present."
+    },
+    {
+      "fixtureId": "fixture.accessibility.skip-link.control.with-skip",
+      "caseType": "control",
+      "description": "Same page with a visible-on-focus skip-to-content link as the first element after body."
+    },
+    {
+      "fixtureId": "fixture.accessibility.skip-link.borderline.spa-routing",
+      "caseType": "borderline",
+      "description": "An SPA with no skip link but programmatic focus management on route navigation."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

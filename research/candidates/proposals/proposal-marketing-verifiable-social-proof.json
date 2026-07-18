@@ -1,0 +1,93 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.marketing.verifiable-social-proof",
+  "proposedRuleId": "marketing.verifiable-social-proof",
+  "title": "Social proof must include verifiable details",
+  "status": "review-ready",
+  "category": "marketing",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated marketing sections include social proof without verifiable details, making it feel manufactured.",
+  "instruction": "Every social proof element must include identifying details: company name for logos, full name for testimonials, methodology for metrics.",
+  "rationale": "Social proof only works if users believe it. Vague testimonials ('Amazing product - John'), unlabeled logos, and unverifiable metrics trigger skepticism rather than trust.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "Testimonials attributed to first names only with blurry avatars.",
+      "A logo grid of unrecognizable logos with no labels."
+    ],
+    "controls": [
+      "Testimonials with full name, title, company, photo, referencing specific outcomes.",
+      "Logo grid with recognizable names and optional permission statements."
+    ],
+    "borderline": [
+      "Startups with early customers may not have recognizable logos - names and context suffice."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Enterprise sales pages where customer logos are under NDA. Internal tool landing pages where the audience knows the customer base.",
+      "examples": [
+        "Enterprise NDA-bound case study",
+        "Internal tool for known stakeholders"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "manual-only",
+    "signalDescription": "Review testimonial elements, logo lists, and metric counters for identifiable details.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "testimonial",
+        "logo",
+        "trusted by"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Requires semantic understanding of what constitutes verifiable details for each context."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Recognizable Fortune 500 logos needing no text labels.",
+      "Startups with legitimate but unknown early customers."
+    ],
+    "mitigations": [
+      "Logos of well-known brands need no text labels. Flag only when logos are obscure AND unlabeled."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.marketing.social-proof.violation.generic",
+      "caseType": "violation",
+      "description": "Testimonials with first names only, generic stock photos, unlabeled logos."
+    },
+    {
+      "fixtureId": "fixture.marketing.social-proof.control.verifiable",
+      "caseType": "control",
+      "description": "Testimonials with full details, specific outcomes, recognized logos."
+    },
+    {
+      "fixtureId": "fixture.marketing.social-proof.borderline.startup",
+      "caseType": "borderline",
+      "description": "Startup page with real customer names and companies even if not well-known."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

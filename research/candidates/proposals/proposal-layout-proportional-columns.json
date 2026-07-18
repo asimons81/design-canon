@@ -1,0 +1,94 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.layout.proportional-columns",
+  "proposedRuleId": "layout.proportional-columns",
+  "title": "Size columns proportionally to content importance",
+  "status": "review-ready",
+  "category": "layout",
+  "surfaces": [
+    "product-app",
+    "marketing"
+  ],
+  "summary": "AI-generated grid layouts default to equal-width columns regardless of content differences, creating unnatural proportions.",
+  "instruction": "Size columns proportionally to their content and importance. If one column has primary actions and another has secondary metadata, the primary should be wider.",
+  "rationale": "Equal-width columns by reflex ignores content hierarchy. A 2-column layout where one column has a dense data table and the other has a single metric wastes space on one side and crowds the other.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A dashboard with three equal panels where one has dense data, one has a single metric.",
+      "A two-column layout splitting 50/50 when one column has twice the content."
+    ],
+    "controls": [
+      "A grid using 2fr/1fr for primary/secondary based on content hierarchy.",
+      "A dashboard with column widths proportional to data density."
+    ],
+    "borderline": [
+      "An e-commerce grid where equal-width product cards are intentional for visual consistency."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Photo grid galleries where equal-width is standard. Settings forms where label-width consistency demands equal columns.",
+      "examples": [
+        "Masonry photo gallery",
+        "Settings form with aligned label columns"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "visual",
+    "signalDescription": "Detect CSS Grid or Flex layout with equal fr or flex values for all children. Check if content volume differs significantly.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "grid-template-columns",
+        "flex"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish content volume without rendering.",
+      "Equal columns in a 12-column grid are a different case than equal 2-4 column layouts."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "A 12-column grid where equal columns are the system (content spans variable columns).",
+      "A product grid where equal card widths are the design."
+    ],
+    "mitigations": [
+      "Flag only 2-4 column layouts, not multi-column grid systems."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.layout.proportional.violation.equal-panels",
+      "caseType": "violation",
+      "description": "Three equal panels: dense data table, single metric number, chart - all same width."
+    },
+    {
+      "fixtureId": "fixture.layout.proportional.control.weighted",
+      "caseType": "control",
+      "description": "Same layout with 2fr (data table), 1fr (metric), 2fr (chart)."
+    },
+    {
+      "fixtureId": "fixture.layout.proportional.borderline.product-grid",
+      "caseType": "borderline",
+      "description": "A product catalog with 3 equal-width product cards where equal is intentional."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.accessibility.text-contrast-minimum",
+  "proposedRuleId": "accessibility.text-contrast-minimum",
+  "title": "Text must meet WCAG AA contrast ratios",
+  "status": "review-ready",
+  "category": "accessibility",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated interfaces frequently use low-contrast text that fails WCAG AA minimum contrast requirements, creating readability barriers.",
+  "instruction": "Ensure all text meets WCAG AA contrast: 4.5:1 for normal text and 3:1 for large text (18px+ bold or 24px+ regular). Verify with a color contrast tool before choosing text and background combinations.",
+  "rationale": "Low-contrast text is the most common accessibility failure. Users with visual impairments, outdoor lighting, or low-quality displays are disproportionately affected. WCAG AA is the legal minimum in many jurisdictions including the EU and US federal procurement.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-standard.wcag-contrast"
+  ],
+  "examples": {
+    "violations": [
+      "Body text at 16px using #999 on white background (~2.8:1, fails 4.5:1).",
+      "Placeholder text (#CCC) on white (~1.6:1) used as an input label."
+    ],
+    "controls": [
+      "Body text at 16px using #4A4A4A on white (~8.6:1, passes AA).",
+      "Large heading text using #666 on white (~5.4:1, passes AA for large text)."
+    ],
+    "borderline": [
+      "Inverted text on image overlays where background luminance varies - requires text-shadow fallback or dynamic contrast."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Decorative text not intended to be read (background watermarks, design patterns), disabled controls where reduced contrast communicates state, and logos in brand color schemes.",
+      "examples": [
+        "Background watermark text",
+        "Disabled form inputs",
+        "Brand logo in company colors"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Parse CSS color and background-color pairs, compute relative luminance per WCAG formula, calculate contrast ratio. Flag pairs below 4.5:1 (normal text) or 3:1 (large text).",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "color",
+        "background-color",
+        "background"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Dynamic colors from CSS custom properties require runtime computation.",
+      "Background images with text overlays cannot be statically analyzed.",
+      "Multi-layer backgrounds (gradient over image) require rendering."
+    ]
+  },
+  "impact": "blocking",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Text on gradient backgrounds where contrast varies - may pass at some points and fail at others.",
+      "Disabled elements where reduced contrast is intentionally communicative."
+    ],
+    "mitigations": [
+      "Exclude disabled and decorative elements. For gradient backgrounds, check contrast at multiple sample points."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.accessibility.text-contrast.violation.light-gray-text",
+      "caseType": "violation",
+      "description": "A page with body text at #999 on white background and light gray placeholder text."
+    },
+    {
+      "fixtureId": "fixture.accessibility.text-contrast.control.dark-text-white-bg",
+      "caseType": "control",
+      "description": "Same page with body text at #333 on white background passing WCAG AA."
+    },
+    {
+      "fixtureId": "fixture.accessibility.text-contrast.borderline.gradient-overlay",
+      "caseType": "borderline",
+      "description": "A card with text over a gradient where contrast passes on dark end but fails on light end."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

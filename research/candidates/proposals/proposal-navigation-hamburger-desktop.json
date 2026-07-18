@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.navigation.hamburger-desktop",
+  "proposedRuleId": "navigation.hamburger-desktop",
+  "title": "Do not hide navigation behind hamburger on desktop viewports",
+  "status": "review-ready",
+  "category": "navigation",
+  "surfaces": [
+    "marketing",
+    "product-app",
+    "editorial"
+  ],
+  "summary": "AI-generated interfaces default to hamburger menus on desktop, hiding navigation and reducing discoverability.",
+  "instruction": "Show primary navigation links visibly in the header on viewports wider than 768px. Reserve hamburger menus for narrow viewports.",
+  "rationale": "Hamburger menus reduce discoverability by hiding links. On desktop viewports with horizontal space, visible navigation improves engagement and task completion.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A marketing page at 1440px with a hamburger icon hiding all navigation links.",
+      "A dashboard at 1920px with hamburger for 4 primary sections that would fit in the header."
+    ],
+    "controls": [
+      "A marketing page with visible nav links at desktop, collapsing to hamburger below 768px.",
+      "A dashboard with persistent left sidebar showing section names at desktop."
+    ],
+    "borderline": [
+      "Apps with 7+ navigation items may need to prioritize or combine visible top-level with hamburger for secondary."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Content-forward pages where the entire viewport is for reading. Minimalist portfolio or artistic sites with documented design direction.",
+      "examples": [
+        "Long-form reading interface",
+        "Minimalist photography portfolio"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Detect hamburger icon (three-line SVG or unicode) as primary navigation on desktop-width viewports (>768px).",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "hamburger menu",
+        "three-line icon",
+        "nav-toggle"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Hamburger styling differs across frameworks.",
+      "JavaScript toggling may not appear in static CSS analysis."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Apps with only 1-2 pages where hamburger containing just Home and About is fine.",
+      "Mobile-first PWAs using mobile patterns at all widths intentionally."
+    ],
+    "mitigations": [
+      "Require at least 3 nav items to flag. Check breakpoint in responsive CSS."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.navigation.hamburger.violation.desktop-hidden",
+      "caseType": "violation",
+      "description": "A 1440px landing page with hamburger icon hiding 6 nav links."
+    },
+    {
+      "fixtureId": "fixture.navigation.hamburger.control.visible-links",
+      "caseType": "control",
+      "description": "Same page with visible nav links at 1440px, hamburger below 768px."
+    },
+    {
+      "fixtureId": "fixture.navigation.hamburger.borderline.minimal-portfolio",
+      "caseType": "borderline",
+      "description": "A portfolio with hamburger at all widths but only 2 nav items, documented design direction."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

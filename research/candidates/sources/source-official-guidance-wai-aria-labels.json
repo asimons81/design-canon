@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.official-guidance.wai-aria-labels",
+  "sourceType": "official-guidance",
+  "title": "WAI-ARIA 1.2: Label and Described-By Requirements",
+  "publisher": "W3C",
+  "url": "https://www.w3.org/TR/wai-aria-1.2/#name-computation",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "explicit-open-license",
+  "license": "CC-BY-4.0",
+  "summary": "Every interactive form control must have an accessible name computed from aria-label, aria-labelledby, or associated label element.",
+  "supportingClaims": [
+    "Placeholder text does not serve as an accessible label and disappears on input.",
+    "Inputs without labels fail WCAG 3.3.2 (Labels or Instructions) and 2.4.6 (Headings and Labels)."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

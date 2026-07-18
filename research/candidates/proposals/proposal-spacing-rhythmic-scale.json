@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.spacing.rhythmic-scale",
+  "proposedRuleId": "spacing.rhythmic-scale",
+  "title": "Use a consistent spacing scale",
+  "status": "review-ready",
+  "category": "spacing",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated interfaces use arbitrary margin and padding values without following a consistent ratio or base unit.",
+  "instruction": "Use a structured spacing scale with at most 6-8 steps. Every margin and padding value must come from this scale. Avoid one-off values between scale steps.",
+  "rationale": "A spacing scale creates visual rhythm. When elements use 8px, 10px, 11px, 16px, 24px, and 27px in the same view, the layout feels unsettled. Predictable spacing allows the eye to develop reading patterns.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A card with padding:16px, gap:12px, margin-top:20px - three different values in one component.",
+      "A sidebar with section spacing of 22px, 18px, 14px, 30px without systematic relationship."
+    ],
+    "controls": [
+      "A component library using an 8px base scale: 4, 8, 16, 24, 32, 48, 64px for all gaps, paddings, margins.",
+      "A marketing page where every spacing value is one of 4, 8, 12, 16, 24, 32, 48, 64px."
+    ],
+    "borderline": [
+      "Rich text article paragraph margins in em units (1em = 16px at default body size) that fall outside the spacing scale numerically but follow a different system."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Negative margins for intentional overlap, spacing inside SVG/canvas renderings, and third-party widget spacing that cannot be controlled.",
+      "examples": [
+        "Overlapping hero elements with negative margins",
+        "Chart legend spacing in SVG"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Collect all CSS margin, padding, and gap values. Normalize to px. Cluster by proximity to a 4-step or 8-step scale. Flag values >2px from nearest scale step.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "margin",
+        "padding",
+        "gap"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "CSS custom properties prevent static value resolution.",
+      "Shorthand properties with multiple values must be decomposed.",
+      "Responsive spacing produces different values at different breakpoints."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Projects using a 10px base scale that needs different step detection.",
+      "Responsive spacing that changes at breakpoints (different values are expected)."
+    ],
+    "mitigations": [
+      "Detect the dominant spacing scale from the dataset first, then flag outliers."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.spacing.scale.violation.arbitrary-values",
+      "caseType": "violation",
+      "description": "A feature section with margins of 18px, 22px, 34px, 45px that don't follow any scale."
+    },
+    {
+      "fixtureId": "fixture.spacing.scale.control.eight-point",
+      "caseType": "control",
+      "description": "A form section using spacing: 8px inside inputs, 16px between fields, 24px between sections."
+    },
+    {
+      "fixtureId": "fixture.spacing.scale.borderline.em-units",
+      "caseType": "borderline",
+      "description": "A blog post with 1em paragraph spacing alongside 24px section spacing - mixed unit system."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

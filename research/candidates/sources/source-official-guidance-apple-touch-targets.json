@@ -1,0 +1,23 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.official-guidance.apple-touch-targets",
+  "sourceType": "official-guidance",
+  "title": "Apple Human Interface Guidelines: Touch Targets",
+  "publisher": "Apple",
+  "url": "https://developer.apple.com/design/human-interface-guidelines/touch-targets",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "publicly-readable",
+  "summary": "Apple HIG recommends a minimum touch target of 44x44 points for all interactive elements on iOS and iPadOS.",
+  "supportingClaims": [
+    "44x44 points is the minimum touch target for comfortable interaction across device sizes.",
+    "Smaller targets increase error rates and negatively impact users with reduced dexterity."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

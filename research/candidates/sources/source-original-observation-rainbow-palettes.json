@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.rainbow-palettes",
+  "sourceType": "original-observation",
+  "title": "Rainbow palettes in AI-generated data visualizations",
+  "sourceLocation": "Review of AI-generated chart, dashboard, and data-display code from multiple code-generation tools",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI coding agents frequently assign full-hue-cycle palettes (red through violet) to data categories and UI states without considering adjacent-hue contrast or accessibility.",
+  "supportingClaims": [
+    "Rainbow palettes distribute contrast unevenly, with yellow-green adjacent pairs typically scoring below 2:1 contrast.",
+    "White text labels over mid-luminance hues in rainbow palettes consistently fail WCAG contrast requirements."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.forms.input-labels-required",
+  "proposedRuleId": "forms.input-labels-required",
+  "title": "Every input must have an accessible label",
+  "status": "review-ready",
+  "category": "forms",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated forms use placeholder text as the sole label, which disappears on input and fails WCAG requirements for persistent labels.",
+  "instruction": "Associate a persistent visible label with every input element. Do not rely on placeholder text as a label replacement.",
+  "rationale": "Placeholder text disappears when users start typing, forcing recall. This fails WCAG 2.4.6 (Headings and Labels) and 3.3.2 (Labels or Instructions). Users with cognitive disabilities and anyone on mobile benefit from persistent labels. The fix requires a for/id label association, aria-label, or aria-labelledby.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-guidance.wai-aria-labels"
+  ],
+  "examples": {
+    "violations": [
+      "A signup form with email and password fields using only placeholder='Enter your email' without visible labels.",
+      "A search form with no label, just a magnifying glass icon and placeholder='Search...' without aria-label."
+    ],
+    "controls": [
+      "A signup form with visible labels above each field and proper for/id association on label/input pairs.",
+      "A search form with aria-label='Search documentation' on the input and a visible placeholder that complements the label."
+    ],
+    "borderline": [
+      "A settings form with clear section headings and visible descriptions beside each field may be accessible without explicit labels if visual grouping is unambiguous."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Fields where the label is part of surrounding visual context and duplication would create redundancy, evaluated on a case-by-case basis.",
+      "examples": [
+        "Inline confirmation dialogs with a single text field",
+        "Visual-only filter controls with visible icon labels"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Find all input, textarea, and select elements. Check for associated label via for/id, wrapping label element, aria-label, or aria-labelledby. Flag if none of these exist.",
+    "matcherProposal": {
+      "kind": "dom-structure",
+      "patterns": [
+        "input:not([type=hidden]):not([type=submit]):not([type=button])",
+        "textarea",
+        "select"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Custom form controls (rich text editors, date pickers) may handle accessibility internally via ARIA.",
+      "Dynamically added labels via JavaScript may not appear in static DOM analysis."
+    ]
+  },
+  "impact": "blocking",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Custom form controls that manage accessibility internally.",
+      "A single search input with a visible label outside the immediate DOM context."
+    ],
+    "mitigations": [
+      "Accept aria-label and aria-labelledby as valid label mechanisms beyond just for/id associations.",
+      "Check the enclosing parent container for implicit labeling text."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.forms.input-labels.violation.signup-form",
+      "caseType": "violation",
+      "description": "A signup form with email and password inputs using placeholder-only labeling, no labels, no aria-labels."
+    },
+    {
+      "fixtureId": "fixture.forms.input-labels.control.signup-form-labeled",
+      "caseType": "control",
+      "description": "Same signup form with proper label associations and visible text labels above each input."
+    },
+    {
+      "fixtureId": "fixture.forms.input-labels.borderline.settings-form",
+      "caseType": "borderline",
+      "description": "A settings form with section headings that implicitly label the fields below."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

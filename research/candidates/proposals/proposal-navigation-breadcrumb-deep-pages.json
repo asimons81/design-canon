@@ -1,0 +1,94 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.navigation.breadcrumb-deep-pages",
+  "proposedRuleId": "navigation.breadcrumb-deep-pages",
+  "title": "Use breadcrumbs on pages three or more levels deep",
+  "status": "review-ready",
+  "category": "navigation",
+  "surfaces": [
+    "product-app",
+    "editorial"
+  ],
+  "summary": "AI-generated multi-page apps often lack breadcrumb navigation, disorienting users in deep hierarchies.",
+  "instruction": "Any page three or more levels deep in the site hierarchy should display breadcrumb navigation showing the path from the top level.",
+  "rationale": "Breadcrumbs reduce disorientation and support backtracking. They provide context for deep-linked pages where users arrive without surrounding navigation.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A product detail page 3 levels deep with no breadcrumb.",
+      "A documentation page 5 levels deep with no breadcrumb."
+    ],
+    "controls": [
+      "An e-commerce page with 'Home > Electronics > Headphones > Sony WH-1000XM5'.",
+      "A docs page with 'Docs > API > Authentication > OAuth2'."
+    ],
+    "borderline": [
+      "Single-page applications where 'level' is ambiguous should still provide context."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Dashboards where the user's mental model is flat. Marketing landing pages that are single-level. Mobile-first apps with bottom tab navigation.",
+      "examples": [
+        "Analytics dashboard with flat sections",
+        "Landing page with single-level content"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Check URL path depth. If 3+ segments, check for nav with aria-label='breadcrumb' or breadcrumb-structured data.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "breadcrumb",
+        "aria-label"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "SPA hash routing makes URL depth unreliable.",
+      "Alternative navigation context (tabs, steps) may serve the same purpose."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Flat sites where URL depth does not match navigation depth.",
+      "Wizard/multi-step forms where step indicators replace breadcrumbs."
+    ],
+    "mitigations": [
+      "Check for step indicators and tab navigation as alternative context."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.navigation.breadcrumb.violation.missing",
+      "caseType": "violation",
+      "description": "An e-commerce product page at /products/electronics/headphones/sony with no breadcrumb."
+    },
+    {
+      "fixtureId": "fixture.navigation.breadcrumb.control.present",
+      "caseType": "control",
+      "description": "Same page with breadcrumb showing the full path."
+    },
+    {
+      "fixtureId": "fixture.navigation.breadcrumb.borderline.tab-nav",
+      "caseType": "borderline",
+      "description": "A settings page at /settings/account/security with tab-based section navigation."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

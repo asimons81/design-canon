@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.states.specific-error-messages",
+  "proposedRuleId": "states.specific-error-messages",
+  "title": "Error messages must explain what happened and how to fix it",
+  "status": "review-ready",
+  "category": "states",
+  "surfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated error states use vague 'Something went wrong' without context or recovery guidance.",
+  "instruction": "Every error message must include: what happened, why it happened, and what the user can do. Avoid generic error language.",
+  "rationale": "Vague error messages increase support load. Users seeing 'Something went wrong' cannot retry, fix, or report effectively. Specific error messages restore user autonomy and reduce frustration.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A form error showing 'Something went wrong' with no distinction between validation, network, or server failure.",
+      "An API error toast showing 'An unexpected error occurred' with dismiss only."
+    ],
+    "controls": [
+      "A form error saying 'Your session expired. Please refresh and try again.' with a Refresh button.",
+      "An upload error saying 'Image must be under 5MB. Your file was 8MB.' with compression guidance."
+    ],
+    "borderline": [
+      "Security-related errors that should be intentionally vague to avoid revealing system structure."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Catastrophic system failures where the system cannot determine what happened. Security errors where specific information aids attackers.",
+      "examples": [
+        "Unrecoverable kernel panic",
+        "Authentication failure where revealing valid usernames aids attackers"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Pattern-match error display elements against known generic error templates. Check for specific context near the error.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "something went wrong",
+        "an error occurred",
+        "unexpected error",
+        "try again later"
+      ],
+      "caseSensitive": false,
+      "wordBoundary": true
+    },
+    "limitations": [
+      "Error messages may be loaded from backend API and not in frontend source.",
+      "Some errors are genuinely unrecoverable."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A 404 page that's appropriately specific ('Page not found' with recovery).",
+      "A maintenance page ('We'll be back soon') that's intentionally broad."
+    ],
+    "mitigations": [
+      "Require at least 2 of: specific error type, recovery action, or reference ID. Flag only generic messages with none."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.states.error-messages.violation.generic-toast",
+      "caseType": "violation",
+      "description": "Error toast saying 'Something went wrong' with an X button and no details."
+    },
+    {
+      "fixtureId": "fixture.states.error-messages.control.actionable",
+      "caseType": "control",
+      "description": "Error saying 'Connection lost. Changes saved locally. Reconnect to sync.' with Reconnect button."
+    },
+    {
+      "fixtureId": "fixture.states.error-messages.borderline.http-403",
+      "caseType": "borderline",
+      "description": "403 page saying 'Access denied. Contact your administrator.'"
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

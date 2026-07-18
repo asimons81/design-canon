@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.color.contrast-rainbow-palette",
+  "proposedRuleId": "color.contrast-rainbow-palette",
+  "title": "Reject rainbow palettes that ignore contrast",
+  "status": "review-ready",
+  "category": "color",
+  "surfaces": [
+    "universal",
+    "product-app"
+  ],
+  "summary": "AI-generated data displays use full-hue-cycle rainbow palettes where adjacent hues (yellow-green) fail WCAG contrast for overlaid text and differ illegibly from each other.",
+  "instruction": "Do not use a full-hue-cycle rainbow palette for data, UI elements, or decorative surfaces unless each adjacent pair meets WCAG AA for the content layer above it. Restrict palette hues to at most one-third of the wheel per view.",
+  "rationale": "Rainbow palettes distribute contrast unevenly: yellow-green adjacent pairs typically score below 1.5:1, while red-blue can exceed 3:1. This forces users to rely on position alone for differentiation and creates inaccessible text contrast. Sequential or luminance-based palettes preserve readability.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.rainbow-palettes"
+  ],
+  "examples": {
+    "violations": [
+      "A chart legend using red, orange, yellow, green, blue, purple fills with white text illegible against yellow and green swatches.",
+      "A dashboard status bar using a continuous rainbow gradient with black text at the midpoint where luminance is closest to text color."
+    ],
+    "controls": [
+      "A data dashboard using a single-hue sequential palette (light blue to dark blue) for a geographic heatmap with luminance-switching text colors.",
+      "A marketing page using a three-color analogous palette (blue-teal-green) with consistent luminance for accessible text overlays."
+    ],
+    "borderline": [
+      "A children's education app using full rainbow colors for isolated decorative icons with no overlaid text and a documented educational purpose."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Data-visualization tools offering rainbow palettes as an explicit user choice with contrast warnings or auto-switching text color per swatch.",
+      "examples": [
+        "Chart libraries with built-in contrast checking",
+        "Color-blindness simulation tools where the full spectrum is the instructional material"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Detect 3+ CSS color declarations spanning hue intervals >60 degrees apart in the same viewport, suggesting a rainbow palette is in use.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "background",
+        "color",
+        "background-color"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish decorative from semantic color usage without element role annotations.",
+      "CSS custom properties computed at runtime are invisible to static analysis.",
+      "Hue-bin grouping near bin boundaries is approximate."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A brand's established color system with 6 hues and careful luminance balancing.",
+      "An intentionally maximalist design (music festival site) with a documented broad-palette direction."
+    ],
+    "mitigations": [
+      "Flag only when adjacent hue bins are populated AND pairwise contrast falls below 2:1. Allow suppression with a documented design direction."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.color.rainbow-palette.violation.six-category-cards",
+      "caseType": "violation",
+      "description": "Marketing page with six cards each using a different hue (red-yellow-green-blue-violet) with white text failing AA on yellow/green."
+    },
+    {
+      "fixtureId": "fixture.color.rainbow-palette.control.sequential-blue",
+      "caseType": "control",
+      "description": "Dashboard with single-hue sequential blue palette (four luminance steps) with appropriate text colors per step."
+    },
+    {
+      "fixtureId": "fixture.color.rainbow-palette.borderline.kids-icons",
+      "caseType": "borderline",
+      "description": "Children's app with six pastel hues as isolated icon backgrounds (no text overlay), separated by whitespace."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

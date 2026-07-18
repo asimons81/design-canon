@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.layout.visual-focal-point",
+  "proposedRuleId": "layout.visual-focal-point",
+  "title": "Every view needs a visual focal point",
+  "status": "review-ready",
+  "category": "layout",
+  "surfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "AI-generated layouts distribute visual weight evenly across sections without a clear entry point, leaving users unsure where to look first.",
+  "instruction": "Design each view with one dominant visual focal point. Secondary elements must support rather than compete with the focal element.",
+  "rationale": "A page where everything is equally prominent communicates that nothing is important. The eye needs a visual anchor to establish reading order. Without a focal point, users scan aimlessly or abandon the page.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A marketing section with heading, illustration, three feature cards, testimonial, and CTA all at equal visual weight.",
+      "A dashboard with four KPI cards of identical size, color, and density - user must read all labels to find the relevant metric."
+    ],
+    "controls": [
+      "A landing page with a large hero image as focal point, headline overlaid, single CTA. Feature cards below are visually lighter.",
+      "A dashboard highlighting the most important metric card with slightly larger size, accent border, and elevation."
+    ],
+    "borderline": [
+      "A product listing grid with equal card sizes where the focal point is the page title rather than a single card."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Search results, product grids, and index pages where equal weight across items is intentional. Admin panels used by experienced operators who scan for known data.",
+      "examples": [
+        "E-commerce category page",
+        "File browser",
+        "Admin data table"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "visual",
+    "signalDescription": "Segment page into bounding boxes for major content regions. Compare area, contrast ratio, border weight, and elevation between top elements.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "visual weight",
+        "dominant element",
+        "hierarchy"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish intentional flat layouts (gallery pages) from unintentional flatness.",
+      "A focal point may be established through typography rather than container size."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A grid-based portfolio where equal image sizes let the work compete.",
+      "A settings page where all sections have equal weight intentionally."
+    ],
+    "mitigations": [
+      "Require at least one element with area 1.5x the median or 3:1+ contrast versus other sections. Allow suppression for index and gallery layouts."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.layout.focal-point.violation.flat-grid",
+      "caseType": "violation",
+      "description": "A features page with four equal-sized cards in a 2x2 grid, identical styling, no emphasis."
+    },
+    {
+      "fixtureId": "fixture.layout.focal-point.control.hero-emphasis",
+      "caseType": "control",
+      "description": "A product page with a large hero image (60% viewport width) as focal point, smaller cards below."
+    },
+    {
+      "fixtureId": "fixture.layout.focal-point.borderline.heading-focal",
+      "caseType": "borderline",
+      "description": "An e-commerce grid with equal cards but a strongly styled page title providing the focal point."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

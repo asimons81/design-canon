@@ -1,0 +1,97 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.states.skeleton-over-spinner",
+  "proposedRuleId": "states.skeleton-over-spinner",
+  "title": "Use skeleton screens instead of spinners for content areas",
+  "status": "review-ready",
+  "category": "states",
+  "surfaces": [
+    "product-app",
+    "mobile"
+  ],
+  "summary": "AI-generated loading states default to centered spinners rather than skeleton screens that improve perceived performance.",
+  "instruction": "Use skeleton screens approximating final content layout for content loading. Reserve spinners for whole-page loading or actions that cannot be approximated.",
+  "rationale": "Research shows skeleton screens reduce perceived loading time by providing visual structure. Users are less likely to abandon a loading state when they can anticipate the content shape.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A dashboard showing a centered spinner on page load with no layout hints.",
+      "A data table showing a full-page spinner while fetching rows."
+    ],
+    "controls": [
+      "A dashboard with skeleton cards matching final layout - grey rectangles approximating chart positions.",
+      "A content feed with skeleton items showing avatar circle, title line, description lines."
+    ],
+    "borderline": [
+      "A full-page route transition where content structure changes completely may justify a brief spinner."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Operations completing in under 300ms (no loading state needed). Upload progress bars. Legacy systems where skeleton approximation is impractical.",
+      "examples": [
+        "Instant data fetch (<300ms)",
+        "File upload with progress percentage",
+        "Legacy system without layout information"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find centered spinner elements. Check for nearby skeleton placeholder elements (grey dimmed rectangles, pulsing blocks).",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "spinner",
+        "loading",
+        "skeleton",
+        "placeholder"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot detect loading states implemented entirely in JavaScript.",
+      "Button-level spinners (saving states) are appropriate and should not be flagged."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Simple action button showing spinner during save - appropriate for button-level feedback.",
+      "Brand launch screen animation before app loads."
+    ],
+    "mitigations": [
+      "Target content-area loading states, not button-level spinners. Flag only page-level spinner as sole treatment."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.states.skeleton.violation.spinner-only",
+      "caseType": "violation",
+      "description": "A dashboard page with a single centered spinner when data is loading, no skeleton."
+    },
+    {
+      "fixtureId": "fixture.states.skeleton.control.skeleton-cards",
+      "caseType": "control",
+      "description": "Same page with 4 skeleton cards matching final metric card layout with shimmer."
+    },
+    {
+      "fixtureId": "fixture.states.skeleton.borderline.mixed",
+      "caseType": "borderline",
+      "description": "A page with skeleton header but spinner in content area because content structure varies."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}
