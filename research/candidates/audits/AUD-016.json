@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-016",
+  "component": "mobile-navigation",
+  "recurringPattern": "Bottom tab bar with 4-5 icon+label tabs (Home, Search, Activity, Profile, More), a hamburger menu for additional items, and a top status bar that either hides or unnaturally persists. Active tab uses the brand's primary color fill.",
+  "designHarm": "The 5-tab bottom bar is a sensible mobile pattern, but AI applies it universally regardless of app architecture. Apps with 3 or fewer primary destinations get unnecessary tabs. The 'More' overflow becomes a dumping ground for important features. The bottom bar competes with gesture-based navigation on modern iOS/Android.",
+  "legitimateExceptions": ["Content-consumption apps (Instagram, Twitter) where 5 primary destinations are genuine", "Utility apps with well-defined, mutually exclusive sections"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 5-tab bottom nav", "Gesture-driven navigation without bottom bar", "Top-tab navigation for secondary-level mobile sections"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-016"],
+  "originalObservations": [
+    "AI-generated mobile navigation always defaults to 5 bottom tabs regardless of app depth.",
+    "Tab icons are always outlined when inactive and filled when active, using the primary brand color.",
+    "The hamburger menu is always positioned top-left on screens that also have bottom tabs."
+  ]
+}

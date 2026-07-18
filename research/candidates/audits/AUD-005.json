@@ -1,0 +1,18 @@
+{
+  "auditId": "AUD-005",
+  "component": "sidebars",
+  "recurringPattern": "Dark or glass sidebar with vertically stacked navigation items, each using an outlined icon + label, a bottom section with user avatar and settings icon, and a collapsed-state hamburger or chevron toggle.",
+  "designHarm": "Unnecessary dark sidebar forces high contrast against a light main area, creating fatigue. The glass variant introduces readability issues on content behind it. The pattern is treated as required when many layouts don't need a persistent sidebar at all.",
+  "legitimateExceptions": ["Desktop-first operating tools where sidebar is the primary command surface (Figma, VS Code)", "Apps with deep information architecture that genuinely needs persistent category navigation"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard dark sidebar with icon+label nav items", "Sidebar-less layout with top navigation", "Light sidebar with contextual visibility instead of persistent display"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-005"],
+  "originalObservations": [
+    "AI nearly always places a persistent sidebar on the left for any product app or dashboard, even when the navigation has only 3-4 items.",
+    "The sidebar-dark, main-light color split is the default rather than a considered choice."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "batch": "calibration-001",
+  "date": "2026-07-18",
+  "tracks": {
+    "A": { "name": "General Anti-Slop Research", "target": 40, "actual": 0 },
+    "B": { "name": "Contextual AI-Copy Research", "target": 60, "actual": 0 },
+    "C": { "name": "Component Audits", "audits_target": 25, "audits_actual": 0, "proposals_target": 30, "proposals_actual": 0 },
+    "D": { "name": "Candidate Fixtures", "fixture_count": 0 },
+    "E": { "name": "Source Registry", "source_count": 0 },
+    "F": { "name": "Duplicate and Overlap Review", "completed": false }
+  },
+  "validation": {
+    "errors": 0,
+    "warnings": 0,
+    "passed": false
+  },
+  "summary": ""
+}

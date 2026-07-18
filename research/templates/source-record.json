@@ -1,0 +1,11 @@
+{
+  "sourceId": "SRC-000000",
+  "sourceType": "original-observation",
+  "title": "Example source",
+  "publicLocation": "https://example.com/source",
+  "accessDate": "2026-07-18",
+  "licenseStatus": "fair-use",
+  "summary": "Original summary of the source.",
+  "supportingClaims": ["Claim supported by this source."],
+  "cleanRoomAttestation": "independently-discovered"
+}

@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-026",
+  "proposedRuleId": "dashboards.overcrowded-metrics",
+  "title": "Limit metrics per dashboard card",
+  "category": "dashboards",
+  "relevantSurfaces": ["dashboards"],
+  "summary": "Generated dashboards pack 6-12 distinct metrics into a single card or viewport, presenting raw data without visual hierarchy or prioritization, overwhelming the user with equal-weight numbers instead of directing attention to key performance indicators.",
+  "instruction": "A single dashboard card should display at most 3 primary metrics. Additional supporting metrics may appear in a secondary style (smaller, muted, in a sub-grid) but must not compete for visual attention with the primary KPIs. If more than 8 metrics are needed per view, split them into category cards with clear section hierarchy.",
+  "rationale": "The human brain can hold approximately 4 items in working memory (Miller's Law). Displaying > 8 metrics on a single card forces serial scanning, undermining the dashboard's purpose of providing at-a-glance status. Good dashboards prioritize: a dashboard with 3 well-chosen metrics is more useful than one with 12 undifferentiated ones.",
+  "claimType": "research-backed",
+  "violations": [
+    "A marketing dashboard card showing impressions, clicks, CTR, CPC, conversions, conversion rate, revenue, ROAS, bounce rate, and time on page — 10 metrics in a single card with no visual distinction.",
+    "An analytics dashboard with a single 'Overview' card containing 15 numeric values in a 3x5 grid, all using the same font weight and size.",
+    "A server monitoring dashboard where a single card shows CPU, memory, disk, network, uptime, processes, load, temperature, and fan speed — 9 metrics, all equal weight."
+  ],
+  "controls": [
+    "A marketing dashboard with three KPI cards: 'Traffic' (impressions, clicks, CTR), 'Conversion' (conversions, rate, revenue), 'Efficiency' (CPC, ROAS) — 3 cards, 3 metrics each, with section headings.",
+    "An analytics dashboard with a primary metric card showing 'Revenue: $12.4K (+18%)' in large text, with secondary metrics (visitors, conversion rate) in smaller supporting text below.",
+    "A server dashboard with four cards: 'Performance' (CPU, memory), 'Network' (in/out), 'Storage' (used/total), 'Health' (uptime, processes) — each card focused on one category."
+  ],
+  "borderlineCases": [
+    "A compact operations dashboard designed for a small screen (smartwatch or mobile terminal) where 4 mini-metrics per card is the maximum for the display size — 4 is stretching but acceptable with clear labels."
+  ],
+  "contextualExceptions": [
+    "Embedded analytics widgets where the host application controls the card layout and the dashboard is a raw data display, not a designed interface.",
+    "Financial trading dashboards where 10+ tickers on one screen are the expected UX and users are trained to scan rapidly.",
+    "User-configurable dashboards where the user has explicitly chosen which metrics to display and can reorder or remove them."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A dashboard card containing more than 8 numeric values sharing the same font-size, font-weight, and color within a 200px radius",
+  "matcherProposal": "Identify dashboard-like containers (containers with numeric data patterns: % signs, currency symbols, decimal values). Count numeric values per container. If a single container has >8 values with the same font-weight and within 2px of each other's font-size, flag. Additional check: ratio of numeric values to label text — high ratio indicates metric overload.",
+  "detectorLimitations": [
+    "Cannot distinguish intentional data-dense dashboards (Bloomberg terminal style) from overcrowded ones without context about the user's role.",
+    "Numeric values in chart legends, axis labels, and tooltips may be misidentified as card metrics.",
+    "Dashboards with expandable sections or drill-downs may show many metrics only when expanded — the initial state may be sparse."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A financial data terminal where 15 metrics on a single card is the expected, trained interaction model and users expect density.",
+    "A developer monitoring dashboard with 10 server metrics where all are equally critical to the DevOps role.",
+    "A dashboard where the 'card' is actually a data table misidentified by the heuristic."
+  ],
+  "mitigationStrategy": "Exclude containers with [role=grid] or [role=table]. Lower to warning threshold at 10+ metrics. Provide data-dense-ok attribute for power-user dashboards.",
+  "fixturePlans": {
+    "violation": "A marketing dashboard card with 10 metric tiles (impressions, clicks, CTR, CPC, conversions, rev, ROAS, bounce, pages/session, duration) all at 16px/600-weight/#111827 in a 5x2 grid.",
+    "control": "A marketing dashboard with 3 KPI cards: 'Traffic' (impressions, clicks, CTR), 'Revenue' (conversions, rev, ROAS), 'Quality' (bounce, duration) — each card has a section header and 3 metrics in bold, plus optional supporting text in smaller type.",
+    "borderline": "A server ops dashboard with a 'System Health' card showing 8 metrics (CPU, mem, disk, net in/out, uptime, processes, load) all in 14px with small labels — borderline but the role demands data density."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Working memory limit based on publicly available Miller's Law reference."
+  ],
+  "overlapNotes": "First proposal in the dashboards category. No overlap with existing rules."
+}

@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-006",
+  "proposedRuleId": "settings.sidebar-content-split",
+  "title": "Do not default to sidebar-content settings layout",
+  "category": "layout",
+  "relevantSurfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated settings pages universally use a two-level layout with sidebar navigation and content panel, even when there are only 3-4 sections that would fit on a single page.",
+  "instruction": "Choose a settings layout that matches the number of categories. For 3-5 settings sections, prefer a single scrollable page with section headings, tabs, or an accordion. Reserve the sidebar-content split for settings with 6+ distinct categories.",
+  "rationale": "The sidebar-content split wastes horizontal space on desktop and forces awkward stacking on mobile. It creates unnecessary navigation overhead for shallow settings. The universal 'Save Changes' button pattern risks lost edits when users navigate between sections before saving.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Settings page with persistent sidebar listing 3-5 categories",
+    "Content panel with same category order repeated as the sidebar",
+    "'Save Changes' button at the bottom of every section requiring manual save",
+    "iOS-style toggle switches for boolean settings regardless of platform",
+    "Categories always labeled General, Account, Notifications, Appearance, Privacy"
+  ],
+  "controls": [
+    "Single-page settings with section dividers and auto-save",
+    "Tab-based settings for moderate category counts",
+    "Slide-out settings panel accessible from anywhere in the app",
+    "Settings wizard for initial setup with fewer categories"
+  ],
+  "borderlineCases": [
+    "Desktop applications with many settings categories requiring persistent navigation"
+  ],
+  "contextualExceptions": [
+    "Enterprise admin panels with genuinely deep settings hierarchies"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A two-panel layout where the left panel contains labeled section headings and the right panel shows form fields, with a save/submit button at the bottom.",
+  "matcherProposal": "Detect a page with a side navigation containing labeled sections (General, Account, Notifications, etc.) and a main content area with form elements matching those section labels.",
+  "detectorLimitations": [
+    "Cannot assess whether the layout is justified by the actual number of categories"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Legitimate settings pages with 8+ categories",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag only when sidebar contains fewer than 6 items that could fit in a top tab or single-page layout.",
+  "fixturePlans": {
+    "violation": "Settings with 4-section sidebar (General, Account, Notifications, Appearance), content panel, Save button, iOS toggles.",
+    "control": "Single-page settings with section dividers, auto-save, platform-native toggle controls.",
+    "borderline": "Enterprise settings with 10+ categories in sidebar-content layout."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

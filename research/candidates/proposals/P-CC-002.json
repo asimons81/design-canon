@@ -1,0 +1,43 @@
+{
+  "proposalId": "P-CC-002",
+  "proposedRuleId": "feature-grid.uniform-cards",
+  "title": "Do not flatten feature hierarchy into uniform cards",
+  "category": "hierarchy",
+  "relevantSurfaces": ["marketing", "product-app"],
+  "summary": "AI-generated feature grids default to a uniform grid of identical icon-headline-body cards, treating every feature as equally important with no visual hierarchy.",
+  "instruction": "Avoid presenting all features in identical cards. Use varied sizing, staggered layouts, or list formats to signal which features are primary. A flat card grid is acceptable only when all features are genuinely co-equal.",
+  "rationale": "Uniform feature cards make it impossible for users to distinguish the primary value proposition from secondary features. The pattern hides the product's differentiation behind a wallpaper of equally-weighted claims.",
+  "claimType": "observation",
+  "sourceRefs": ["SRC-CC-001"],
+  "violations": [
+    "3x2 or 3x3 grid of cards with identical dimensions",
+    "Every card has a colored circle/square icon container of the same size",
+    "Every card has a bold short headline with exactly two lines of body copy",
+    "Identical border-radius and shadow values on every card",
+    "No visual distinction between flagship feature and minor functionality"
+  ],
+  "controls": [
+    "Staggered card sizes where the primary feature gets more visual weight",
+    "Feature list format alternating text and media sections",
+    "One primary hero feature above a secondary grid",
+    "Card format with intentional variation in media type (icon, screenshot, video)"
+  ],
+  "borderlineCases": ["Documentation category tiles where features are genuinely co-equal"],
+  "contextualExceptions": ["Design system documentation showing all available card variants"],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Multiple card elements with identical bounding box dimensions arranged in a regular grid containing icon+headline+body structure.",
+  "matcherProposal": "Detect repeated card-like containers in grid formation where each contains an icon element, a heading-level text, and a paragraph, with all cards sharing identical CSS dimensions.",
+  "detectorLimitations": ["Cannot distinguish intentional feature parity from template defaulting"],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": ["Product pages where features genuinely are co-equal", "Icon grid navigation components"],
+  "mitigationStrategy": "Flag with a reminder to review whether the grid represents the actual feature hierarchy or was chosen by default.",
+  "fixturePlans": {
+    "violation": "3x2 grid of identical feature cards with icons in colored circles and two-line descriptions.",
+    "control": "Staggered feature layout with one large hero feature card above smaller secondary cards.",
+    "borderline": "Co-equal feature grid for a product with equally weighted components."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": ["Developed without access to proprietary prompt collections."],
+  "overlapNotes": "Not covered by existing rules. Related to layout.centered-everything but focuses on card uniformity within grids."
+}

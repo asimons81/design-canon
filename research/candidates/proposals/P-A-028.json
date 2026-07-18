@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-028",
+  "proposedRuleId": "color.monochrome-default",
+  "title": "Do not default to monochrome brand palettes that eliminate all accent color",
+  "category": "color",
+  "relevantSurfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "Some AI generations default to an all-gray, all-white, all-black minimalist palette that removes accent color entirely, making interfaces feel unfinished or sterile.",
+  "instruction": "Every interface needs at least one accent color for interactive elements, links, and states. A pure monochrome interface should be an explicit design direction, not the default result of omitting color guidance.",
+  "rationale": "While overuse of color is a known anti-pattern, complete absence of accent color removes wayfinding cues (links, buttons, interactive elements) and creates a clinical, uninviting interface. Most users need at least one color to orient themselves.",
+  "claimType": "observation",
+  "violations": [
+    "A SaaS dashboard using only black, white, and three shades of gray with no accent color on any interactive element, link, or state.",
+    "A marketing page with a black/white/grayscale palette where even buttons and links are gray."
+  ],
+  "controls": [
+    "A dashboard using gray as the primary interface color with a single blue accent for links, buttons, and active states.",
+    "A marketing page using a warm gray palette with a single brand accent color reserved for CTAs and highlights."
+  ],
+  "borderlineCases": [
+    "A photo-centric portfolio where the photography provides all the color and interface elements are intentionally neutral."
+  ],
+  "contextualExceptions": [
+    "Photography, art, or design portfolio where the work is the color.",
+    "Print-style editorial layouts designed for grayscale reading.",
+    "Dark mode implementations that use the blue channel as the only accent."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "All CSS color declarations fall within the gray/hue-less range (saturation below 10%)",
+  "matcherProposal": "Parse all CSS color declarations. Compute HSL saturation for each. Flag if 95%+ of colors have saturation <10%. Count distinct hue values - if fewer than 2 hues beyond gray appear, flag as monochrome default. Exclude images.",
+  "detectorLimitations": [
+    "Cannot detect colors applied through images or SVGs.",
+    "Design systems may define accent colors that are not used in the current view.",
+    "Some accessibility high-contrast modes strip color intentionally."
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A legitimate monochrome brand identity (e.g., Apple, Spotify's neutral interfaces).",
+    "An interface designed for accessibility where color is intentionally minimized.",
+    "A focused reading mode where interface chrome is designed to be invisible."
+  ],
+  "mitigationStrategy": "Flag only when the monochrome interface has interactive elements (buttons, links) that lack any color differentiator. Monochrome is acceptable for content-display interfaces.",
+  "fixturePlans": {
+    "violation": "A SaaS dashboard with gray sidebar, gray buttons, gray links, gray cards - no color anywhere except black text.",
+    "control": "Same dashboard with gray interface but blue accent on all links, buttons, and active navigation items.",
+    "borderline": "A photography portfolio with gray navigation, black text, and no accent color - the photos are the color."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation."
+  ],
+  "overlapNotes": "Opposite concern from color.purple-gradient-default - this targets no-color rather than overuse of one color."
+}

@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-039",
+  "proposedRuleId": "error-states.toast-alone",
+  "title": "Surface errors persistently, not only via fleeting toasts",
+  "category": "error-states",
+  "relevantSurfaces": ["product-app", "forms", "dashboards"],
+  "summary": "Models rely exclusively on auto-dismissing toast notifications for all error states, including critical errors that require user action — the toast disappears after 3-5 seconds, leaving no indication that a problem occurred and no way to act on it.",
+  "instruction": "Errors that require user action, block task completion, or involve data loss must use persistent error surfaces (inline banner, modal dialog, status bar, or stuck notification) that remain visible until the user explicitly acknowledges or resolves them. Auto-dismissing toasts are acceptable only for transient, informational, non-blocking confirmations.",
+  "rationale": "Auto-dismissing toasts have a typical lifetime of 3-5 seconds. Users with attention deficits, users who are momentarily distracted, or users who need time to read and understand the error will miss the message entirely. Critical errors hidden in fleeting toasts result in unrecoverable actions and user frustration.",
+  "claimType": "observation",
+  "violations": [
+    "A payment form where a declined card error appears as a 3-second toast — the user looks down at their card, looks up, and the toast is gone with no record of the error.",
+    "A file upload interface that shows '3 files failed to upload' as a 5-second auto-dismiss toast — the user has no way to see which files failed or retry them.",
+    "A form submission that shows a success toast but actually saved with errors on one field — the toast disappears before the user notices the inline error."
+  ],
+  "controls": [
+    "A payment form that shows a persistent error banner above the form: 'Your card was declined. Please try a different payment method.' that stays until dismissed by the user.",
+    "A file upload interface that shows a persistent error section below the upload area: '3 files failed to upload' with individual 'Retry' buttons for each failed file.",
+    "A form submission that shows a success banner at the top of the page plus inline error messages next to each failed field — both persistent."
+  ],
+  "borderlineCases": [
+    "A non-critical success confirmation ('Message sent') — this is a transient informational message appropriately shown as a toast."
+  ],
+  "contextualExceptions": [
+    "Transient informational messages (success confirmations, 'Changes saved', status updates that do not require action) — toasts are appropriate for these.",
+    "Live-updating notifications in feeds (new message arrived, new follower) where the toast is not the primary notification mechanism.",
+    "Systems with a separate notification center or history panel where dismissed toasts are still accessible."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Elements with aria-live='polite' or role='status' that contain error text and have an auto-dismiss animation or fade-out class",
+  "matcherProposal": "Identify toast/notification containers: elements with aria-live, role='status', role='alert', [class*=toast], [class*=notification]. Check for: (a) error-related text, (b) CSS animation that removes the element (fadeOut, slideOut, or transition with display:none at the end), (c) a setTimeout or similar JS mechanism (not detectable statically). Flag if error text is present AND the element has an auto-dismiss animation AND the error is not also rendered in a persistent element elsewhere.",
+  "detectorLimitations": [
+    "Cannot detect auto-dismiss timing without runtime JavaScript analysis — the CSS animation class alone is a proxy, not definitive proof.",
+    "Some toast libraries keep the toast in the DOM indefinitely but visually fade it — the element is still in the access tree but invisible.",
+    "A persistent notification center that stores dismissed toasts functionally addresses the 'fleeting' concern even if the visual toast disappears."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A success-confirmation toast ('Payment sent!') that uses an auto-dismiss animation — this is an appropriate use of a transient toast.",
+    "An error toast that also creates a persistent entry in the notification center — the toast itself fades but the information remains accessible.",
+    "A system where the user has set 'auto-dismiss notifications' in their accessibility preferences — the user explicitly chose to auto-dismiss."
+  ],
+  "mitigationStrategy": "Only flag when: (a) the element contains error text (matching 'error', 'fail', 'declined', 'sorry', 'unable'), (b) has auto-dismiss animation behavior, (c) there is no persistent error surface (banner, modal, inline) within the same viewport for the same error. Exclude success toasts entirely.",
+  "fixturePlans": {
+    "violation": "A checkout page where a card-declined error appears as a 3-second auto-dismiss toast at the top-right — by the time the user finishes reading 'declined', the toast is gone and there is no record of the error.",
+    "control": "A checkout page where a card-declined error renders as a persistent red banner above the payment form: 'Your card was declined. Please try another payment method.' with a 'Try again' button.",
+    "borderline": "A social app where a 'New message from Jane' appears as a toast that auto-dismisses — but the message also appears in the chat list, so the notification is transient but the content is persistent."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Second error-states proposal, distinct from P-A-035 (generic error messages). No overlap with existing rules."
+}

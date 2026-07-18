@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-012",
+  "component": "footers",
+  "recurringPattern": "Multi-column footer with logo/description in first column, 3-4 link columns (Product, Resources, Company, Legal), social media icon row, and a copyright bar at the bottom with a thin separator line.",
+  "designHarm": "The four-column footer with link-heavy structure assumes every site needs the same footer density. Users almost never scan footer links — the pattern wastes vertical space and adds cognitive load for accessibility (screen readers must navigate all links). The copyright bar is often taller than necessary for legal text.",
+  "legitimateExceptions": ["Large corporate sites with legal mandate to list many links", "Documentation sites where footer serves as secondary navigation"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 4-column footer with social icons", "Minimal footer with only copyright and essential legal links", "Footer-as-sitemap for content-heavy sites"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-012"],
+  "originalObservations": [
+    "AI-generated footers always default to exactly 4 columns regardless of actual link count.",
+    "Column headings are always Product, Resources, Company, Legal, or close variants.",
+    "The social media row uses circular icon buttons with identical sizing."
+  ]
+}

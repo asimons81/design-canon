@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-005",
+  "proposedRuleId": "auth.centered-card-template",
+  "title": "Do not default to the centered authentication card with decorative background",
+  "category": "layout",
+  "relevantSurfaces": [
+    "product-app",
+    "marketing"
+  ],
+  "summary": "AI-generated authentication screens consistently use a centered card on a decorative gradient or geometric background, with logo, email+password fields, social login buttons, and a 'Forgot password?' link.",
+  "instruction": "Choose an authentication layout that matches the app's context and security requirements. Consider inline authentication, passwordless entry, or context-specific login instead of the universal centered card on a decorative background.",
+  "rationale": "The centered auth card on gradient background is a default pattern that wastes vertical space, adds social login choice overload at the point of entry, and decorates a security-sensitive interaction with meaningless visuals.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Centered card containing logo, email input, password input with eye toggle, and 'Sign In' button",
+    "Decorative gradient, mesh, or geometric pattern background unrelated to brand",
+    "'Or continue with' divider with Google and GitHub icon buttons",
+    "'Forgot password?' link positioned below the password field",
+    "Card does not fill viewport height, leaving large empty margins on desktop"
+  ],
+  "controls": [
+    "Inline authentication within the app context (no full-page takeover)",
+    "Passwordless authentication with magic link as the primary method",
+    "Minimal authentication with a single input field and no decorative background",
+    "SSO-only authentication for enterprise products"
+  ],
+  "borderlineCases": [
+    "Consumer apps where social login is the primary entry method"
+  ],
+  "contextualExceptions": [
+    "Enterprise apps where the centered card is an expected convention"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A centered card containing credential input fields with a decorative background (gradient or pattern) and social login provider icons below a divider.",
+  "matcherProposal": "Detect a centered form card on a full-viewport gradient/pattern background with email and password inputs, plus social login buttons.",
+  "detectorLimitations": [
+    "Cannot distinguish between intentional social-login-first design and template defaulting"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Consumer apps where social login is genuinely the primary path",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag with context about whether the background and social login row add value or are decorative defaults.",
+  "fixturePlans": {
+    "violation": "Centered auth card with purple gradient background, email+password fields, eye toggle, social login row, and 'Forgot password?' link.",
+    "control": "Inline login form within an existing page, no decorative background, single method promoted.",
+    "borderline": "Consumer app where social login is the primary expected method."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Partially related to color.purple-gradient-default when the background uses purple-indigo gradients."
+}

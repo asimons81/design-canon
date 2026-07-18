@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-008",
+  "component": "settings",
+  "recurringPattern": "Two-level sidebar navigation (sections like General, Account, Notifications, Appearance) with content panel on the right. Each section uses labeled rows with toggle switches for booleans, text inputs for strings, and a 'Save Changes' button at bottom.",
+  "designHarm": "The settings sidebar-over-content layout wastes horizontal space on desktop and forces awkward stacking on mobile. The universal 'Save Changes' button pattern creates risk of lost edits when users navigate between sections before saving. Toggle density can create affordance confusion (does the toggle save instantly or not?).",
+  "legitimateExceptions": ["Desktop applications with very many settings categories that require persistent navigation", "Enterprise admin panels where settings are genuinely complex and hierarchical"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard settings page with sidebar navigation and save button", "Single-page settings with auto-save and instant-toggle", "Settings as a slide-out panel instead of a full page"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-008"],
+  "originalObservations": [
+    "AI-generated settings pages universally use the sidebar+content split even when there are only 3-4 sections that would fit in a single page.",
+    "The section headings are always the same: General, Account, Notifications, Appearance, Privacy.",
+    "Boolean settings always use iOS-style toggle switches regardless of platform convention."
+  ]
+}

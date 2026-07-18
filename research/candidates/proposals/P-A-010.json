@@ -1,0 +1,52 @@
+{
+  "proposalId": "P-A-010",
+  "proposedRuleId": "forms.missing-labels",
+  "title": "Every input must have an accessible label",
+  "category": "forms",
+  "relevantSurfaces": [
+    "product-app",
+    "marketing"
+  ],
+  "summary": "AI-generated forms often use placeholder text as the sole label for inputs, which disappears on typing and fails WCAG requirements.",
+  "instruction": "Associate a persistent visible label with every input element. Do not rely on placeholder text as a label replacement. Use aria-label only when visual context is unambiguous and persistent labels would clutter.",
+  "rationale": "Placeholder text disappears when users start typing, forcing them to remember what field they were filling. This fails WCAG 2.4.6 (Headings and Labels) and 3.3.2 (Labels or Instructions). Users with cognitive disabilities are disproportionately affected.",
+  "claimType": "research-backed",
+  "violations": [
+    "A signup form with email, password, and name fields using only placeholder='Enter your email' without visible labels above or beside each field.",
+    "A search form with no label, just a magnifying glass icon and placeholder='Search...' without aria-label on the input."
+  ],
+  "controls": [
+    "A signup form with visible labels above each field (they stay visible during input), plus proper for/id association between label and input.",
+    "A search form with an aria-label='Search the documentation' on the input and a visible placeholder text that complements but does not replace the accessible label."
+  ],
+  "borderlineCases": [
+    "A settings form with clear section headings and a visible description beside each field may be accessible without explicit labels if the visual grouping is unambiguous."
+  ],
+  "contextualExceptions": [
+    "Fields where the label is part of the surrounding visual context and duplication would create redundancy."
+  ],
+  "detectorFeasibility": "definitive",
+  "detectorSignal": "Input and textarea elements without associated label, aria-label, or aria-labelledby",
+  "matcherProposal": "Find all <input>, <textarea>, <select> elements. For each, check: 1) has an <label> with matching for/id, 2) is wrapped in a <label>, 3) has aria-label, 4) has aria-labelledby pointing to a visible element. If none, flag. Exclude type=hidden, type=submit, type=button.",
+  "detectorLimitations": [
+    "Cannot detect labels added dynamically via JavaScript.",
+    "May flag custom select/combobox components that handle accessibility internally."
+  ],
+  "impact": "critical",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Custom form controls (e.g., rich text editors, date pickers) that use aria-labelledby or aria-describedby from a parent component.",
+    "Fields where the label is visually present but not programmatically associated (needs fixing but detection is correct)."
+  ],
+  "mitigationStrategy": "Check for all four association methods. Only flag when all are missing. Provide specific guidance on which association method to add.",
+  "fixturePlans": {
+    "violation": "A login form with <input type='email' placeholder='Email'> <input type='password' placeholder='Password'> and no labels, aria-labels, or wrapping labels.",
+    "control": "Same login form with <label for='email'>Email</label> <input id='email' type='email'> and proper label for password.",
+    "borderline": "A search form with <input type='search' aria-label='Search products' placeholder='Type to search...'> where aria-label exists but no visible label."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "WCAG 2.4.6 and 3.3.2 requirements. Baymard Institute form usability research."
+  ],
+  "overlapNotes": "Distinct from existing rules. No form-specific rule exists in the accepted catalog."
+}

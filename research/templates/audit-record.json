@@ -1,0 +1,17 @@
+{
+  "auditId": "AUD-000",
+  "component": "hero",
+  "recurringPattern": "Description of recurring pattern.",
+  "designHarm": "Likely design harm.",
+  "legitimateExceptions": ["Exception one."],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": false,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Fixture idea one."],
+  "confidenceLevel": "medium",
+  "sourceRecords": ["SRC-000001"],
+  "originalObservations": [
+    "Original observation."
+  ]
+}

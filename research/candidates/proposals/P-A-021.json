@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-021",
+  "proposedRuleId": "navigation.breadcrumb-absence",
+  "title": "Provide breadcrumbs for interfaces deeper than two levels",
+  "category": "navigation",
+  "relevantSurfaces": ["product-app", "dashboards", "editorial-surfaces"],
+  "summary": "Generated applications with multi-level information architecture (settings, account management, documentation, file browsers) omit breadcrumbs, forcing users to rely on browser back-button or guess parent-page URLs to navigate back up the hierarchy.",
+  "instruction": "Any page that represents the third or deeper level in a content hierarchy must provide a visible breadcrumb trail showing at least the path from the top level to the current page. The current page label should be the last breadcrumb item (non-interactive), and each ancestor must be a clickable link back to that level.",
+  "rationale": "Breadcrumbs reduce navigation errors in deep hierarchies by 10-15% (Nielsen Norman Group). Without them, users navigating to a third-level page have no way to jump back to the first level or any intermediate level — they must use the browser's back button (which may exit the site entirely) or guess URLs.",
+  "claimType": "research-backed",
+  "violations": [
+    "A settings page at /account/settings/notifications/preferences with no breadcrumbs — the user must click 'Back to Settings' through three separate back-navigation clicks.",
+    "A documentation site with a five-level sidebar hierarchy but no breadcrumb trail on article pages — users in the third+ level cannot tell where they are in the IA.",
+    "A file management interface where opening a deeply nested folder shows no path — the user cannot navigate back to the root without manually clicking the folder hierarchy in the sidebar."
+  ],
+  "controls": [
+    "A settings page with breadcrumb: Account > Settings > Notifications > Preferences (last item non-link, bold). Each ancestor is a clickable link.",
+    "A documentation site with breadcrumb: Docs > Section > Article, displayed below the header with a small separator icon and reduced font-size.",
+    "A file manager with a clickable path: Home > Projects > Design > Assets (each segment is a link, current segment is bold text)."
+  ],
+  "borderlineCases": [
+    "A single-level microsite (one landing page with anchor links to sections) — there is no hierarchy to navigate."
+  ],
+  "contextualExceptions": [
+    "Application interfaces where the primary navigation is a sidebar/tree view that always shows the full path (the sidebar itself serves the breadcrumb function).",
+    "Wizard or multi-step flows where a step indicator substitutes for breadcrumb hierarchy.",
+    "Mobile-first designs where breadcrumbs are collapsed into a 'Back' button and page title due to limited horizontal space."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Pages with URL depth >= 3 (three or more path segments) that lack any element with role=navigation, aria-label=breadcrumb, or class containing 'breadcrumb'",
+  "matcherProposal": "Parse the URL path. If path segments (excluding domain) >= 3, check the rendered DOM for: (a) element with aria-label='breadcrumb', (b) element with role='navigation' and 'breadcrumb' in class or label, (c) an ordered list of links before the main content heading. Flag if none found.",
+  "detectorLimitations": [
+    "Cannot detect breadcrumbs rendered purely with JavaScript (SPA dynamic content) without waiting for full app bootstrap.",
+    "Some applications use a 'Back' button + location indicator instead of breadcrumbs — functionally similar but structurally different.",
+    "Flat IA where deep URLs are used for SEO (URL structure does not match user-visible hierarchy) — breadcrumbs may be unnecessary."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "An application with a persistent sidebar tree that shows the full navigation path — breadcrumbs are redundant despite a deep URL.",
+    "A wizard or checkout flow where the user is guided linearly and doesn't need to navigate back to arbitrary ancestors.",
+    "A flat-hierarchy site where SEO-friendly deep URLs (e.g., /blog/2024/06/article-title) don't correspond to a three-level user-facing hierarchy."
+  ],
+  "mitigationStrategy": "Only flag when URL depth >= 3 AND the page is not part of a wizard/multi-step flow (check for step indicators) AND no persistent navigation tree is present on the page. Lower to warning for flat-hierarchy deep URLs.",
+  "fixturePlans": {
+    "violation": "A settings page at /account/preferences/notifications/critical — four URL segments, no breadcrumb, no sidebar tree, user must rely on browser back button.",
+    "control": "The same settings page with breadcrumb: 'Account > Preferences > Notifications > Critical' with clickable ancestors and bold current-page label.",
+    "borderline": "A checkout flow at /checkout/shipping/payment/confirm with a step indicator showing 'Step 3 of 4' — no breadcrumbs, but the step indicator serves the orientation function."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Breadcrumb usability statistics based on publicly published Nielsen Norman Group research."
+  ],
+  "overlapNotes": "Second navigation proposal. Distinct from P-A-020 (active state ambiguity). No overlap with existing rules."
+}

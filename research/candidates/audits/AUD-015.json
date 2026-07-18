@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-015",
+  "component": "error-states",
+  "recurringPattern": "Centered error page with a large error code (404/500), a whimsical or abstract illustration of something broken, a short apologetic message ('Something went wrong'), and a 'Go back home' or 'Try again' button.",
+  "designHarm": "The error page as decoration-first pattern delays the user from solving their actual problem. Large error codes are for developers, not users — they don't help someone recover. The apologetic tone with whimsical illustration creates a mismatch for serious errors (500, payment failure), undermining trust.",
+  "legitimateExceptions": ["Consumer web apps where a lighthearted error tone matches the brand personality", "404 pages on content sites where the primary goal is keeping users on-site"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 404 page with illustration and error code", "Recovery-oriented error page with specific user guidance and contact options", "Error inline in context instead of full-page takeover"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-015"],
+  "originalObservations": [
+    "AI-generated error pages consistently display the HTTP status code in large type (72px+) as the primary visual element.",
+    "The illustration is always abstract broken-object or disconnected-plug themed.",
+    "The 'Go back home' CTA is universal, rarely offering context-specific recovery options."
+  ]
+}

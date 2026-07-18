@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-010",
+  "component": "tables",
+  "recurringPattern": "Full-width striped or bordered data table with a sticky header row, sortable column headers with arrow icons, pagination controls at bottom (Prev/1/2/3.../Next), and a search bar above. Selected rows use a tinted background color.",
+  "designHarm": "The default striped table treats all rows as equally important, hiding data patterns that row grouping or hierarchical rows would reveal. The pagination pattern forces users to click through pages instead of using infinite scroll, virtual scroll, or filtered views. The checkbox column appears reflexively even for view-only tables.",
+  "legitimateExceptions": ["Financial or audit tables where row-by-row verification is the primary task", "Admin panels where every row needs individual action menus"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard striped table with pagination", "Card-based data view for content-focused browsing", "Tree table with hierarchical grouping"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-010"],
+  "originalObservations": [
+    "AI-generated tables always include zebra striping, though modern design guidance advises against it for accessibility.",
+    "The pagination component is always Prev/1/2/3/.../Last with identical styling.",
+    "A 'select all' checkbox in the header with per-row checkboxes appears by default."
+  ]
+}

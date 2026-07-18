@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-003",
+  "proposedRuleId": "sidebars.persistent-dark-default",
+  "title": "Do not default to a persistent dark sidebar",
+  "category": "layout",
+  "relevantSurfaces": [
+    "product-app",
+    "mobile"
+  ],
+  "summary": "AI-generated product apps universally include a persistent dark or glassmorphic left sidebar even when the navigation structure has only 3-4 items that would fit in a top bar.",
+  "instruction": "Choose a persistent sidebar only when the navigation structure genuinely requires it. Consider top navigation, context-revealing navigation, or sliding navigation for shallow information architectures. If a sidebar is chosen, ensure it does not force a dark/light color split by reflex.",
+  "rationale": "A persistent dark sidebar consumes horizontal space, forces a high-contrast dark/light split, and adds visual weight that many interfaces don't need. The sidebar is a structural choice, not a default layout frame.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Left sidebar with dark background regardless of brand color scheme",
+    "Sidebar with 3-4 navigation items that would fit in a top header",
+    "Glassmorphism sidebar with readability issues on overlaid content",
+    "Sidebar takes 240-280px of horizontal space on every page",
+    "Collapse/expand hamburger toggle that reveals an equally unnecessary menu"
+  ],
+  "controls": [
+    "Top navigation bar for apps with shallow hierarchies (3-5 items)",
+    "Contextual sidebar that only appears when relevant to the current view",
+    "Tab-based navigation for secondary-level content categories",
+    "Light sidebar with reduced visual weight matching the main content area"
+  ],
+  "borderlineCases": [
+    "Desktop-first tools where sidebar is the primary command surface (Figma, VS Code)"
+  ],
+  "contextualExceptions": [
+    "Deep information architecture requiring persistent category navigation"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A wide (180-320px) persistent left-side element with navigation links, contrasted background, and a collapse toggle.",
+  "matcherProposal": "Detect side-positioned nav elements that occupy >150px width, contain 3+ navigation links, and use a different background from the main content area.",
+  "detectorLimitations": [
+    "Cannot assess whether the sidebar is justified by navigation depth"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Legitimate desktop applications that need persistent navigation",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as informational with a recommendation to evaluate whether the sidebar could be replaced with a lighter navigation pattern.",
+  "fixturePlans": {
+    "violation": "Dark left sidebar with 4 navigation items, glassmorphism effect, and a hamburger collapse toggle.",
+    "control": "Light top navigation bar with the same 4 items, no sidebar.",
+    "borderline": "Sidebar for a developer tool with 8+ navigation sections."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

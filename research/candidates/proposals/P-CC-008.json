@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-008",
+  "proposedRuleId": "tables.striped-pagination-default",
+  "title": "Do not default to striped tables with pagination",
+  "category": "hierarchy",
+  "relevantSurfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated data tables consistently use zebra striping, a checkbox column, sortable column headers, and Prev/1/2/3/Next pagination regardless of data characteristics or user task.",
+  "instruction": "Choose a data presentation format based on the user's primary task, not the default table template. Consider card layouts, grouped rows, infinite scroll, or filtered views. Remove the checkbox column if users do not need batch actions.",
+  "rationale": "The striped paginated table treats all rows as equally important, hides data patterns, and forces click-through navigation. The checkbox column appears reflexively even for view-only tables, wasting horizontal space.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Zebra striping (alternating row backgrounds) on every data table",
+    "Checkbox column in every table regardless of batch action requirements",
+    "Prev / 1 2 3 ... Next pagination controls at bottom",
+    "Sortable column headers with identical arrow icon on every column",
+    "Selected row always uses a tinted background in the brand's primary color"
+  ],
+  "controls": [
+    "Card-based layout for content-focused browsing instead of tabular rows",
+    "Infinite scroll or virtual scroll for long lists",
+    "Grouped rows with expandable categories",
+    "Filtered views that reduce the need for pagination"
+  ],
+  "borderlineCases": [
+    "Financial or audit tables where row-by-row verification is the primary task"
+  ],
+  "contextualExceptions": [
+    "Admin panels where every row needs individual action menus and batch selection"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "An HTML table element with alternating row background colors, column header elements with sort indicators, and a pagination component below showing page numbers.",
+  "matcherProposal": "Detect table elements with at least 5 rows where row colors alternate, combined with a navigation bar containing page numbers and Prev/Next links.",
+  "detectorLimitations": [
+    "Cannot determine whether zebra striping is needed for readability",
+    "Cannot assess whether batch selection is needed"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Data-heavy admin interfaces where all these features are needed",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a suggestion to review whether the full table template is needed or a simpler presentation would serve users better.",
+  "fixturePlans": {
+    "violation": "Striped table with checkbox column, 8 sortable columns, Prev/1/2/3/Next pagination, tinted selected row.",
+    "control": "Card-based data view with filtering, content preview, no pagination (infinite scroll).",
+    "borderline": "Audit log table requiring row selection, verification, and pagination by compliance requirement."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

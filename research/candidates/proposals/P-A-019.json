@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-A-019",
+  "proposedRuleId": "data-integrity.raw-vs-formatted",
+  "title": "Format data for human consumption",
+  "category": "data-integrity",
+  "relevantSurfaces": [
+    "product-app",
+    "dashboards"
+  ],
+  "summary": "AI-generated interfaces often display raw data values without appropriate formatting, localization, or contextual labels.",
+  "instruction": "Format every data value for its usage context: numbers with appropriate precision, currencies with proper symbols, dates in user-locale format, percentages with clear baselines. Do not display raw API response values unless the user explicitly requests debug data.",
+  "rationale": "Timestamps like '2026-07-18T11:24:00Z' are machine-readable but user-hostile. Currency amounts without symbols, percentages without denominators, and raw floating-point numbers all reduce comprehension and trust.",
+  "claimType": "observation",
+  "violations": [
+    "A dashboard showing 'revenue: 1234567.89' without currency symbol, thousands separator, or formatting.",
+    "A user activity feed showing ISO 8601 timestamps ('2026-07-18T14:30:00.000Z') instead of relative or formatted dates.",
+    "A progress display showing '0.3333333333333333' instead of '33%'."
+  ],
+  "controls": [
+    "Dashboard showing revenue as '$1,234,567.89' with appropriate currency formatting and thousand separators.",
+    "Activity feed showing '2 hours ago', 'Yesterday at 2:30 PM', or 'Jul 18, 2026' depending on recency.",
+    "Progress showing '33%' with a progress bar visual indicator."
+  ],
+  "borderlineCases": [
+    "A developer console or API debug panel may intentionally show raw values for technical users."
+  ],
+  "contextualExceptions": [
+    "Debug/developer modes explicitly enabled.",
+    "Data export views where raw values are useful for spreadsheet import.",
+    "Scientific instruments where raw precision is the user's purpose."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "ISO 8601 timestamps, raw float numbers with excessive precision, unformatted numbers without separators",
+  "matcherProposal": "Pattern match for ISO 8601 date patterns in visible text content. Detect floating-point numbers with >4 decimal places in content areas. Detect large numbers (5+ digits) without commas, periods, or spaces as separators. Exclude <code>, <pre>, and debug containers.",
+  "detectorLimitations": [
+    "Data may be formatted by JavaScript Intl API at runtime and not visible in static HTML.",
+    "Cannot detect server-side rendered localized values that are already formatted correctly.",
+    "Scientific and engineering interfaces may legitimately need high precision."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A code example in documentation showing a timestamp in ISO format (within a <code> block).",
+    "A scientific dashboard where raw sensor readings with 6 decimal places are the user's requirements.",
+    "API documentation showing sample response payloads."
+  ],
+  "mitigationStrategy": "Exclude <code>, <pre>, <samp> elements. Check for Intl.DateTimeFormat or Intl.NumberFormat usage in JavaScript. Allow suppression for scientific and dev-tool contexts.",
+  "fixturePlans": {
+    "violation": "A user profile page showing 'createdAt: 2026-07-18T14:30:00.000Z', 'score: 0.8723498723', 'amount: 1234567.89'.",
+    "control": "Same profile page showing 'Joined Jul 18, 2026', 'Score: 87%', 'Amount: $1,234,567.89'.",
+    "borderline": "A developer API dashboard showing raw JSON payload responses alongside formatted summaries - labeled clearly as 'Raw Response' vs 'Summary'."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation. Standard UX formatting practice."
+  ],
+  "overlapNotes": "Distinct from existing rules. No data-integrity rule exists in the catalog."
+}

@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-008",
+  "proposedRuleId": "motion.ignores-reduced-motion",
+  "title": "Respect prefers-reduced-motion",
+  "category": "motion",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated animations often lack reduced-motion media query support, ignoring vestibular accessibility needs.",
+  "instruction": "Wrap non-essential animations in a prefers-reduced-motion media query. Provide a motion-reduced alternative that preserves the interaction's functional outcome without visual movement.",
+  "rationale": "Motion can cause vestibular discomfort, nausea, and disorientation for a significant portion of users. WCAG requires a mechanism to pause, stop, or hide motion. A proper reduced-motion implementation protects accessibility without banning motion entirely.",
+  "claimType": "research-backed",
+  "violations": [
+    "A hero section with a 5-second looping video background, parallax scrolling, and animated text reveals - none wrapped in prefers-reduced-motion.",
+    "A dashboard with animated chart transitions, spinning loading indicators, and sliding notifications that cannot be disabled."
+  ],
+  "controls": [
+    "A marketing page with CSS transitions that respect prefers-reduced-motion: reduce, replacing slide animations with crossfade or instant state changes.",
+    "A presentation tool with a global 'reduce motion' toggle that sets prefers-reduced-motion on the document, disabling non-essential animations."
+  ],
+  "borderlineCases": [
+    "Essential animations (progress bars, loading spinners that indicate activity) may need to remain visible in reduced-motion mode, but should stop looping or reduce speed."
+  ],
+  "contextualExceptions": [
+    "Critical-system alerts that use animation to draw attention.",
+    "Video content (user-watched, not auto-playing decorated video)."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "CSS animations, transitions, or keyframes without an associated prefers-reduced-motion override",
+  "matcherProposal": "Search for CSS animation, transition, @keyframes declarations. Check for @media (prefers-reduced-motion: reduce/no-preference) wrappers. If animation exists without reduction, flag. Also check for JavaScript Web Animation API calls without motion preference checks.",
+  "detectorLimitations": [
+    "Cannot detect motion added via JavaScript libraries (GSAP, Framer Motion) without static source analysis.",
+    "Cannot detect video autoplay.",
+    "JavaScript event listeners for animation may not appear in static analysis."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A page using only CSS transitions for hover effects that are essential to interaction feedback (button press, link hover) - these are typically exempt.",
+    "Animations that only play once on page load (not looping) may be low-risk but should still be checked."
+  ],
+  "mitigationStrategy": "Flag only non-essential, looping, or continuous animations without reduction. Exclude micro-interactions (hover states, button presses, focus transitions).",
+  "fixturePlans": {
+    "violation": "A landing page with @keyframes float, @keyframes fadeInUp, CSS transitions on all elements, and no prefers-reduced-motion anywhere.",
+    "control": "A landing page with the same effects but wrapped in @media (prefers-reduced-motion: no-preference), with a reduced alternative using @media (prefers-reduced-motion: reduce).",
+    "borderline": "A page with only button hover scale(1.02) transitions and a loading spinner that stops after data loads (non-looping essential feedback)."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "WCAG 2.2 Success Criterion 2.3.3 (Animation from Interactions) and 2.2.2 (Pause, Stop, Hide)."
+  ],
+  "overlapNotes": "Complementary to motion.transition-all (targets property-level animation overuse). This targets accessibility compliance for reduced-motion preferences."
+}

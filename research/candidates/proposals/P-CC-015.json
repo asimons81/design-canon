@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-015",
+  "proposedRuleId": "onboarding.carousel-default",
+  "title": "Do not default to swipeable onboarding carousels",
+  "category": "layout",
+  "relevantSurfaces": [
+    "mobile",
+    "product-app"
+  ],
+  "summary": "AI-generated onboarding flows universally use a 3-4 screen horizontal swipeable carousel with full-width illustration, headline, description, dot indicators, and 'Next'/'Get Started' navigation.",
+  "instruction": "Replace linear swipeable onboarding with progressive disclosure that teaches the product through actual use. Consider preference-setting screens, contextual tips, or interactive tutorials over the carousel format.",
+  "rationale": "The swipeable carousel onboarding trains users to skip content. Users swipe through to reach the app, absorbing little to nothing. The illustration-on-top format prioritizes decoration over information, and the fixed slide count forces content into an unnatural narrative structure.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "3-4 horizontal swipeable screens with dot indicators",
+    "Full-width illustration at top of each screen",
+    "'Welcome' or 'Introducing X' as the first screen",
+    "'Next' button on intermediate screens, 'Get Started' on final",
+    "Abstract illustrations that do not show actual product UI"
+  ],
+  "controls": [
+    "Interactive onboarding where users configure preferences as they proceed",
+    "Contextual tooltips that reveal features when first encountered",
+    "Blank-slate experience that guides the first action",
+    "Progressive disclosure: reveal features gradually as user competence grows"
+  ],
+  "borderlineCases": [
+    "Consumer apps where the core value proposition needs narrative explanation"
+  ],
+  "contextualExceptions": [
+    "Regulated apps that must present specific disclosures before first use"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A horizontal scrollable container with 3-4 full-height child screens, each containing an illustration at top and text below, with dot indicators and a 'Next'/'Get Started' button sequence.",
+  "matcherProposal": "Detect a multi-screen onboarding flow with horizontal swipe behavior, dot position indicators, and sequential navigation buttons (Next \u2192 Get Started).",
+  "detectorLimitations": [
+    "Cannot assess if the carousel format is appropriate for the product"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Products with genuinely sequential concepts to explain",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a suggestion to evaluate whether the carousel onboarding is the most effective approach or if interactive onboarding would serve users better.",
+  "fixturePlans": {
+    "violation": "4-screen onboarding: Welcome illustration, Feature 1, Feature 2, Get Started. Dot indicators, Next/Get Started buttons.",
+    "control": "Preference setup onboarding: pick interests, set preferences, see personalized content immediately.",
+    "borderline": "Banking app with 3 regulatory disclosure screens that must be viewed sequentially."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

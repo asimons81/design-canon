@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-023",
+  "proposedRuleId": "forms.button-inline-states",
+  "title": "Show inline validation states on form buttons",
+  "category": "forms",
+  "relevantSurfaces": ["product-app", "dashboards"],
+  "summary": "Models place submit buttons at the bottom of forms without indicating whether the form is valid, loading, or has errors — users click submit, see no feedback, and must scroll up to discover missing fields, compounding task time.",
+  "instruction": "Submit buttons must visually indicate the form's state: disabled and gray when the form has validation errors (with a tooltip or inline message), show a loading spinner during submission, and enable with subtle emphasis when the form is valid. Do not rely on a popover or toast at the top of the page to communicate form validity.",
+  "rationale": "Forms where the user fills fields, clicks submit, scrolls back up to see errors, corrects, and submits again create a frustrating loop. Inline button state changes provide immediate feedback near the user's action point, reducing form completion time and error recovery effort.",
+  "claimType": "observation",
+  "violations": [
+    "A long checkout form where clicking 'Place Order' scrolls to the top to show a validation error banner, but the button never changes state — user must scroll down, hunt for errors, and click again.",
+    "A registration form with a submit button that appears active even with invalid fields — user clicks, nothing happens (client-side validation prevents submit), with no visual feedback.",
+    "A form where the submit button shows a loading state only after a 1-second delay, leaving the user uncertain whether the click registered."
+  ],
+  "controls": [
+    "A checkout form with a 'Place Order' button that is disabled (gray, reduced opacity) while any required field is invalid, with an inline message '2 required fields incomplete' directly above the button.",
+    "A registration form with a button that shows 'Complete your profile' when fields are empty, changes to 'Ready to join' (with a gentle emphasis pulse) when all fields are valid, and shows a spinner with 'Creating account…' upon click.",
+    "A multi-step form where the 'Continue' button is disabled with a tooltip 'Required fields in this section incomplete' on hover, enabling only when all visible fields pass validation."
+  ],
+  "borderlineCases": [
+    "A search form where the submit button is always active and the page handles empty queries gracefully — the button state is static because the action is always valid."
+  ],
+  "contextualExceptions": [
+    "Forms submitted to external services where immediate client-side validation is not possible (e.g., credit card authorization that requires a server round-trip).",
+    "Forms with a single field that has no validation requirement (e.g., a simple search box)."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Form element with a submit button that has no disabled state, no loading state class, and no dynamic content change between valid/invalid states",
+  "matcherProposal": "Identify all <form> elements or [role=form] containers. Collect submit buttons (input[type=submit], button[type=submit], [role=button] with submit context). Check for: (a) [disabled] attribute or class, (b) CSS classes indicating loading state, (c) aria-busy attribute, (d) dynamic text content that changes with state. Flag if none detected.",
+  "detectorLimitations": [
+    "Cannot detect live form states from a static capture — an always-enabled button may be functionally correct if client-side validation is absent and the form accepts incomplete submissions gracefully.",
+    "Inline validation messages above the button (not on the button) provide the same function but may not be detected as button state.",
+    "Progressive enhancement patterns where button state changes are applied via JavaScript class toggles that are not visible in the initial render."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A simple contact form with email-only validation where the button is always enabled and invalid email throws an inline error next to the input — the button does not need to change state.",
+    "A form submitted via AJAX where the button shows a spinner via CSS pseudo-element on a class added by JavaScript — not detectable in static HTML without runtime state."
+  ],
+  "mitigationStrategy": "Only flag forms with 3+ required inputs where the submit button has no visible state differentiation. Exclude single-field forms and search forms. Lower to warning.",
+  "fixturePlans": {
+    "violation": "A checkout form (10 fields) with a 'Place Order' button that is always bright blue and clickable — clicking reveals errors at the top of the page with no button state feedback.",
+    "control": "A checkout form where the 'Place Order' button shows '2 fields incomplete' in muted gray with reduced opacity when validation fails, enables in brand blue when valid, and shows a spinner+ 'Processing…' on click.",
+    "borderline": "A three-field contact form with a submit button that is always active — valid because client-side validation throws inline errors next to individual fields and the button state is static."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Second forms proposal, distinct from P-A-022 (label placement). No overlap with existing rules."
+}

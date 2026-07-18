@@ -1,0 +1,47 @@
+{
+  "proposalId": "P-CP-000",
+  "proposedRuleId": "ai-copy.example-pattern",
+  "title": "Contextual AI-copy proposal",
+  "category": "ai-copy",
+  "relevantSurfaces": ["marketing", "editorial"],
+  "summary": "Proposal summary.",
+  "instruction": "Concise replacement strategy.",
+  "rationale": "Why this copy pattern is problematic.",
+  "claimType": "observation",
+  "sourceRefs": ["SRC-000001"],
+  "violations": [
+    "Example violation one.",
+    "Example violation two."
+  ],
+  "controls": [
+    "Legitimate control one.",
+    "Legitimate control two."
+  ],
+  "borderlineCases": [
+    "Borderline case one."
+  ],
+  "contextualExceptions": [
+    "When the term is used with literal, specific meaning."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Term plus surrounding evidence of generic usage.",
+  "matcherProposal": "Match token plus sentence-structure heuristics.",
+  "detectorLimitations": ["Cannot distinguish parody."],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Literal domain usage.",
+    "Quoted customer content."
+  ],
+  "mitigationStrategy": "Require product-specific evidence within sentence context.",
+  "replacementStrategy": "Specific alternative phrasing that improves clarity.",
+  "fixturePlans": {
+    "violation": "Description of violation fixture.",
+    "control": "Description of control fixture.",
+    "borderline": "Description of borderline fixture."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ]
+}

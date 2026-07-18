@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-029",
+  "proposedRuleId": "radii.sharp-everything",
+  "title": "Do not make every corner sharp in the name of professionalism",
+  "category": "radii",
+  "relevantSurfaces": [
+    "product-app"
+  ],
+  "summary": "AI agents overcorrect from pill-everything by making every corner 0px, creating harsh, unapproachable interfaces.",
+  "instruction": "Use radius as part of the product's shape language. Zero-radius on all surfaces is as much a default as pill-radius. Choose radius values that support the product's character and readability.",
+  "rationale": "Sharp corners on everything is the opposite default - just as unthinking as rounding everything. Interactive elements benefit from slight rounding (2-4px) for visual approachability. Zero-radius everywhere creates visual harshness.",
+  "claimType": "observation",
+  "violations": [
+    "An enterprise dashboard where cards, inputs, buttons, modals, and badges all have border-radius: 0px.",
+    "A medical app interface with zero-radius on every element, including buttons and interactive controls."
+  ],
+  "controls": [
+    "An enterprise dashboard with 4px on cards, 6px on buttons, 0px on data tables (functional role separation).",
+    "A professional tool with 2px radius on interactive elements and 0px on data containers."
+  ],
+  "borderlineCases": [
+    "A command-line inspired interface where zero-radius is part of the terminal aesthetic."
+  ],
+  "contextualExceptions": [
+    "Terminal/CLI-inspired interfaces.",
+    "Architecture or CAD tools where precision aesthetics demand sharp corners.",
+    "Print-style editorial where zero-radius is intentional."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Every surface-element in the codebase uses border-radius: 0",
+  "matcherProposal": "Count all border-radius declarations. If 90%+ are 0px or 0, flag. Also count elements without any border-radius (implicit 0).",
+  "detectorLimitations": [
+    "Elements without border-radius declaration inherit - they are not intentionally 0px.",
+    "Tailwind 'rounded-none' is explicit; absence of 'rounded-*' is implicit."
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A data-dense admin interface where zero-radius on ALL surfaces is the product's design direction.",
+    "A mobile OS-level interface component where platform conventions use 0px."
+  ],
+  "mitigationStrategy": "Flag only when radius: 0 appears on interactive elements (buttons, inputs), not on structural containers.",
+  "fixturePlans": {
+    "violation": "A form with <input style='border-radius: 0'>, <button style='border-radius: 0'>, <select style='border-radius: 0'>.",
+    "control": "A form with <input style='border-radius: 4px'>, <button style='border-radius: 6px'>, <select style='border-radius: 4px'>.",
+    "borderline": "A terminal-themed admin panel with 0px radius everywhere and documentation stating the design direction."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation."
+  ],
+  "overlapNotes": "Counterpoint to radius.everything-pill. Both are defaults that should be replaced with intentional choice."
+}

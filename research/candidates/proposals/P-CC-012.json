@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-012",
+  "proposedRuleId": "loading.spinner-skeleton-default",
+  "title": "Communicate loading progress, not just loading appearance",
+  "category": "motion",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated loading states default to a spinning animation or shimmer skeleton screen without communicating progress expectations, estimated duration, or what is being loaded.",
+  "instruction": "Replace generic loading indicators with progress information that helps the user wait: estimated time, step indicators for multi-phase loads, or meaningful content previews. Consider skeleton screens only when the proportions match the actual content.",
+  "rationale": "A spinning indicator communicates nothing about progress or expected duration. Users cannot estimate whether a wait will be 2 seconds or 20 seconds. The shimmer skeleton often uses incorrect proportions, misrepresenting the eventual content layout.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Generic spinning circle or rotating icon as the only loading indicator",
+    "Skeleton screen with gray rectangular blocks and left-to-right shimmer animation",
+    "Skeleton proportions that do not match the actual content dimensions",
+    "Spinner centered both horizontally and vertically regardless of content position",
+    "Identical loading animation timing parameters across all contexts"
+  ],
+  "controls": [
+    "Progress steps with labels for multi-phase operations",
+    "Estimated time remaining where predictable",
+    "Content-aware skeleton that matches actual layout proportions",
+    "Progressive content reveal instead of an all-at-once loading screen"
+  ],
+  "borderlineCases": [
+    "Operations where progress is genuinely unpredictable (AI inference, file transcoding)"
+  ],
+  "contextualExceptions": [
+    "Brand-consistent loading animation that is part of the visual identity"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A centered animated element (rotating icon or pulsing blocks) that appears temporarily during data fetching, with no progress or timing information.",
+  "matcherProposal": "Detect animated SVG/CSS spinner elements or a container of gray rectangular blocks with shimmer animation that precede content rendering.",
+  "detectorLimitations": [
+    "Cannot distinguish between meaningful loading feedback and decorativs spinner"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Quick operations where progress communication would add more delay than it saves",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Focus detection on loading states that persist for more than a threshold (e.g., 2 seconds) without communicating progress.",
+  "fixturePlans": {
+    "violation": "Centered spinning circle on brand color, no progress info, appears for 3+ seconds.",
+    "control": "Progress bar with 'Loading your dashboard...' label and estimated time for slow operations.",
+    "borderline": "Quick-loading action that shows a brief spinner for <500ms with no additional info needed."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to motion.transition-all but addresses loading communication specifically."
+}

@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-036",
+  "proposedRuleId": "badges-indicators.color-only-signals",
+  "title": "Do not use color as the only differentiator for badges and indicators",
+  "category": "badges-indicators",
+  "relevantSurfaces": ["product-app", "dashboards", "tables"],
+  "summary": "Models use color exclusively — red for error, green for success, yellow for warning — in badges, status indicators, and notification dots without adding text, icon, or pattern labels, making the signal inaccessible to color-blind users and ambiguous when colors are similar.",
+  "instruction": "Every status indicator, badge, or notification signal must use at least one non-color differentiator in addition to color: a text label, a distinct icon, a pattern fill, or a text abbreviation. Color alone is never sufficient. For badges with text, the text must describe the state (e.g., 'Active', 'Pending', 'Failed'), not just the category.",
+  "rationale": "Approximately 8% of men and 0.5% of women have some form of color vision deficiency. Red-green differentiation is the most common form. A green 'Active' badge and a red 'Error' badge are indistinguishable to a deuteranope. Adding a checkmark icon for success and an X icon for error makes the state universally readable.",
+  "claimType": "research-backed",
+  "violations": [
+    "A status badge using only green fill for 'Active' and red fill for 'Inactive' — no text, no icon, the badge is just a colored circle.",
+    "A table with a 'Status' column using red/yellow/green filled circles only — the user must remember which color maps to which state.",
+    "A notification dot (red circle on an icon) with no count text, no aria-label, and no tooltip — the user sees 'something is new' but not what or where."
+  ],
+  "controls": [
+    "A status badge with green background + white checkmark icon + 'Active' text — three redundant cues (color, icon, text).",
+    "A table status column with colored indicator dots plus text labels: green + 'Active', yellow + 'Pending', red + 'Failed' — color and text together.",
+    "A notification badge with the count in white text on a red circle plus aria-label '3 unread notifications' — the number provides the 'how many', the aria-label provides the 'what'."
+  ],
+  "borderlineCases": [
+    "A traffic-light-style status indicator used in a control room where operators are trained on the color mapping and the system includes a legend — acceptable in specialized contexts."
+  ],
+  "contextualExceptions": [
+    "Ambient status indicators on hardware dashboards (factory floor, network operations center) where operators are trained on color codes and alternative signals are provided via alarms.",
+    "Accessibility settings mode where the user has enabled 'color-only mode' as a personal preference override.",
+    "Minimal data visualization sparklines where the color IS the data (e.g., red-to-green heatmap) with a legend provided."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Colored element with a status/indicator role that contains no text node, no img/svg icon, and no aria-label describing the state",
+  "matcherProposal": "Identify badge and indicator elements: [class*=badge], [class*=status], [class*=indicator], [class*=tag], small elements with colored backgrounds, circular elements < 32px with non-white background. For each, check: (a) contains text content, (b) contains <svg> or <img> element, (c) has aria-label or aria-labelledby. Flag if none of (a), (b), or (c) are true.",
+  "detectorLimitations": [
+    "Cant distinguish between a decorative colored dot and a semantic status indicator without contextual role analysis.",
+    "Some status indicators use CSS pseudo-elements (::before, ::after) for the icon — these are not captured by child-element checks.",
+    "Status indicators that inherit their color from a parent (e.g., a row-level color) require parent-child color attribution."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A purely decorative colored dot in a card header that has no semantic meaning — the detector may flag it as a status indicator.",
+    "A color swatch in a UI color picker where the color itself IS the content — the swatch is not a status indicator."
+  ],
+  "mitigationStrategy": "Only flag elements that have semantic indicators in their class list or are inside status/table/data-display contexts. Exclude decorative elements (aria-hidden=true, role=presentation, or inside color-picker contexts).",
+  "fixturePlans": {
+    "violation": "A user table with a 'Status' column that shows solid green circles for active and solid red circles for inactive — no text, no icons, no aria-labels.",
+    "control": "A user table with a 'Status' column showing green circle + white checkmark + 'Active' text (red circle + X + 'Inactive') — color, icon, and text combined.",
+    "borderline": "A server-room monitoring panel using red/yellow/green status lights as ambient indicators, with a printed legend at the bottom of the panel and operator training on color codes."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Color vision deficiency prevalence statistics based on publicly available medical data."
+  ],
+  "overlapNotes": "First badge-indicator proposal. No overlap with existing rules."
+}

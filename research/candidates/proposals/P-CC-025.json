@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-025",
+  "proposedRuleId": "motion.auto-rotation-consent",
+  "title": "Do not auto-rotate content carousels",
+  "category": "motion",
+  "relevantSurfaces": [
+    "marketing",
+    "editorial"
+  ],
+  "summary": "AI-generated marketing pages frequently auto-rotate carousels (testimonials, hero slides, feature showcases) without user initiation, a pattern known to reduce engagement and cause motion-sickness accessibility issues.",
+  "instruction": "Do not auto-rotate carousels. Present content in a static, user-controlled format. If a carousel is essential for space reasons, require user interaction to advance slides and respect prefers-reduced-motion.",
+  "rationale": "Auto-rotating carousels have been shown to decrease user engagement \u2014 users cannot read at the rotation speed and learn to ignore the content area. The motion is inaccessible for users with vestibular disorders, and the pattern forces users to fight the interface for control.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Content slides that auto-advance every 4-5 seconds",
+    "Auto-rotation without pause-on-hover or pause-on-focus behavior",
+    "No respect for prefers-reduced-motion media query",
+    "Carousel with both auto-rotation AND manual arrows/dots (competing controls)",
+    "Autoplay carousels in the hero section (highest-visibility position)"
+  ],
+  "controls": [
+    "Static content presentation without carousel mechanics",
+    "Manual carousel with user-initiated advancement only",
+    "Feature grid that shows all items without rotation",
+    "Accordion or tab interface instead of sequential slides"
+  ],
+  "borderlineCases": [
+    "News tickers or live data feeds where auto-rotation is the intended function"
+  ],
+  "contextualExceptions": [
+    "Physical display kiosks where auto-rotation is the expected mode"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A set of slides or panels that receive CSS animation or JavaScript setInterval for automatic rotation without user interaction.",
+  "matcherProposal": "Detect carousel/slider implementations that use auto-rotation via CSS animation (infinite), JavaScript timers, or data-autoplay attributes.",
+  "detectorLimitations": [
+    "Cannot distinguish between essential auto-rotation and decorative auto-rotation"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Live data displays where auto-rotation communicates change",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a warning when auto-rotating content is detected. Require manual advancement as the default.",
+  "fixturePlans": {
+    "violation": "Hero carousel auto-rotating through 4 slides every 4 seconds with dot indicators and arrow buttons.",
+    "control": "Static hero section with all content visible, no rotation. If multiple testimonials, show as a static grid.",
+    "borderline": "Real-time news ticker where content rotation is the intended reading model."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to motion.transition-all but addresses the specific anti-pattern of auto-rotating content. Complements testimonials.carousel-default (P-CC-009)."
+}

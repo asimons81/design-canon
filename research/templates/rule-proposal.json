@@ -1,0 +1,47 @@
+{
+  "proposalId": "P-XX-000",
+  "proposedRuleId": "category.example-rule",
+  "title": "Example anti-slop proposal",
+  "category": "color",
+  "relevantSurfaces": ["marketing", "product-app"],
+  "summary": "Proposal summary here.",
+  "instruction": "Concise instruction that could become a rule.",
+  "rationale": "Why this rule matters.",
+  "claimType": "observation",
+  "sourceRefs": ["SRC-000001"],
+  "violations": [
+    "Example violation one.",
+    "Example violation two."
+  ],
+  "controls": [
+    "Legitimate control one.",
+    "Legitimate control two."
+  ],
+  "borderlineCases": [
+    "Borderline case one."
+  ],
+  "contextualExceptions": [
+    "When this rule may be relaxed."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "What the detector looks for.",
+  "matcherProposal": "Pattern-matching strategy without executable regex.",
+  "detectorLimitations": ["Limitation one."],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Scenario one.",
+    "Scenario two."
+  ],
+  "mitigationStrategy": "How to handle false positives.",
+  "fixturePlans": {
+    "violation": "Description of violation fixture.",
+    "control": "Description of control fixture.",
+    "borderline": "Description of borderline fixture."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

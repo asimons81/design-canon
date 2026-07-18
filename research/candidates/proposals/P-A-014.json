@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-014",
+  "proposedRuleId": "radii.inconsistent-corner-treatments",
+  "title": "Match corner radii to surface role and maintain consistency",
+  "category": "radii",
+  "relevantSurfaces": ["*"],
+  "summary": "Beyond the 'everything pill' problem, models mix inconsistent radius values across related surfaces — 4px on buttons, 12px on cards, 8px on inputs, 20px on modals — producing a shape language that feels erratic rather than intentional.",
+  "instruction": "Within a view, every surface type should have a consistent radius that reflects its role, and radius values should come from a small deliberate set (typically 2–4 values). Do not apply unique radius values per component instance. The shape language must be predictable from the surface role.",
+  "rationale": "Inconsistent radii create a visual texture that reads as noise rather than system. Users unconsciously map radius to surface importance (larger = more elevated), and inconsistent values break that mapping. A button at 4px next to a card at 12px next to a modal at 20px provides no consistent signal.",
+  "claimType": "observation",
+  "violations": [
+    "A checkout page with input fields at 6px, buttons at 10px, a card at 14px, and a modal at 18px — five unique radius values with no role-based reasoning.",
+    "A card grid where the first card has border-radius: 8px, the second uses 12px, and the third 10px — no two cards share a radius.",
+    "A component library where every component defines its own radius value independently: button at 4px, chip at 16px, card at 12px, drawer at 0px — no consistent shape language."
+  ],
+  "controls": [
+    "A design system with exactly three radii: 4px for interactive controls (buttons, inputs, chips), 8px for contained surfaces (cards, modals, drawers), 0px for full-bleed panels — consistent per role.",
+    "A product interface using only two radii: 6px for all interactive elements, 0px for structural panels — clean, predictable shape language.",
+    "A card grid where every card has border-radius: 12px, inputs use 6px, and buttons 6px — consistent per type and a clear relationship between types."
+  ],
+  "borderlineCases": [
+    "A design where button radius (4px) matches card radius (4px) and input radius (4px) — everything uses the same value. Consistent but potentially misses opportunities for role differentiation."
+  ],
+  "contextualExceptions": [
+    "Brand systems where a signature shape element (e.g., a uniquely-shaped hero image, a die-cut card) intentionally breaks from the role radius for brand identity reasons.",
+    "Third-party widget embeds whose internal radii cannot be controlled by the host page."
+  ],
+  "detectorFeasibility": "definitive",
+  "detectorSignal": "Four or more unique border-radius values on visible surfaces within a single viewport, with no role-based grouping",
+  "matcherProposal": "Collect all computed border-radius values across the viewport (excluding 0px and 50%/9999px which have distinct shape semantics). Group by element role (button, input, card, dialog, etc.) using semantic selectors. Flag if total unique radial values exceed N (configurable, default 4) OR if the same role has two or more different radius values.",
+  "detectorLimitations": [
+    "Cannot distinguish radii applied to non-visual elements (hidden, zero-size) from visible surfaces without visibility checks.",
+    "Border-radius on individual corners (border-top-left-radius, etc.) requires checking each corner separately.",
+    "Pseudo-elements and decorative shapes may legitimately have unique radii not tied to surface roles."
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A component library with a deliberate three-tier radius system (4px for controls, 8px for surfaces, 16px for dialogs) that appears to have 3+ radii but is actually role-consistent.",
+    "A decorative flourish element with a unique radius that is the sole outlier in an otherwise consistent system."
+  ],
+  "mitigationStrategy": "Exclude decorative pseudo-elements and aria-hidden elements. Only flag per-element-role inconsistency (same role, different radius) or more than 4 unique radii total. Ignore radius values on hidden elements.",
+  "fixturePlans": {
+    "violation": "A page with a 4px button, 12px card, 6px input, 16px modal, 8px badge, and 20px tooltip — six unique values with no role pattern.",
+    "control": "A page with buttons and inputs at 6px, cards and modals at 12px, badges at 4px — three radii, each tied to a surface role.",
+    "borderline": "A page where every surface uses 8px radius — technically consistent but fails to differentiate interactive from container surfaces."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Extends beyond radius.everything-pill which targets overuse of large radii. This targets internal inconsistency and role-based radius mapping. No overlap."
+}

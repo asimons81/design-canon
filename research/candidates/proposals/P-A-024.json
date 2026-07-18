@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-024",
+  "proposedRuleId": "forms.validation-timing",
+  "title": "Validate inline after first blur, not on submit only",
+  "category": "forms",
+  "relevantSurfaces": ["product-app", "dashboards"],
+  "summary": "Generated forms wait until form submission to display all validation errors at once, forcing users with multiple invalid fields to fix them sequentially without knowing the full scope of issues until submission fails.",
+  "instruction": "Validate each field on blur (when the user leaves the field) after the first attempt, and display a persistent inline error message below the invalid field. Pre-validation must not trigger before the user interacts with the field. On submit, additionally run a full validation pass to catch any missed fields.",
+  "rationale": "Submit-only validation creates a high-friction cycle: fill → submit → see all errors → scroll → fix → submit again. Inline blur validation reduces this to: fill → blur → see error → fix before the next field. Combined with a final submit pass, this minimizes form completion time.",
+  "claimType": "general-knowledge",
+  "violations": [
+    "A multi-field registration form where no validation occurs until 'Create Account' is clicked — then all 8 errors appear at once, and correcting one field requires a re-submit to see if other errors remain.",
+    "A checkout form where the credit card field silently accepts an invalid number, showing the error only at final submission — the user gets interrupted at the end.",
+    "A settings form where the email field lets the user type any value, then shows 'Invalid email format' on submit — the user must guess which field is wrong."
+  ],
+  "controls": [
+    "A registration form where as soon as the user leaves the email field, it shows 'Please enter a valid email' or 'Email already registered' inline below the input.",
+    "A checkout form where the card number field validates format and Luhn check on blur, displaying inline errors beneath the field without blocking further typing.",
+    "A settings form where each field validates independently on blur, and the save button enables only when all visible fields are valid."
+  ],
+  "borderlineCases": [
+    "A password confirmation field that validates only when both password field and confirmation field have been touched — validating on the first field's blur would produce a premature 'passwords do not match' error."
+  ],
+  "contextualExceptions": [
+    "Server-side-only validation where round-trip latency makes per-field blur validation impractical (e.g., checking username availability via API — acceptable to validate asynchronously with a debounced API call on blur, with clear loading state).",
+    "Short single-field forms (newsletter signup, search) where submit-only validation is the expected UX pattern."
+  ],
+  "detectorFeasibility": "not-feasible",
+  "detectorSignal": "Cannot be detected in static capture — requires interaction observation to determine when validation events fire",
+  "matcherProposal": "Monitor form submission events and blur events on form fields. On submit: collect the count of validation errors displayed simultaneously. Compare against per-field blur validation: if >80% of errors appear only on submit and not on blur, flag. Requires runtime instrumentation — not feasible for static analysis.",
+  "detectorLimitations": [
+    "Cannot detect validation timing from a server-rendered or static HTML page at all — the behavior is entirely client-side JavaScript.",
+    "Forms using async validation (API calls on blur) may show a delay that looks like submit-only validation but is intentionally async.",
+    "Framework-level validation (Formik, React Hook Form) may defer validation to a re-render cycle that the detector does not observe."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A form where most fields are optional and the only required field validates on blur — submit-only validations for optional fields are acceptable.",
+    "A form where server-side validation is the only option (address verification, credit card auth) and blur validation is technically impossible."
+  ],
+  "mitigationStrategy": "Mark as not-feasible for automated detection. Provide manual test checklist: interact with each required field, tab away, verify an inline error appears before submission.",
+  "fixturePlans": {
+    "violation": "A registration form (name, email, password, confirm password) where clicking 'Sign Up' reveals 4 error messages simultaneously — no validation occurred on any blur event.",
+    "control": "A registration form where blurring the email field shows 'Invalid email format' immediately, blurring password shows 'Min 8 characters', and the confirm-password validates only after both password fields are touched.",
+    "borderline": "A checkout form where the card number validates on blur (Luhn check), but the address fields validate only on submit because they require a server geocoding call."
+  },
+  "status": "needs-research",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Third forms proposal. Detection feasibility noted as 'not-feasible' due to the runtime nature of validation timing. No overlap with existing rules."
+}

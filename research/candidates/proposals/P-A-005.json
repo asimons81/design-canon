@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-005",
+  "proposedRuleId": "borders.everywhere",
+  "title": "Do not border every element",
+  "category": "borders",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated UIs often add borders to every card, section, input, and container, creating visual noise and flattening the hierarchy that whitespace should establish.",
+  "instruction": "Use borders deliberately to separate, highlight, or group content. Do not border every surface. Use background color and spacing as the primary separation mechanism, and reserve borders for emphasis or interactive states.",
+  "rationale": "Borders on everything mean nothing is actually separated. Whitespace and background contrast are more efficient visual separation tools. Excessive borders create a cluttered, dense appearance.",
+  "claimType": "observation",
+  "violations": [
+    "A dashboard panel where every card, chart container, legend item, and metric box has a 1px border, creating a grid of rectangles that fights with the data.",
+    "A card with border on the container, borders on each inner section, bordered avatar, and bordered button - four levels of borders in one component."
+  ],
+  "controls": [
+    "A card with no outer border, using a subtle background tint for the container and whitespace between inner sections. Only the interactive button has a border.",
+    "A pricing table using borders only on the column edges and the CTA buttons, with whitespace separating plan details."
+  ],
+  "borderlineCases": [
+    "An asset-heavy dashboard where borders help differentiate dense data regions - but each border should be the lightest weight that achieves separation."
+  ],
+  "contextualExceptions": [
+    "Data tables where cell borders aid scanability.",
+    "Wireframes or low-fidelity prototypes.",
+    "Accessible high-contrast modes."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "More than 70% of layout containers have border declarations",
+  "matcherProposal": "Count total layout containers (div, section, card, panel elements). Count those with any border-style declaration. Flag if >70% have borders AND border is not part of a deliberate design direction.",
+  "detectorLimitations": [
+    "Cannot distinguish structural borders from decorative ones.",
+    "May misclassify thematic designs where borders are part of the brand language."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A terminal-themed design where borders are part of the aesthetic.",
+    "A technical documentation site where bordered code blocks and tables are standard."
+  ],
+  "mitigationStrategy": "Flag only when border density exceeds 70% AND no design-direction rule justifies a border-heavy style.",
+  "fixturePlans": {
+    "violation": "A dashboard with 8 cards, all having 1px borders, plus bordered chart containers, bordered legend items, and bordered metric badges.",
+    "control": "A dashboard with no card borders, using background tints for containers and border only on the primary action button.",
+    "borderline": "A code documentation site where code blocks have borders, tables have cell borders, but navigation and header are borderless."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI pattern."
+  ],
+  "overlapNotes": "Related to depth.shadow-soup (about depth language) but addresses border overuse specifically - a distinct signal."
+}

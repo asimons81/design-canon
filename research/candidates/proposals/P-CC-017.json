@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-017",
+  "proposedRuleId": "analytics.uniform-metric-cards",
+  "title": "Do not present all metrics in identical cards",
+  "category": "hierarchy",
+  "relevantSurfaces": [
+    "product-app",
+    "dashboards"
+  ],
+  "summary": "AI-generated analytics dashboards uniformly display all metrics in identical-sized cards with sparklines, trend arrows, and labels, treating every number as equally important.",
+  "instruction": "Establish metric hierarchy through card sizing, positioning, and visual weight. Reserve the most prominent position and largest card for the primary key result. Use compact formats for secondary and tertiary metrics. Remove sparklines and trend arrows where they add noise rather than insight.",
+  "rationale": "When every metric gets the same card treatment, users cannot distinguish the one number that matters most from vanity metrics. Identical analytics cards turn the dashboard into wallpaper, not a decision-support tool.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "All metric cards have identical dimensions regardless of metric importance",
+    "Every card includes a sparkline chart with gradient fill",
+    "Every card has a green-up or red-down trend arrow and percentage change",
+    "4-6 cards in a horizontal row with equal spacing",
+    "Cards use rounded corners and subtle shadows matching other card elements"
+  ],
+  "controls": [
+    "One primary KPI card larger and visually distinct from secondary metrics",
+    "Compact secondary metrics without sparklines or trend arrows",
+    "Text-only metric display where numbers are the only signal needed",
+    "Metrics integrated into their context rather than isolated in cards"
+  ],
+  "borderlineCases": [
+    "Executive dashboards where many metrics need at-a-glance monitoring"
+  ],
+  "contextualExceptions": [
+    "Real-time monitoring for operations teams where every metric is time-critical"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A row of multiple cards with identical dimensions, each containing a large number, a short label, and a small chart element.",
+  "matcherProposal": "Detect rows of identical-sized card elements containing numeric values, trend indicators (arrows/percentages), and inline charts (small SVG path elements).",
+  "detectorLimitations": [
+    "Cannot assess the actual importance hierarchy of metrics"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Monitoring dashboards where all metrics have equal operational urgency",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag when 4+ metric cards are in the same visual tier with identical styling.",
+  "fixturePlans": {
+    "violation": "4 identical analytics cards: Revenue, Users, Sessions, Conversion \u2014 each with sparkline, trend arrow, percentage change.",
+    "control": "Primary KPI card (Revenue) larger and top-left, secondary metrics in compact pills below.",
+    "borderline": "Server monitoring dashboard where CPU, memory, disk, and network all have equal urgency."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

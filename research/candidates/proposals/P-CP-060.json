@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CP-060",
+  "proposedRuleId": "ai-copy.cta-start-journey",
+  "title": "'Start your journey' cliche",
+  "category": "ai-copy",
+  "relevantSurfaces": [
+    "marketing",
+    "landing-pages"
+  ],
+  "summary": "Metaphorical CTA that doesn't describe a concrete action or outcome.",
+  "instruction": "Replace generic ''Start your journey' cliche' messaging with specific, context-aware language that names outcomes, mechanisms, or audiences.",
+  "rationale": "Generic copy patterns like ''Start your journey' cliche' fail to differentiate, build trust, or communicate value. Users scan for specific claims they can evaluate.",
+  "claimType": "observation",
+  "violations": [
+    "Generic usage: ''Start your journey' cliche' used as primary messaging without supporting specifics.",
+    "A landing page where ''Start your journey' cliche' is the only value communication."
+  ],
+  "controls": [
+    "Describe the concrete start: 'Upload your first CSV', 'Connect GitHub', 'Take the product tour' - specific entry points.",
+    "Specific alternative that names the mechanism, audience, or outcome instead of the generic phrase."
+  ],
+  "borderlineCases": [
+    "The term used in a context where it has category-specific meaning rather than generic marketing usage.",
+    "A/B test results showing the generic phrase outperforming specific alternatives (documented preference)."
+  ],
+  "contextualExceptions": [
+    "Quoted customer language in testimonials.",
+    "Licensing/category names (e.g., 'Enterprise' as a plan name).",
+    "Deliberate stylistic/nostalgic usage with self-awareness.",
+    "Domain-specific technical meanings that differ from marketing usage."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Detection of ''Start your journey' cliche' pattern in marketing copy sections without supporting specificity nearby.",
+  "matcherProposal": "Match the phrase pattern. Check surrounding 300 characters for evidence signals: proper nouns, metrics, domain terminology, named entities. Flag if generic phrase has no evidence within the same section.",
+  "detectorLimitations": [
+    "Cannot distinguish parody, satire, or deliberate stylistic choices.",
+    "Customer quotes embedded in testimonials should be excluded.",
+    "Some domain-specific uses are legitimate and require a context allowlist."
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A parody landing page intentionally using generic copy for effect.",
+    "A minimalist brand that uses generic copy as a deliberate style choice.",
+    "Documented A/B test results showing generic outperforming specific."
+  ],
+  "mitigationStrategy": "Require evidence of product-specific context within the same section. Exclude testimonial blocks, quote elements, and navigation-level copy.",
+  "replacementStrategy": "Describe the concrete start: 'Upload your first CSV', 'Connect GitHub', 'Take the product tour' - specific entry points.",
+  "fixturePlans": {
+    "violation": "A marketing page using ''Start your journey' cliche' as the primary headline or CTA with no product-specific details nearby.",
+    "control": "Same page using specific language that names the audience, mechanism, or outcome.",
+    "borderline": "A page using the term in a context where it has legitimate domain meaning or is part of a documented brand style."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI-generated marketing copy patterns across public landing pages and SaaS websites."
+  ],
+  "overlapNotes": "Distinct from copy.generic-hero rule. This expands coverage to additional generic copy categories including innovation language, filler transitions, fake social proof, productivity promises, future-of language, and repetitive CTAs."
+}

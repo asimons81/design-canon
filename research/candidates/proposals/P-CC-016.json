@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-016",
+  "proposedRuleId": "command-palette.universal-reflex",
+  "title": "Do not add a command palette by default",
+  "category": "layout",
+  "relevantSurfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated apps almost always include a \u2318K/Ctrl+K command palette with grouped actions and keyboard shortcut badges, regardless of whether the app has enough commands to justify a palette.",
+  "instruction": "Add a command palette only when the app has enough discoverable actions (typically 15+) to warrant an alternative to menu navigation. For simpler apps, use a search bar, keyboard shortcuts, or contextual menus instead.",
+  "rationale": "The command palette pattern from VS Code and Superhuman is applied universally by AI, creating an empty or sparse palette that frustrates power users and confuses new users. Every palette gets the same \u2318K shortcut, same category grouping, and same keyboard shortcut badges regardless of app depth.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Command palette invoked by \u2318K / Ctrl+K in every app",
+    "Action list with category headings (Navigation, Actions, Pages) regardless of command count",
+    "Keyboard shortcut badges displayed on every action item",
+    "'Type a command or search...' placeholder text",
+    "Centered overlay with dark backdrop and rounded corners"
+  ],
+  "controls": [
+    "App-level search instead of a command palette for discovery",
+    "Contextual menu shortcuts without a dedicated palette UI",
+    "Keyboard shortcut reference sheet accessible on demand",
+    "No keyboard shortcut overlay for apps with <10 actions"
+  ],
+  "borderlineCases": [
+    "Power-user tools with 50+ commands hard to find in menus"
+  ],
+  "contextualExceptions": [
+    "Developer tools where keyboard-driven workflows are the norm"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A centered overlay dialog with a search input at top, categorized action list, and shortcut key labels (\u2318/Ctrl).",
+  "matcherProposal": "Detect a modal overlay containing a text input with placeholder suggesting command entry, followed by a grouped list of actions with keyboard shortcut annotations.",
+  "detectorLimitations": [
+    "Cannot determine if the app's action density justifies the palette"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Genuinely action-rich apps that benefit from command palette",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag only when the action list in the palette contains fewer than 10 entries across all categories.",
+  "fixturePlans": {
+    "violation": "Command palette in a todo app with 5 actions, category headings for 3 groups, \u2318K shortcut, shortcut badges on each action.",
+    "control": "Simple search bar for the same todo app, no overlay, no keyboard shortcut badges.",
+    "borderline": "Developer tool with 60+ actions genuinely needing a command palette."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

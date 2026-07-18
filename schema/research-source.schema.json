@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design-canon.dev/schema/research-source.schema.json",
+  "title": "Research Source Record",
+  "description": "A publicly accessible source referenced by a Design Canon research proposal.",
+  "type": "object",
+  "required": [
+    "sourceId",
+    "sourceType",
+    "title",
+    "publicLocation",
+    "accessDate",
+    "licenseStatus",
+    "summary",
+    "supportingClaims",
+    "cleanRoomAttestation"
+  ],
+  "properties": {
+    "sourceId": {
+      "type": "string",
+      "pattern": "^SRC-[A-Z0-9]{6}$",
+      "description": "Unique source identifier"
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "academic-paper",
+        "publication",
+        "documentation",
+        "public-interface",
+        "open-standard",
+        "original-observation",
+        "blog-post",
+        "conference-talk",
+        "accessibility-spec",
+        "design-system-doc",
+        "ui-pattern-library",
+        "research-report"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3
+    },
+    "publicLocation": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL where the source is publicly accessible"
+    },
+    "accessDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "licenseStatus": {
+      "type": "string",
+      "enum": [
+        "MIT",
+        "Apache-2.0",
+        "CC-BY-4.0",
+        "CC-BY-SA-4.0",
+        "CC0-1.0",
+        "fair-use",
+        "public-domain",
+        "unknown",
+        "proprietary-public"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 250,
+      "description": "Brief original summary of the source"
+    },
+    "supportingClaims": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "minItems": 1,
+      "description": "Specific claims supported by this source (max 100 chars each)"
+    },
+    "excerpt": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Optional short excerpt under 25 words from the source"
+    },
+    "cleanRoomAttestation": {
+      "type": "string",
+      "enum": [
+        "independently-discovered",
+        "original-observation",
+        "public-knowledge",
+        "hybrid"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

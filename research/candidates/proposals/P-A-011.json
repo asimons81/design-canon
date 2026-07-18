@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-011",
+  "proposedRuleId": "layout.stacking-without-hierarchy",
+  "title": "Reject linear stacking without visual hierarchy",
+  "category": "layout",
+  "relevantSurfaces": ["marketing", "product-app", "editorial"],
+  "summary": "Models default to stacking every section vertically with identical spacing and visual weight — hero, features, testimonials, pricing, CTA — producing a 'scroll wallpaper' where no section is visually prioritized and the page reads as a flat sequence.",
+  "instruction": "Do not stack full-width sections in identical style without establishing a clear visual hierarchy among them. At least one section must be visually dominant (different background, larger padding, distinct color treatment, or non-standard layout). If every section has the same background, same padding, same width, then none guides the eye.",
+  "rationale": "A page where every section has identical visual weight forces the user to scan linearly with no entry point. Visual hierarchy in section treatments helps users orient: the hero should feel like an entry, the CTA like a destination, and supporting sections like middle content they can skip or absorb.",
+  "claimType": "observation",
+  "violations": [
+    "A landing page with six sections, each with white background, 80px padding, centered layout, and no background image or color break — the page is a uniform white column.",
+    "A SaaS site where testimonials use the same background and padding as the feature grid and the hero — nothing signals which content is primary.",
+    "A blog article page where the hero, body, author bio, comments, and related posts all share the same background and internal padding — no section boundary cues."
+  ],
+  "controls": [
+    "A landing page with a dark hero (full-viewport height), light feature grid (alternating backgrounds), dark testimonials (image background), and highlighted CTA (brand color strip).",
+    "A product page with a full-bleed hero, contained feature section with alternating row backgrounds, and an immersive demo section with a dark backdrop that breaks the pattern.",
+    "A documentation site using a consistent content-container width but varying the background treatment for section types: white for docs, light gray for related resources, dark for code-only sections."
+  ],
+  "borderlineCases": [
+    "A single-purpose landing page (one message, one CTA) that intentionally uses identical visual weight across its two sections because there is no secondary content."
+  ],
+  "contextualExceptions": [
+    "Long-form editorial content where uniform reading experience is the goal and section hierarchy is expressed exclusively through headings, not layout.",
+    "Application interfaces where tool windows are deliberately uniform to avoid distracting from the content."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Three or more consecutive full-width sections sharing the same background-color, padding, and layout mode with no alternating visual treatment",
+  "matcherProposal": "Detect major layout sections (section, article, [class*=section], [class*=panel]) that are full-width (>= 90% viewport). Group them sequentially. If three or more consecutive sections share the same background-color, padding-top, and layout column count, flag for review.",
+  "detectorLimitations": [
+    "Cannot detect visual hierarchy expressed through imagery, typography size, or imagery that differs while structural CSS is identical.",
+    "Hero sections with background images that share the same CSS class as text-only sections will not flag despite different visual weight.",
+    "CSS custom properties that change background between sections at the cascade level may not be detected as different."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A brand that deliberately uses a consistent visual container, relying entirely on content imagery and headings to establish section hierarchy — the CSS is identical but the visual result is distinct.",
+    "A design system's section components that wrap different background colors via inline styles or utility classes not captured by the heuristic."
+  ],
+  "mitigationStrategy": "Lower to warning. Only flag when consecutive sections exceed 4 and no section contains a non-white background or distinct layout grid. Use CSS custom-property resolution where possible.",
+  "fixturePlans": {
+    "violation": "A landing page with six sections all using .section { background: #fff; padding: 80px 24px; max-width: 1200px; margin: 0 auto; } — uniform white blocks from hero to footer.",
+    "control": "A landing page with alternating dark hero image section, white feature grid, gray testimonial section (#F9FAFB), and brand-colored CTA strip (#1D4ED8).",
+    "borderline": "A single-message landing page with two sections (value prop + CTA) both using the same white background — acceptable because there is no secondary content."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to layout.centered-everything but focuses on section-level stacking without hierarchy rather than per-element centering. No overlap with existing rules."
+}

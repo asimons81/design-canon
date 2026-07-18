@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-030",
+  "proposedRuleId": "editorial-surfaces.image-aspect-ratio-neglect",
+  "title": "Maintain consistent image aspect ratios within article surfaces",
+  "category": "editorial-surfaces",
+  "relevantSurfaces": ["editorial", "editorial-surfaces", "marketing"],
+  "summary": "Models place images within editorial content without enforcing consistent aspect ratios — mixing portrait, landscape, square, and panoramic images within the same gallery or card grid — causing layout shifts, uneven card heights, and a disjointed visual rhythm.",
+  "instruction": "All images within the same editorial surface (gallery, card grid, article inline, related-posts) must share the same aspect ratio within a 5% tolerance. Use object-fit to handle source images with different native ratios without breaking layout consistency. Do not rely on auto-height that causes the surrounding layout to shift.",
+  "rationale": "Inconsistent image aspect ratios break grid alignment, cause adjacent cards to have different heights, and create an uneven visual flow. This is one of the most common visual flaws in generated editorial layouts and signals a lack of content-modeling discipline. A consistent crop signals editorial quality.",
+  "claimType": "observation",
+  "violations": [
+    "A blog related-posts grid with three cards: first has a landscape hero image at 16:9, second has a portrait image at 3:4, third has a square image at 1:1 — cards are different heights, layout is ragged.",
+    "An article inline image gallery with 5 images at different native aspect ratios — the page reflows as each image loads.",
+    "A news homepage with a featured-article card using a wide 2:1 hero image while secondary cards use 4:3 thumbnails — grid alignment breaks at the second row."
+  ],
+  "controls": [
+    "A related-posts grid where every card uses a 16:9 aspect ratio for the hero image via object-fit: cover, regardless of the source image native ratio.",
+    "An article inline gallery using a single ratio at 4:3 for all images, with object-fit: cover and a container height set in CSS to prevent layout reflow.",
+    "A news homepage using a consistent 1:1 thumbnail for all secondary stories and a consistent 16:9 for the featured story — only two ratios, each applied consistently to its surface type."
+  ],
+  "borderlineCases": [
+    "An artist portfolio where the varying aspect ratios of the work itself are the content — images must be displayed at their native ratios as part of the artistic presentation."
+  ],
+  "contextualExceptions": [
+    "Art, photography, and design portfolios where the image native aspect ratio carries information about composition and crop choice by the artist.",
+    "User-generated content platforms where enforcing a uniform aspect ratio would crop critical content from user photos.",
+    "Masonry grid layouts that explicitly use varied aspect ratios as a design pattern."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Two or more img elements within the same container with aspect ratios differing by more than 15% computed from natural dimensions or CSS dimensions",
+  "matcherProposal": "Group images by container (gallery, grid, card row). For each group, collect image aspect ratios (computed width divided by height). If the variance in ratio exceeds 15% (coefficient of variation greater than 0.15), flag. Check for object-fit: cover on parent or image element — if present, the container enforces uniform display despite varied sources.",
+  "detectorLimitations": [
+    "Cannot detect image aspect ratios before images load — natural dimensions are unavailable without rendering.",
+    "CSS background-image elements (background-size: cover) visually enforce aspect ratio but are not img elements and require different detection.",
+    "Responsive images using srcset with different crops per breakpoint may intentionally change aspect ratio at different viewports."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A gallery where images have the same CSS aspect ratio but different native ratios handled by object-fit: cover — the detector should not flag if CSS enforces uniformity.",
+    "A card grid where image dimensions are set as CSS aspect-ratio property — layout is stable even if source images differ.",
+    "A product catalog showing items with different shapes where the image crop must adapt to the product shape."
+  ],
+  "mitigationStrategy": "Only flag when images have no object-fit or aspect-ratio CSS, variance exceeds 15%, and they are in the same visual surface (same row, same grid). Exclude portfolios, UGC, and masonry grids.",
+  "fixturePlans": {
+    "violation": "A related-posts grid with 3 cards: card 1 image at 1200x675 (16:9), card 2 image at 800x1200 (2:3), card 3 image at 600x600 (1:1) — no object-fit, no consistent container ratio, layout is broken.",
+    "control": "The same grid with each image container set to aspect-ratio: 16/9 and object-fit: cover — all cards same height regardless of source image ratio.",
+    "borderline": "A photography portfolio where the first image is a 2:1 landscape and the second is a 3:4 portrait — the layout is a masonry grid that intentionally shows images at their native dimensions."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "First proposal in the editorial-surfaces category. No overlap with existing rules."
+}

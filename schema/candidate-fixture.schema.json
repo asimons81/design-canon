@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design-canon.dev/schema/candidate-fixture.schema.json",
+  "title": "Candidate Fixture Manifest",
+  "description": "A deterministic, self-contained fixture for testing a proposed anti-slop rule.",
+  "type": "object",
+  "required": [
+    "fixtureId",
+    "proposalId",
+    "caseType",
+    "summary",
+    "deterministicFindings",
+    "expectedFutureBehavior",
+    "sourceFiles",
+    "cleanRoomAttestation"
+  ],
+  "properties": {
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^FX-[A-Z]{2}-[0-9]{3}-(VIOLATION|CONTROL|BORDERLINE)$"
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^P-[A-Z]{2}-[0-9]{3}$"
+    },
+    "caseType": {
+      "type": "string",
+      "enum": ["violation", "control", "borderline"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 10
+    },
+    "deterministicFindings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Current deterministic observations about this fixture. Do not claim linter findings for nonexistent detectors."
+    },
+    "expectedFutureBehavior": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Expected semantic or visual expectations for future detectors"
+    },
+    "sourceFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "byteCount", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "byteCount": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      },
+      "minItems": 1
+    },
+    "cleanRoomAttestation": {
+      "type": "string",
+      "enum": [
+        "original-creation",
+        "derived-from-public-source",
+        "independent-construction"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

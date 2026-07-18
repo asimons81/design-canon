@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-002",
+  "component": "pricing-sections",
+  "recurringPattern": "Three-column pricing table with a highlighted 'Popular' or 'Recommended' middle column, feature checkmarks in monotone green, annual/monthly toggle, and 'Get Started' CTAs in each column.",
+  "designHarm": "False scarcity; the 'Popular' badge becomes meaningless when every pricing page uses the identical layout. Users learn to ignore the badge, and the real pricing decision is obscured by the templated framing.",
+  "legitimateExceptions": ["Actual three-tier SaaS products where the middle tier genuinely serves most users", "Enterprise pricing with custom quotes that must sit alongside standard tiers"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 3-column pricing with highlighted middle tier", "Alternative pricing layout: single-column feature matrix, sliding scale, usage-based", "Pricing with honest empty tiers and no 'Popular' badge"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-002"],
+  "originalObservations": [
+    "AI consistently produces a three-column layout when asked for a pricing section, regardless of whether the product actually has three tiers.",
+    "The green checkmark icons are nearly always identical, and the 'Popular' badge uses a filled accent-color pill shape.",
+    "The annual/monthly toggle is always positioned top-center with a sliding pill switch."
+  ]
+}

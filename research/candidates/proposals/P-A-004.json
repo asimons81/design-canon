@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-004",
+  "proposedRuleId": "typography.heading-font-multiplicity",
+  "title": "Limit heading font weights and styles per level",
+  "category": "typography",
+  "relevantSurfaces": ["editorial", "marketing", "product-app"],
+  "summary": "Models frequently apply three or more distinct font weights, sizes, letter-spacing values, or cases to different heading levels within the same page, creating a disjointed typographic hierarchy that undermines scanning.",
+  "instruction": "Use at most two font weights and one letter-spacing value per heading level across the page. Do not vary heading caps, weight, or tracking from section to section unless changing from display to content. Heading styles should signal level priority, not brand variety.",
+  "rationale": "When H2 elements vary between bold/80% width/all-caps in one section and semi-bold/normal-case/wide-tracking in another, the reader cannot rely on typography to orient within the document. Consistent heading treatment is the primary wayfinding cue in scannable content.",
+  "claimType": "observation",
+  "violations": [
+    "A feature page uses bold-all-caps H2s in the hero, semibold-normal-case H2s in a feature grid, and thin-wide-tracking H2s in a testimonial section — three treatments for the same level.",
+    "A blog article template applies different weights to H3 in sidebar (600), main content (500), and related-posts (700) based on container styling.",
+    "A product landing page switches H4 between uppercase with 0.15em tracking in one row and sentence-case with 0.05em tracking in another."
+  ],
+  "controls": [
+    "A documentation site uses one H3 style (600 weight, normal case, 0.02em tracking) consistently across all pages, regardless of section.",
+    "A marketing site uses two H2 treatments: one for display sections (700 weight, all-caps, 0.1em tracking) and one for content sections (600 weight, normal case, normal tracking), documented as a deliberate system.",
+    "A news article page uses one H2, one H3, and one H4 style throughout the article body, with only the hero section getting a separate display treatment."
+  ],
+  "borderlineCases": [
+    "A magazine-style layout uses contrasting H2 styles for different article types (news vs opinion vs review), but the variation is documented, intentional, and predictable per section."
+  ],
+  "contextualExceptions": [
+    "Within a single article where a pull-quote or callout uses an alternate heading style to signal a distinct content type (e.g., 'Editor's Note' treatment on a heading).",
+    "Systems where heading families deliberately change weight to denote language hierarchy (e.g., English headings at 700, translated headings at 500 within the same page)."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Three or more distinct computed font-weight or text-transform values on same-level heading elements in one viewport",
+  "matcherProposal": "Group all rendered headings by level (h1-h6). Within each level, collect computed font-weight, text-transform, and letter-spacing values. If any heading level has >2 distinct combinations, emit warning.",
+  "detectorLimitations": [
+    "Cannot distinguish intentional multi-treatment design systems from accidental variance without semantic section annotations.",
+    "Headings in separate navigational regions (aside, footer, main) may legitimately differ.",
+    "Computed style extraction requires rendered page, not static source analysis."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A design system with explicitly documented display and content heading variants (two H2 styles used consistently across sections) — the detector sees three sections using each style and flags.",
+    "A multi-language page where translated headings are styled differently to indicate language, with clear documentation."
+  ],
+  "mitigationStrategy": "Only flag when >2 distinct combination sets are found on the same heading level within the <main> landmark. Allow an allowlist of up to two treatment IDs per heading level.",
+  "fixturePlans": {
+    "violation": "A SaaS landing page with three H2 styles: section 1 (bold, all-caps, 0.1em), section 2 (semibold, normal, normal), section 3 (300 weight, uppercase, 0.2em) — all within the page's main content area.",
+    "control": "A SaaS landing page with H2 consistently styled at 700 weight, normal case, normal tracking throughout, plus a separate hero display treatment (800 weight, uppercase, 0.15em) used only above the fold.",
+    "borderline": "A magazine homepage where H2 treatment changes by article category (news=bold, opinion=italic bold) — ruled acceptable because a legend explains the code."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Extends the typography domain beyond generic-primary-font. Addresses internal heading consistency, not font selection. No overlap with existing rules."
+}

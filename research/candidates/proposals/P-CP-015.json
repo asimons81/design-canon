@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CP-015",
+  "proposedRuleId": "ai-copy.feature-intuitive",
+  "title": "'Intuitive' without user evidence",
+  "category": "ai-copy",
+  "relevantSurfaces": [
+    "marketing",
+    "landing-pages"
+  ],
+  "summary": "Calling an interface 'intuitive' without usability test results or specific evidence. Intuition is subjective and culturally dependent.",
+  "instruction": "Replace Calling an interface 'intuitive' without with specific, verifiable language.",
+  "rationale": "Generic copy patterns erode trust and fail to differentiate the product. The term ''Intuitive' without user evidence' is used reflexively without adding information value.",
+  "claimType": "observation",
+  "violations": [
+    "Generic usage: Calling an interface 'intuitive' without usability test results or specific evidence. Intuition is subjective and culturally dependent.",
+    "'Intuitive drag-and-drop interface' without mentioning learning curve or user testing.",
+    "'Intuitive dashboard' with no onboarding or help system."
+  ],
+  "controls": [
+    "Describe the learning outcome: 'New users complete their first task in under 3 minutes' not 'Intuitive interface'.",
+    "'Designed for 5-minute onboarding: 90% of users create their first report without tutorials' - 'intuitive' backed by data.",
+    "'Intuitively, one would expect the system to...' in academic writing - 'intuitively' as a reasoning term, not a product claim."
+  ],
+  "borderlineCases": [
+    "A calculator app's interface - 'intuitive' is relatively objective here due to universal conventions."
+  ],
+  "contextualExceptions": [
+    "Literal technical definitions of the term in domain-specific contexts.",
+    "Quoted user testimonials that use the phrase (do not edit customer quotes).",
+    "Creative or literary contexts where the term is used deliberately with self-awareness."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "The specific phrase pattern in marketing copy without supporting specificity nearby",
+  "matcherProposal": "Pattern match the key phrase. Check surrounding 200 characters for product-specific evidence (metrics, domain terms, proper nouns). Flag if generic phrase exists without supporting specificity.",
+  "detectorLimitations": [
+    "Cannot distinguish parody or deliberate stylistic choices.",
+    "Quoted customer testimonials should not be flagged.",
+    "Domain-specific literal usage requires context detection."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Literal domain-specific usage where the term has a technical meaning.",
+    "Parody or satirical marketing.",
+    "Customer quotes embedded in testimonial sections."
+  ],
+  "mitigationStrategy": "Require evidence of product-specific context within the same sentence or adjacent element. Exclude quoted content and code examples.",
+  "replacementStrategy": "Describe the learning outcome: 'New users complete their first task in under 3 minutes' not 'Intuitive interface'.",
+  "fixturePlans": {
+    "violation": "A SaaS landing page hero using ''Intuitive' without user evidence' as the primary headline with no supporting specificity.",
+    "control": "Same page using specific, evidence-backed language that names the outcome, mechanism, or audience.",
+    "borderline": "A page using the term in a context where it has legitimate domain-specific meaning."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI-generated copy patterns across public landing pages."
+  ],
+  "overlapNotes": "Distinct from copy.generic-hero which covers different phrase patterns. This proposal expands coverage to additional generic copy categories."
+}

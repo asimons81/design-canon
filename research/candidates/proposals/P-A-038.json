@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-038",
+  "proposedRuleId": "data-integrity.stale-data-indicator",
+  "title": "Surface staleness indicators for cached or delayed data",
+  "category": "data-integrity",
+  "relevantSurfaces": ["dashboards", "product-app", "tables"],
+  "summary": "Generated interfaces display data without indicating when it was last refreshed — users may act on stale information (yesterday's inventory count, hours-old server status, cached exchange rates) without realizing it is not current.",
+  "instruction": "Any viewport that displays data fetched from an external source (API, database, cache, webhook) must show the data's age or last-refresh timestamp. Auto-refreshing views should show the countdown to the next refresh. Views where data is known to be stale (cache hit older than defined TTL) must visually differentiate staleness with a warning indicator or muted treatment.",
+  "rationale": "Users rely on dashboards and data displays to make decisions. Without a freshness indicator, users cannot distinguish between real-time data and data that is 30 minutes or 3 hours old. This is especially critical in financial, operational, and inventory contexts where stale data can lead to incorrect decisions with real consequences.",
+  "claimType": "observation",
+  "violations": [
+    "A server monitoring dashboard showing CPU, memory, and disk usage without any 'last updated' timestamp — the data could be 10 seconds or 10 minutes old.",
+    "An inventory management table showing stock levels with no refresh indicator — a user places a fulfillment order based on cached stock that has already been allocated.",
+    "A financial dashboard showing exchange rate data with no timestamp — the user assumes the rate is current but the data is from the previous trading day's close."
+  ],
+  "controls": [
+    "A monitoring dashboard with a 'Last updated: 12:34:56' timestamp in the header, changing to orange text if data is >60 seconds stale.",
+    "An inventory table with 'Data as of 10 minutes ago' in a muted caption above the table, plus a 'Refresh' button.",
+    "A financial dashboard with explicit 'Live' badge (green, pulsing) for streaming data and 'As of 4:00 PM EST' (static) for end-of-day data."
+  ],
+  "borderlineCases": [
+    "A server-rendered static page where the data is known to be current at page-generation time — the 'last updated' is implicit in the page load timestamp."
+  ],
+  "contextualExceptions": [
+    "Static content sites (documentation, blogs, marketing pages) where data freshness is irrelevant because the content version is the source of truth.",
+    "Real-time applications (chat, collaborative docs) where the real-time nature of the connection IS the freshness indicator.",
+    "Interfaces where the data's inherent timing is irrelevant (e.g., a list of employee names — name does not become stale)."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Data-containing viewport elements that lack any visible timestamp, age indicator, or refresh control within 100px of the data",
+  "matcherProposal": "Identify data containers: tables with >5 rows, dashboard metric cards, list views with numeric values, chart canvases. For each container, search within 3 DOM levels for: (a) a timestamp or time-ago text (matching patterns like 'ago', 'updated', 'as of', 'refresh', ':'), (b) a refresh button/icon, (c) an auto-refresh indicator. Flag if none found AND the container includes data that appears dynamic (numeric values that change, status indicators, timestamps in row data).",
+  "detectorLimitations": [
+    "Cannot determine whether displayed data is actually stale without knowing the data's source TTL and when it was last fetched.",
+    "WebSocket or Server-Sent Events-based real-time data does not need a staleness indicator — the connection itself signals freshness.",
+    "Some data is inherently static (user names, configuration labels, product SKUs) — the detector cannot distinguish dynamic from static data without semantic analysis."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A user directory displaying employee names and titles — this data is inherently static and does not need a freshness indicator.",
+    "A real-time chat dashboard where WebSocket connectivity is the freshness guarantee — no explicit 'last updated' is needed because updates are continuous.",
+    "A static report page that is generated once and published — the page generation timestamp is implicit in the publication date visible elsewhere on the page."
+  ],
+  "mitigationStrategy": "Only flag containers that display what appears to be time-sensitive data (numeric values that change, status indicators, financial data patterns). Exclude directories, static lists, and configuration pages. Check for WebSocket or SSE connections as implicit freshness signals.",
+  "fixturePlans": {
+    "violation": "A server monitoring dashboard with 4 metric cards (CPU, Memory, Disk, Network) showing current values (e.g., 'CPU: 67%') with no timestamp, no refresh button, and no auto-refresh indicator anywhere on the page.",
+    "control": "A server monitoring dashboard with 'Last updated: 12:34:56 PM' in the page header, each metric card showing 'Updated 12s ago' in a smaller timestamp below the value, and a 'Refresh Now' button.",
+    "borderline": "A real-time chat dashboard where messages appear as they arrive via WebSocket — no explicit 'last updated' indicator because the data updates continuously in real time."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Second data-integrity proposal, distinct from P-A-037 (destructive action confirmation). No overlap with existing rules."
+}

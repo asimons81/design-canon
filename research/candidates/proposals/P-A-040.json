@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-040",
+  "proposedRuleId": "loading-states.skeleton-mismatch",
+  "title": "Match skeleton shapes to eventual content layout",
+  "category": "loading-states",
+  "relevantSurfaces": ["product-app", "editorial-surfaces", "dashboards"],
+  "summary": "Models use generic skeleton screens (rows of uniformly-sized rectangles) that do not match the eventual content layout, causing users to experience double layout shifts — first when skeleton renders, second when content replaces it — defeating the purpose of the skeleton.",
+  "instruction": "Skeleton elements must approximate the size, position, and shape of the eventual content with reasonable fidelity. Use the same grid structure, same aspect ratios for images, same text line counts (with varying widths for the last line), and same container proportions. Do not render generic 4-row rectangles for a 2-column card grid.",
+  "rationale": "A skeleton that does not match the content layout causes a visible reflow when the real content loads, which is the exact problem skeletons are meant to solve. Good skeletons reduce Cumulative Layout Shift (CLS); bad skeletons add an extra layout shift for no benefit. Skeleton fidelity directly impacts perceived performance.",
+  "claimType": "observation",
+  "violations": [
+    "A product listing page showing a skeleton of 4 uniform rectangular rows when the actual content is a 2-column card grid — the skeleton collapses to 2 columns on content load, causing significant layout shift.",
+    "A blog homepage with a skeleton of 6 identical line blocks when the content includes a featured article (large card) plus secondary articles (smaller cards) — the skeleton gives no hint of the hierarchy.",
+    "A dashboard showing a skeleton of 6 equal rectangles when the actual layout has 2 large metric cards, 3 small cards, and a full-width chart — the content layout is completely different from the skeleton layout."
+  ],
+  "controls": [
+    "A product listing page showing skeleton cards in the same 2-column grid as the content (2 per row), with image placeholder rectangles (same aspect ratio), title lines (2 lines), and price line — same structure.",
+    "A blog homepage skeleton showing a large featured card (2-column span) at the top, then smaller cards in a 3-column grid below — matching the content hierarchy.",
+    "A dashboard skeleton showing 2 large rectangles (metric cards), 3 smaller rectangles (secondary metrics), and a wide rectangle (chart) in the same grid positions as the live content."
+  ],
+  "borderlineCases": [
+    "A highly dynamic layout where the content structure changes based on data or user preferences — building a matching skeleton for every possible state is impractical, so a loosely matched skeleton is acceptable."
+  ],
+  "contextualExceptions": [
+    "Content streams where items appear incrementally (infinite scroll, live feed) — the skeleton for new items can be uniform because the content is uniform.",
+    "User-customizable dashboards where the layout is not known server-side — a generic skeleton may be the only option before user preferences load.",
+    "Extremely slow connections where a minimal skeleton (a few rectangles) is preferable to a detailed one that takes significant bandwidth."
+  ],
+  "detectorFeasibility": "visual-only",
+  "detectorSignal": "Skeleton placeholder elements whose grid structure (columns, aspect ratios, container sizes) differs significantly from the final rendered content structure",
+  "matcherProposal": "Capture the page at initial render (skeleton state) and after content load (complete state). Compare: (a) column counts in grid containers, (b) aspect ratios of placeholder vs content image containers, (c) number of items per row. Flag if any varies by >20%. Requires two-step capture with a wait for content load — visual-only feasibility.",
+  "detectorLimitations": [
+    "Cannot reliably capture 'skeleton state' vs 'loaded state' without orchestrating timing — skeleton state may be too brief on fast connections.",
+    "SPAs that load content progressively may not have a clear skeleton-to-content transition — content may fill in piecemeal.",
+    "Some skeleton libraries use the same classes and structure as the content, just with 'skeleton' CSS classes — structurally identical but visually different, which is correct behavior but hard to differentiate from incorrect behavior."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "high",
+  "falsePositiveScenarios": [
+    "A responsive grid where the skeleton uses the same grid-template-columns as the content but at a narrower viewport — the skeleton matches the layout at the rendered width, but the detector sees a different number of columns.",
+    "A data-dependent dashboard where the skeleton shows max possible cards (6) but the actual data only populates 3 — the grid structure differs because of data constraints, not sloppy design.",
+    "A dynamic feed where items have variable heights based on content length — the skeleton uses uniform heights, which is a reasonable simplification for unknown content."
+  ],
+  "mitigationStrategy": "Only flag when: (a) the skeleton grid column count is different from content, (b) aspect ratios of image placeholders differ by > 10% from content image containers, (c) the skeleton has a fundamentally different layout (rows vs columns, uniform vs hierarchical). Exclude data-dependent and customizable layouts. Set to warning.",
+  "fixturePlans": {
+    "violation": "A product listing page skeleton showing 4 uniform horizontal rows (list layout) while the actual content renders as a 2-column card grid — the skeleton-to-content transition causes a major layout shift.",
+    "control": "A product listing page skeleton showing 2-column skeleton cards with image placeholder (4:3), 2 title lines (second line at 60% width), and a price line — the skeleton grid matches the content grid exactly.",
+    "borderline": "A dashboard skeleton showing 6 metric card placeholders (uniform) when the user has configured 4 primary + 2 secondary cards — the skeleton overshoots count but the grid structure (2 or 3 columns) matches the content grid."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Second loading-states proposal, distinct from P-A-033 (spinner-only). Addresses the fidelity of skeleton screens rather than the absence of skeletons. No overlap with existing rules."
+}

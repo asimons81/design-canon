@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-015",
+  "proposedRuleId": "borders.decorative-only",
+  "title": "Require borders to serve a structural or interactive purpose",
+  "category": "borders",
+  "relevantSurfaces": ["product-app", "dashboards", "marketing"],
+  "summary": "Models add borders as decorative afterthoughts — 1px light-gray dividers between every element, around every card, on every edge — that create visual clutter without communicating grouping, state, or hierarchy.",
+  "instruction": "Every visible border must serve at least one of: separating distinct content groups, indicating interactive state (hover, focus, selected, error), defining a clickable hit area, or creating deliberate visual emphasis. Do not apply borders to every surface by default. Use spacing or background color as an alternative separator first.",
+  "rationale": "Borders are a visual cost: they add ink (or pixels), create contrast, and occupy attention. When every element gets a border, the separator signal is drowned in noise. The best border is often no border — let spacing and background gradients do the grouping work.",
+  "claimType": "observation",
+  "violations": [
+    "A card grid where every card has a 1px #E5E7EB border, every card section inside has a 1px #F3F4F6 border, and every divider between them is also a 1px line — triple border accumulation.",
+    "A sidebar where every list item has a bottom border, producing a ruled-line effect that makes the navigation feel like a printed form rather than interactive UI.",
+    "A dashboard where metric cards, chart containers, table rows, header cells, sidebar items, and footer all have distinct border definitions using different colors and widths."
+  ],
+  "controls": [
+    "A card grid using box-shadow for elevation instead of borders, reserving borders exclusively for interactive states (selected card gets a 2px brand-color border).",
+    "A dashboard using background alternation (white rows, light-gray rows) to distinguish table rows, with borders only on the table header and footer.",
+    "A sidebar using 8px spacing between items and a 1px right border on the sidebar container itself, with no item-level borders."
+  ],
+  "borderlineCases": [
+    "A data table where every cell has a 1px border — acceptable in tabular data contexts where the grid structure aids scanning, but the distinction from decorative borders must be documented."
+  ],
+  "contextualExceptions": [
+    "Data tables, calendars, schedule grids, and other tabular layouts where cell borders are integral to data readability.",
+    "Print stylesheets where borders replace interactive cues (no hover states available on paper).",
+    "Form validation where borders indicate field state (error, success, warning) — these are functional, not decorative."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "More than 50% of visible containers in a viewport have a border declaration, or the same border-style appears on 5+ distinct element types",
+  "matcherProposal": "Count all elements with a non-zero border-width, grouped by element type. Flag if the ratio of bordered elements to total visible elements exceeds 0.5 AND no more than 30% are data-table cells. Compare the page's border usage against its spacing (padding, margin) — high border + low spacing = decorative borders.",
+  "detectorLimitations": [
+    "Cannot determine intent — a border that appears decorative to the detector may be functional for interactive states not visible at static capture (e.g., a default-state border that turns brand color on hover).",
+    "Box-shadow cannot always be distinguished from borders without checking the actual property.",
+    "CSS reset/normalize stylesheets often apply default borders that components override — detector must check computed style, not authored CSS."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A complex data dashboard where many elements need borders for information hierarchy (a Bloomberg terminal style).",
+    "A design system with a deliberate border-per-item approach (e.g., a directory listing with ruled lines) that is consistent and documented."
+  ],
+  "mitigationStrategy": "Exclude table cells, form inputs, and data-grid elements. Only flag when at least 5 bordered elements share the same border-style and no grouping or state-dependent purpose is evident. Set to warning severity.",
+  "fixturePlans": {
+    "violation": "A marketing page where every card, image, button, input, and text area has a 1px #D1D5DB border — borders on every element, no spacing alternatives used.",
+    "control": "A marketing page using 16px spacing between cards, subtle box-shadows for elevation, and borders only on form inputs (for hit-area definition) and the primary CTA (for emphasis).",
+    "borderline": "A data dashboard with bordered table cells (functional) and bordered metric cards (decorative) — the detector may flag the metric cards even though the table borders are justified."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Covers the borders category. Distinct from radius.everything-pill (shape) and depth.shadow-soup (depth). Borders are a separate visual channel. No overlap."
+}

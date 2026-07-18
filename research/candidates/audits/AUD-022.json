@@ -1,0 +1,20 @@
+{
+  "auditId": "AUD-022",
+  "component": "modals-and-dialogs",
+  "recurringPattern": "Center-positioned overlay panel with a white rounded-card background, dark semi-transparent backdrop, close X icon in top-right, a title with optional description, and primary/secondary action buttons bottom-right aligned.",
+  "designHarm": "The centered modal with darkened backdrop is applied to every interstitial interaction — confirmations, forms, details, settings — regardless of whether a non-modal approach (side panel, inline expansion, toast) would preserve context better. The close-X position (top-right) competes with the action buttons (bottom-right) for user attention. Every modal gets a title row even when the content is self-explanatory.",
+  "legitimateExceptions": ["Destructive actions that require confirmation (deletion, irreversible changes)", "Forms that genuinely need exclusive focus (complex entry, multi-step)"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard centered confirmation modal", "Slide-in side panel for detail views", "Inline confirmation within the page context"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-022"],
+  "originalObservations": [
+    "AI-generated modals always use the exact same centered card layout regardless of content type.",
+    "The backdrop opacity is consistently around 50% black with no variation.",
+    "Action buttons always use the primary/secondary pair aligned to the bottom-right.",
+    "The close X icon is always an SVG X mark in a 24x24 box, positioned top-right with no label."
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-027",
+  "proposedRuleId": "spacing.no-content-padding",
+  "title": "Content containers need internal padding",
+  "category": "spacing",
+  "relevantSurfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "AI-generated layouts place content edge-to-edge inside containers without padding, creating cramped, unreadable layouts.",
+  "instruction": "Every content container must have internal padding separating its content from the container edges. The padding should be at least equal to the gap between container elements in the same section.",
+  "rationale": "Content that touches container edges appears unintentional and cramped. The eye needs a gutter between content and container boundaries to register the container as a distinct visual region.",
+  "claimType": "observation",
+  "violations": [
+    "A card with text flush against the card's left, right, and top edges, with only bottom padding.",
+    "A section with a colored background where the text spans the full width without any horizontal padding."
+  ],
+  "controls": [
+    "A card with 16px padding on all sides (consistent with the 8px spacing scale).",
+    "A full-width section with 24px horizontal padding matching the page's gutter width."
+  ],
+  "borderlineCases": [
+    "A full-bleed hero image where text overlay has edge-to-edge alignment but the image itself serves as the background context."
+  ],
+  "contextualExceptions": [
+    "Data tables where cell content alignment is column-based.",
+    "Navigation/dashboard layouts where edge-to-edge is intentional for density.",
+    "Full-width section backgrounds where the background extends edge-to-edge but content is padded."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Container elements (div, section, card) with colored background or border but zero or very small internal padding",
+  "matcherProposal": "Find elements with background-color or border declarations. Check their padding values. Flag if padding is 0 or <8px and the element contains text content. Exclude elements with height < 48px (likely decorative lines or dividers).",
+  "detectorLimitations": [
+    "Padding may be inherited from a parent element rather than declared on the container.",
+    "Flex/grid gap may create visual padding without explicit padding declaration.",
+    "Some frameworks use negative margins on children instead of padding on the container."
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A divider line element that intentionally spans full width with no padding.",
+    "A full-bleed section where the background padding is achieved through child element margins."
+  ],
+  "mitigationStrategy": "Check for both container padding and first-child margin/padding. Accept either mechanism. Flag only when the text is truly flush against the boundary.",
+  "fixturePlans": {
+    "violation": "A <section style='background: #f5f5f5'> with text inside that starts at the section edge (padding: 0).",
+    "control": "Same section with padding: 24px or with child <div style='padding: 24px'> wrapping the text.",
+    "borderline": "A navigation bar with background color and 16px padding for brand/links but no padding on the nav container itself (the children have margins)."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Standard layout practice."
+  ],
+  "overlapNotes": "Distinct from spacing.no-rhythm which addresses value consistency. This addresses absence of padding entirely."
+}

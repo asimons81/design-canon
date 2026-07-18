@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-012",
+  "proposedRuleId": "hierarchy.semantic-heading-misuse",
+  "title": "Ensure heading levels reflect document outline",
+  "category": "hierarchy",
+  "relevantSurfaces": ["*"],
+  "summary": "Models frequently apply h1-h6 levels based on visual style rather than semantic document structure — skipping levels, using h1 in multiple places, or applying h3 where h2 is correct — creating a broken outline that harms both accessibility and scannability.",
+  "instruction": "Heading levels must follow a single logical hierarchy with no skipped levels (h1 → h3 without h2) and no duplicate h1 elements outside of separate documents. Choose the level that reflects the content structure, then apply visual style separately from level selection.",
+  "rationale": "Screen-reader users navigate by heading level. A page with h1 → h3 → h2 → h4 presents a navigable outline that contradicts the visual hierarchy. SEO and readability also benefit from a properly nested document outline. Visual and semantic levels should be decoupled via CSS, not conflated by choosing the wrong element.",
+  "claimType": "general-knowledge",
+  "violations": [
+    "A landing page uses h1 for the hero headline, then h3 for the feature grid section titles, then h2 for the testimonial heading — the outline jumps from 1→3→2.",
+    "A blog article uses h1 for the article title and h1 again for the 'Related Posts' heading in the sidebar — two h1 elements on one page.",
+    "A documentation site uses h2 for every second-level heading but wraps one section in a <div> and uses h4 where h2 is structurally correct because the visual design calls for a smaller heading."
+  ],
+  "controls": [
+    "A landing page uses h1 for the hero, h2 for each major section (features, testimonials, pricing), h3 for subsection headings, and h4 for card titles — perfect nesting with no level skips.",
+    "A blog article uses a single h1 for the article title, h2 for major sections, h3 for subsections, and hides the 'Related Posts' heading via aria-level or visually-hidden techniques.",
+    "A documentation site uses a clear h1→h2→h3 outline throughout, and uses CSS to visually style headings at the same level differently in different contexts (e.g., smaller h2 in sidebar)."
+  ],
+  "borderlineCases": [
+    "Single-page applications where a root h1 exists in the shell, each 'page' view uses an h2 as its primary heading, and no element claims to be the main document heading."
+  ],
+  "contextualExceptions": [
+    "Iframes, embedded widgets, and web components that represent separate documents and can each have their own h1.",
+    "Long-form editorial where article body headings start at h2 (with h1 reserved for the publication title in the site header)."
+  ],
+  "detectorFeasibility": "definitive",
+  "detectorSignal": "Heading level violations: skipped levels, multiple h1s in the same document, or inverted level order (h2 after h3 without a containing section reset)",
+  "matcherProposal": "Traverse the DOM in document order collecting all h1-h6 elements. Check: (a) no two h1 elements in the same document tree unless separated by an iframe or shadow root, (b) no level skips greater than 1 (h1→h3, h2→h4), (c) no level inversions (h3 followed by h2 at the same nesting depth without a containing section boundary).",
+  "detectorLimitations": [
+    "Cannot detect heading levels set via ARIA (role=heading, aria-level) without also traversing ARIA attributes.",
+    "Dynamic single-page apps where headings change without full page load require runtime observation.",
+    "Some frameworks (Angular, React) render heading elements into the DOM programmatically — static source analysis may misread the final outline."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A site with an h1 in the site header and an h1 inside a <main> article — technically two h1s but widely accepted practice in HTML5 where the article is its own sectioning root.",
+    "A carefully nested outline where a sectioning element (<section>, <article>) resets the heading scope, making h2 after h3 correct within the section's nesting."
+  ],
+  "mitigationStrategy": "Account for HTML5 sectioning content elements (article, section, nav, aside) that reset heading scope. Only flag violations within the same sectioning root. Exclude ARIA-level headings from the naive element check.",
+  "fixturePlans": {
+    "violation": "A page with h1 hero, followed by h3 section heading (skip h2), then h4 subsection, then h2 section heading — outline reads 1→3→4→2 with a skip and an inversion.",
+    "control": "A page with h1 hero, h2 features (3x), h3 feature detail, h2 testimonials (2x), h2 pricing, h3 pricing tiers, h2 CTA — perfect nested outline.",
+    "borderline": "A site-header h1 (brand name) plus a <main> article section with its own h1 (article title) — two h1s but each in a separate sectioning root."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Addresses semantic hierarchy structure, distinct from marketing.single-primary-action (visual hierarchy of actions). No overlap."
+}

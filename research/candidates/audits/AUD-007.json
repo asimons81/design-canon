@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-007",
+  "component": "authentication",
+  "recurringPattern": "Centered card with logo above, email + password fields, 'Sign In' button, 'Forgot password?' link, and a social login separator ('Or continue with') with Google/GitHub icon buttons. Background often a gradient or abstract geometric pattern.",
+  "designHarm": "The social-auth separator and multi-button row create choice overload at the moment of entry. The floating card on decorative background wastes vertical space on mobile. Users spend extra cognitive cycles choosing a login method instead of getting into the app.",
+  "legitimateExceptions": ["Consumer apps where social login is the primary entry path (reducing friction)", "Enterprise apps requiring SSO as the only or default option"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard sign-in card with social login row", "Minimalist sign-in with one default method, no decorative background", "Sign-in that merges email+social into a single entry point"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-007"],
+  "originalObservations": [
+    "The authentication card template is remarkably consistent across AI generations: centered card, decorative background, social buttons stack.",
+    "The decorative background is either a purple-blue gradient, abstract mesh, or geometric pattern with no brand connection.",
+    "Passwords fields always use a show/hide eye icon inside the input."
+  ]
+}
