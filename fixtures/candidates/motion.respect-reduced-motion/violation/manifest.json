@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.motion.reduced-motion.violation.no-preference",
+  "proposalId": "proposal.motion.respect-reduced-motion",
+  "caseType": "violation",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 659,
+      "sha256": "84a72beb5744c8b4c687e2a96aaedb412ccfbb129d935a4b24cb1bfb8d520a7e"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A landing page with keyframe animations and no prefers-reduced-motion wrapping.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A landing page with keyframe animations and no prefers-reduced-motion wrapping.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic violation fixture for proposal.motion.respect-reduced-motion."
+  }
+}

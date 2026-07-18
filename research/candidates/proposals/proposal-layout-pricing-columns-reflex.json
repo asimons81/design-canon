@@ -11,7 +11,7 @@
   ],
   "summary": "AI-generated pricing sections default to three identical columns with the middle plan highlighted as 'Popular' regardless of the product's actual pricing strategy.",
   "instruction": "Choose a pricing layout that reflects the product's actual pricing logic: tier differences, feature groupings, and the plan most users should choose. The three-column reflex with a highlighted middle tier is a template, not a pricing strategy.",
-  "rationale": "The three-column pricing card with a 'Most Popular' middle badge is the most recognizable AI-generation template in SaaS marketing. It makes every pricing page look like every other pricing page, regardless of whether the product has three meaningful tiers or a different optimal plan structure.",
+  "rationale": "A three-column pricing page with a highlighted middle tier is a recurring output pattern that may indicate the layout was generated from a template rather than designed around real pricing differences. The pattern is not inherently wrong but should trigger a design review of whether the pricing structure genuinely justifies three equal columns.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.ai-default-patterns"
@@ -40,8 +40,8 @@
   ],
   "universalBan": false,
   "detector": {
-    "feasibility": "visual",
-    "signalDescription": "Detect three equal-width card columns in a section with pricing-adjacent labels (price, month, plan, tier). Flag when middle column has a distinct visual treatment (highlighted border, badge).",
+    "feasibility": "manual-only",
+    "signalDescription": "As a manual review signal: detect three equal-width card columns in a section with pricing-adjacent labels. A three-column layout with highlighted middle column is not evidence of a design failure \u2014 it is a triage signal that the pricing section should be reviewed for template-style generation.",
     "matcherProposal": {
       "kind": "heuristic",
       "patterns": [
@@ -59,13 +59,13 @@
   },
   "impact": "nuisance",
   "falsePositiveRisk": {
-    "level": "medium",
+    "level": "high",
     "scenarios": [
-      "A product with three genuinely differentiated pricing tiers.",
-      "An A/B tested layout where three columns and highlighted middle outperformed alternatives."
+      "A product with three genuinely differentiated pricing tiers where the layout is appropriate.",
+      "An enterprise with three plan tiers derived from customer segmentation research."
     ],
     "mitigations": [
-      "Check for meaningful feature differentiation between columns beyond badge color. Accept documented A/B results."
+      "Treat three-column layout as an optional review triage signal, not a detector finding. The signal alone cannot distinguish template generation from deliberate IA-based design."
     ]
   },
   "fixturePlan": [
@@ -91,5 +91,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization correction: detector changed to manual-only, FP risk raised to high. Three-column pattern is a review triage signal, not evidence of design failure. Removed 'most recognizable AI-generation template' hyperbole."
+  ]
 }

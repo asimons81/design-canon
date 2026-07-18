@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>SPA App</title></head>
+<body>
+  <div id="app">
+    <nav>
+      <a href="#/dashboard">Dashboard</a>
+      <a href="#/reports">Reports</a>
+      <a href="#/settings">Settings</a>
+    </nav>
+    <main id="main-content" tabindex="-1">
+      <h1>Dashboard</h1>
+      <p>This SPA uses programmatic focus management on route change via router events. No skip link is present.</p>
+    </main>
+  </div>
+  <script>
+    // Simulated SPA focus management
+    window.addEventListener('hashchange', () => {
+      document.getElementById('main-content').focus();
+    });
+  </script>
+</body>
+</html>

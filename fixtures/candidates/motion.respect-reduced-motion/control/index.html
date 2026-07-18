@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8">
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .hero { animation: fadeInUp 1s ease; }
+    .icon { animation: float 3s ease-in-out infinite; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero { opacity: 1; transform: none; }
+    .icon { transform: none; }
+  }
+  .card { transition: transform 0.3s, box-shadow 0.3s; }
+</style>
+</head>
+<body>
+  <div class="hero"><h1>Welcome</h1><p>Animations respect reduced-motion preference.</p></div>
+  <div class="icon">&#9733;</div>
+  <div class="card">Hover me</div>
+</body>
+</html>

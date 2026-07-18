@@ -10,8 +10,8 @@
     "marketing"
   ],
   "summary": "AI-generated marketing site navigation universally follows the same template: logo left, four center links (Product, Features, Pricing, About), and two right CTAs (Log In, Get Started).",
-  "instruction": "Design navigation around the site's actual information architecture, not a template. The number and names of navigation items should reflect the content structure, not a pattern.",
-  "rationale": "The five-link startup navigation (Product, Features, Pricing, About, Log In) is a recognizable template that makes every AI-generated marketing site feel identical. Navigation should reflect what makes the product different, not generic category labels.",
+  "instruction": "Navigation labels should reflect the site's actual content, not generic category labels. When navigation consists entirely of Product, Features, Pricing, About, Log In, and Get Started, the labels may be coming from a template rather than the product's information architecture.",
+  "rationale": "Generic navigation labels (Product, Features, Pricing, About) communicate nothing about what makes the product distinctive. Navigation is a content directory \u2014 its labels should name the actual features, sections, or content categories the product offers. This is design-review guidance, not a mechanical check.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.ai-default-patterns"
@@ -41,7 +41,7 @@
   "universalBan": false,
   "detector": {
     "feasibility": "manual-only",
-    "signalDescription": "Extract navigation link labels. Compare against the template set {Product, Features, Pricing, About, Log In, Get Started}. Flag when 5+ labels match the template.",
+    "signalDescription": "As a manual design-review check: extract navigation link labels and compare against the generic set {Product, Features, Pricing, About, Log In, Get Started}. A match of 5+ labels may indicate template-style naming rather than IA-driven navigation. This is a review prompt, not a detector finding.",
     "matcherProposal": {
       "kind": "phrase",
       "patterns": [
@@ -93,5 +93,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization correction: removed 'recognizable template' hyperbole. Kept as manual design-review guidance. Detector already correctly assigned as manual-only."
+  ]
 }

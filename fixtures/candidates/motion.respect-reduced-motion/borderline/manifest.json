@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.motion.reduced-motion.borderline.essential-animation",
+  "proposalId": "proposal.motion.respect-reduced-motion",
+  "caseType": "borderline",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 542,
+      "sha256": "fdece68ef1a124f40727e49f00097a1f1f318a22941c6882457e2c90a803599e"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A page with only button hover effects (essential feedback) and non-looping load animation, no prefers-reduced-motion needed.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A page with only button hover effects (essential feedback) and non-looping load animation, no prefers-reduced-motion needed.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic borderline fixture for proposal.motion.respect-reduced-motion."
+  }
+}

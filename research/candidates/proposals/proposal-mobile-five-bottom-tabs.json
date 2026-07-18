@@ -10,8 +10,8 @@
     "mobile"
   ],
   "summary": "AI-generated mobile navigation universally defaults to five bottom tabs with icon-plus-label, regardless of the number of primary sections.",
-  "instruction": "Choose bottom tab count based on the app's primary sections, not a template. Three to five tabs is normal range; the specific number should match the information architecture.",
-  "rationale": "The five-tab bottom bar is another recognizable AI template. Apps with three primary sections get padded to five with 'Profile' and 'Settings' tabs, while apps with six sections squeeze into five. Tab count is an IA decision, not a design default.",
+  "instruction": "Choose bottom tab count based on the app's primary sections. Tab count is an information architecture decision, not a design default. Five tabs that include filler sections ('Profile', 'Settings') suggest padding rather than deliberate IA.",
+  "rationale": "When an app has three primary sections but displays five bottom tabs, the two extra tabs (commonly 'Profile' and 'Settings') suggest the tab count was chosen as a default rather than derived from the app's information architecture. Tab count should reflect the number of primary sections the user navigates between, not a convention.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.ai-default-patterns"
@@ -90,5 +90,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization correction: removed unsupported 'three to five tabs is normal' claim. Preserved IA-follows-tab-count principle. High FP risk retained."
+  ]
 }

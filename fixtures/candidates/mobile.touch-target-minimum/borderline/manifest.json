@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.mobile.touch-targets.borderline.data-table",
+  "proposalId": "proposal.mobile.touch-target-minimum",
+  "caseType": "borderline",
+  "profile": "marketing",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 809,
+      "sha256": "4e179583c7d5e154e5c44cf97aad1d37b4057af147df796af0ef9ba62531e223"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A mobile data table with 36px row heights but 44px touch-friendly checkboxes leading each row.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A mobile data table with 36px row heights but 44px touch-friendly checkboxes leading each row.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic borderline fixture for proposal.mobile.touch-target-minimum."
+  }
+}

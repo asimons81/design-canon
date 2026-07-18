@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.mobile.touch-targets.control.adequate-sizing",
+  "proposalId": "proposal.mobile.touch-target-minimum",
+  "caseType": "control",
+  "profile": "marketing",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 879,
+      "sha256": "dead976509b170bce9f4af71de3fb2d771f448a40d37cd3a21ee8645731ed4c3"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "Same page with 48px submit button, 44px icon targets via padding, 44px nav links.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "Same page with 48px submit button, 44px icon targets via padding, 44px nav links.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic control fixture for proposal.mobile.touch-target-minimum."
+  }
+}

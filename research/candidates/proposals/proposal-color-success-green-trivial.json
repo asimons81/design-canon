@@ -3,15 +3,15 @@
   "schemaVersion": 1,
   "proposalId": "proposal.color.success-green-trivial",
   "proposedRuleId": "color.success-green-trivial",
-  "title": "Do not use success-green indicators for trivial operations",
+  "title": "Reserve green for semantically meaningful success states",
   "status": "researched",
   "category": "color",
   "surfaces": [
     "product-app"
   ],
-  "summary": "AI-generated interfaces use green success indicators for every completed operation, including trivial ones, diluting the meaning of the success signal.",
-  "instruction": "Use green success indicators only for meaningful state changes that benefit from confirmation. Trivial operations (field saved, item selected) may not need a green signal. Reserve green for operations that complete a user goal.",
-  "rationale": "When every action produces a green success toast, users learn to ignore the color. The contrast between 'Email sent' (important) and 'Preference saved' (trivial) should be distinguishable. Overusing green for trivial feedback trains users to dismiss real confirmations.",
+  "summary": "AI-generated interfaces use green as the default color for every completed operation, from trivial field saves to permanent deletions, diluting the semantic meaning of green across badges, inline states, and transient messages.",
+  "instruction": "Green should indicate a meaningful state change that benefits from confirmation feedback. Trivial operations (field auto-save, item selection) should use neutral feedback. Reserve green for operations that complete a user goal, and use it consistently across color-coded badges, inline indicators, and transient messages.",
+  "rationale": "When green appears for every interaction \u2014 preference saved, email sent, item deleted, password changed \u2014 users cannot distinguish routine system noise from meaningful state changes. The color channel loses its semantic weight. Green should communicate 'goal achieved' consistently whether it appears on a badge, an inline success message, or a transient toast.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.ai-default-patterns"
@@ -40,8 +40,8 @@
   ],
   "universalBan": false,
   "detector": {
-    "feasibility": "semantic",
-    "signalDescription": "Find green-colored success elements (toasts, badges, borders) near completion-related text. Check whether the action is genuinely goal-completing or trivial (field-level vs. operation-level).",
+    "feasibility": "manual-only",
+    "signalDescription": "Review the application's green-color usage across all feedback surfaces: badges, inline messages, toasts, and status indicators. Assess whether green is reserved for goal-completing operations or applied reflexively to every completed action.",
     "matcherProposal": {
       "kind": "heuristic",
       "patterns": [
@@ -65,7 +65,7 @@
       "Accessibility-driven confirmation requirements."
     ],
     "mitigations": [
-      "Detect the volume and density of green success signals. A page with 10+ green confirmations suggests overuse."
+      "Review the density of green indicators across the application. If green appears for field-level operations (auto-save, toggle) as frequently as for goal-completing operations (order placed, account created), the semantic distinction has collapsed."
     ]
   },
   "fixturePlan": [
@@ -91,5 +91,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization correction: rewritten as genuinely color-specific rule covering green semantics across badges, inline states, and transient messages. Detector changed to manual-only. Removed arbitrary 10+ threshold. This rule is now distinct from states.toast-notification-overuse \u2014 it focuses on the color signal itself, not the notification mechanism."
+  ]
 }

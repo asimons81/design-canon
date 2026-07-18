@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.forms.input-labels.violation.signup-form",
+  "proposalId": "proposal.forms.input-labels-required",
+  "caseType": "violation",
+  "profile": "marketing",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 333,
+      "sha256": "6fd47098be8c6cb73f28fea3e2260eac69c01bed98a2630caff41185bc0815a9"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A signup form with email and password inputs using placeholder-only labeling, no labels, no aria-labels.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A signup form with email and password inputs using placeholder-only labeling, no labels, no aria-labels.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic violation fixture for proposal.forms.input-labels-required."
+  }
+}
