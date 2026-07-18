@@ -1,0 +1,260 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F012 — competing-ctas
+  profile: marketing
+  anti-pattern: Multiple primary-style buttons in the same section, no single obvious action
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChoiceParade — So Many Buttons</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fff;
+      color: #171717;
+    }
+    .page { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+    h1 { font-size: 42px; font-weight: 800; text-align: center; margin-bottom: 16px; }
+    .subtitle { text-align: center; color: #737373; font-size: 18px; margin-bottom: 48px; }
+    section { margin-bottom: 64px; }
+    section h2 { font-size: 28px; margin-bottom: 24px; text-align: center; }
+
+    /* Hero section: THREE identically styled primary buttons */
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .hero-btn {
+      padding: 18px 40px;
+      border: none;
+      border-radius: 12px;
+      background: #171717;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* All hero buttons look primary — no visual distinction */
+    .hero-btn-outline {
+      padding: 18px 40px;
+      border-radius: 12px;
+      background: #171717;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+    .hero-btn-ghost {
+      padding: 18px 40px;
+      border-radius: 12px;
+      background: #171717;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+
+    /* Feature section: each card has its own primary-looking button */
+    .features { display: flex; flex-direction: column; gap: 24px; }
+    .feature-card {
+      background: #fafafa;
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .feature-card h3 { font-size: 20px; margin-bottom: 4px; }
+    .feature-card p { color: #737373; font-size: 14px; }
+    .feature-btn {
+      padding: 12px 28px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* Pricing section: each plan has a fully styled primary button */
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .pricing-card {
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+    }
+    .pricing-card h3 { font-size: 20px; margin-bottom: 8px; }
+    .pricing-card .price { font-size: 36px; font-weight: 800; margin: 16px 0; }
+    .pricing-card ul { list-style: none; padding: 0; margin: 24px 0; }
+    .pricing-card li { padding: 8px 0; font-size: 14px; color: #525252; }
+    .pricing-btn {
+      width: 100%;
+      padding: 14px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* CTA banner: THREE more identically styled buttons */
+    .cta-banner {
+      background: #f5f5f5;
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+    }
+    .cta-banner h2 { font-size: 32px; margin-bottom: 12px; }
+    .cta-banner p { color: #737373; margin-bottom: 32px; }
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .cta-action-btn {
+      padding: 16px 36px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .cta-action-btn-alt {
+      padding: 16px 36px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .cta-action-btn-tertiary {
+      padding: 16px 36px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    footer { text-align: center; padding: 40px; color: #a3a3a3; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Start Building Today</h1>
+    <p class="subtitle">Choose how you want to begin — every option is equally important.</p>
+    <div class="hero-actions">
+      <button class="hero-btn">Start Free Trial</button>
+      <button class="hero-btn-outline">Schedule Demo</button>
+      <button class="hero-btn-ghost">Talk to Sales</button>
+      <button style="padding:18px 40px;background:#171717;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">Watch Video</button>
+    </div>
+
+    <section>
+      <h2>Our Features</h2>
+      <div class="features">
+        <div class="feature-card">
+          <div><h3>Analytics Dashboard</h3><p>Real-time insights for your business</p></div>
+          <button class="feature-btn">Explore</button>
+        </div>
+        <div class="feature-card">
+          <div><h3>Team Collaboration</h3><p>Work together seamlessly</p></div>
+          <button class="feature-btn">Try Now</button>
+        </div>
+        <div class="feature-card">
+          <div><h3>Automation Engine</h3><p>Streamline repetitive tasks</p></div>
+          <button class="feature-btn">Learn More</button>
+        </div>
+        <div class="feature-card">
+          <div><h3>API Integration</h3><p>Connect with 500+ tools</p></div>
+          <button class="feature-btn">View Docs</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Choose Your Plan</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="price">$19</div>
+          <p style="color:#737373;font-size:14px;">per month</p>
+          <ul>
+            <li>5 projects</li>
+            <li>10GB storage</li>
+            <li>Email support</li>
+          </ul>
+          <button class="pricing-btn">Get Started</button>
+        </div>
+        <div class="pricing-card">
+          <h3>Pro</h3>
+          <div class="price">$49</div>
+          <p style="color:#737373;font-size:14px;">per month</p>
+          <ul>
+            <li>Unlimited projects</li>
+            <li>100GB storage</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="pricing-btn">Get Started</button>
+        </div>
+        <div class="pricing-card">
+          <h3>Enterprise</h3>
+          <div class="price">$149</div>
+          <p style="color:#737373;font-size:14px;">per month</p>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Custom integrations</li>
+            <li>Dedicated manager</li>
+          </ul>
+          <button class="pricing-btn">Contact Us</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-banner">
+      <h2>Ready to Get Started?</h2>
+      <p>Join thousands of companies already using our platform.</p>
+      <div class="cta-actions">
+        <button class="cta-action-btn">Start Free Trial</button>
+        <button class="cta-action-btn-alt">Book a Demo</button>
+        <button class="cta-action-btn-tertiary">See Pricing</button>
+      </div>
+    </div>
+
+    <footer>&copy; 2026 ChoiceParade. So many choices.</footer>
+  </div>
+</body>
+</html>

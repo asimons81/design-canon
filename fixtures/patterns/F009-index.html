@@ -1,0 +1,148 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F009 — weak-hierarchy
+  profile: marketing
+  anti-pattern: Everything looks equally important (same size, weight, color) — no visual hierarchy
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlatLine — No Hierarchy Needed</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fff;
+      color: #333;
+      padding: 40px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    /* Everything is exactly the same — same size, weight, color */
+    h1, h2, h3, h4, h5, h6, p, a, button, li, span, div {
+      font-size: 18px;
+      font-weight: 400;
+      color: #333;
+      line-height: 1.5;
+    }
+    /* No distinction whatsoever */
+    .logo { font-size: 18px; font-weight: 400; color: #333; }
+    nav { display: flex; gap: 24px; padding: 20px 0; }
+    nav a { font-size: 18px; font-weight: 400; color: #333; text-decoration: none; }
+    .hero {
+      padding: 40px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .hero h1 { font-size: 18px; font-weight: 400; color: #333; }
+    .hero p { font-size: 18px; font-weight: 400; color: #333; }
+    .features { display: flex; flex-direction: column; gap: 24px; padding: 20px 0; }
+    .feature h3 { font-size: 18px; font-weight: 400; color: #333; }
+    .feature p { font-size: 18px; font-weight: 400; color: #333; }
+    .pricing { display: flex; gap: 24px; padding: 20px 0; }
+    .plan { flex: 1; padding: 24px; border: 1px solid #ddd; }
+    .plan h3 { font-size: 18px; font-weight: 400; color: #333; }
+    .plan .price { font-size: 18px; font-weight: 400; color: #333; }
+    .plan ul { list-style: none; padding: 0; }
+    .plan li { font-size: 18px; font-weight: 400; color: #333; padding: 8px 0; }
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      padding: 20px 0;
+      justify-content: center;
+    }
+    .btn {
+      padding: 16px 40px;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #333;
+      font-size: 18px;
+      font-weight: 400;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    /* Both buttons look IDENTICAL — no primary action */
+    .btn-primary { padding: 16px 40px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 18px; font-weight: 400; }
+    .btn-secondary { padding: 16px 40px; border: 1px solid #ddd; background: #fff; color: #333; font-size: 18px; font-weight: 400; }
+    .testimonial { padding: 20px 0; }
+    .testimonial blockquote { font-size: 18px; font-weight: 400; color: #333; }
+    .testimonial cite { font-size: 18px; font-weight: 400; color: #333; }
+    .stats { display: flex; gap: 24px; padding: 20px 0; justify-content: center; }
+    .stat { font-size: 18px; font-weight: 400; color: #333; }
+    footer { padding: 40px 0; text-align: center; font-size: 18px; font-weight: 400; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo">FlatLine</div>
+      <a href="#">Product</a>
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+    </nav>
+    <section class="hero">
+      <h1>Welcome to our platform</h1>
+      <p>We make a product that does things for people who need things done. It's quite useful in many ways.</p>
+      <div class="cta-group">
+        <a href="#" class="btn btn-primary">Start Free Trial</a>
+        <a href="#" class="btn btn-secondary">Watch Demo</a>
+      </div>
+    </section>
+    <section class="features">
+      <div class="feature">
+        <h3>Feature One</h3>
+        <p>Description of feature one that explains what it does in moderate detail.</p>
+      </div>
+      <div class="feature">
+        <h3>Feature Two</h3>
+        <p>Description of feature two that also explains what it does in moderate detail.</p>
+      </div>
+      <div class="feature">
+        <h3>Feature Three</h3>
+        <p>Description of feature three that also explains what it does in moderate detail.</p>
+      </div>
+    </section>
+    <section class="pricing">
+      <div class="plan">
+        <h3>Starter</h3>
+        <div class="price">$19 per month</div>
+        <ul>
+          <li>Basic feature access</li>
+          <li>Email support</li>
+          <li>1 workspace</li>
+        </ul>
+        <a href="#" class="btn">Choose Plan</a>
+      </div>
+      <div class="plan">
+        <h3>Professional</h3>
+        <div class="price">$49 per month</div>
+        <ul>
+          <li>All features included</li>
+          <li>Priority support</li>
+          <li>Unlimited workspaces</li>
+        </ul>
+        <a href="#" class="btn">Choose Plan</a>
+      </div>
+    </section>
+    <section class="testimonial">
+      <blockquote>"This is a fine product that does what it says on the tin."</blockquote>
+      <cite>— A Customer, Some Company</cite>
+    </section>
+    <div class="stats">
+      <div class="stat">10K+ Users</div>
+      <div class="stat">99.9% Uptime</div>
+      <div class="stat">4.8 Stars</div>
+    </div>
+    <footer>&copy; 2026 FlatLine. No hierarchy needed.</footer>
+  </div>
+</body>
+</html>
