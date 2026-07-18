@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design-canon.dev/schema/candidate-fixture.schema.json",
+  "title": "Design Canon Candidate Fixture Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "fixtureId",
+    "proposalId",
+    "caseType",
+    "profile",
+    "surface",
+    "sourceFiles",
+    "constraints",
+    "expected",
+    "rationale",
+    "provenance"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "fixtureId": {
+      "type": "string",
+      "pattern": "^fixture\\.[a-z0-9.-]+\\.(violation|control|borderline|profile)\\.[a-z][a-z0-9-]*$"
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^proposal\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "caseType": { "enum": ["violation", "control", "borderline", "profile"] },
+    "profile": { "enum": ["universal", "marketing", "product-app", "editorial", "mobile", "anti-slop"] },
+    "surface": { "type": "string", "minLength": 3, "maxLength": 80 },
+    "sourceFiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "language", "bytes", "sha256"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"
+          },
+          "language": { "enum": ["html", "css", "javascript", "typescript", "jsx", "tsx", "vue", "svelte", "json"] },
+          "bytes": { "type": "integer", "minimum": 1, "maximum": 200000 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selfContained", "externalDependencies", "networkAccess", "deterministic", "syntheticContent"],
+      "properties": {
+        "selfContained": { "const": true },
+        "externalDependencies": { "const": false },
+        "networkAccess": { "const": false },
+        "deterministic": { "const": true },
+        "syntheticContent": { "const": true }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currentDeterministic", "semanticExpectations", "mustNotTrigger"],
+      "properties": {
+        "currentDeterministic": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ruleId", "minimum", "maximum"],
+            "properties": {
+              "ruleId": { "type": "string", "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$" },
+              "minimum": { "type": "integer", "minimum": 0 },
+              "maximum": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "semanticExpectations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["description", "reviewerType"],
+            "properties": {
+              "description": { "type": "string", "minLength": 15, "maxLength": 500 },
+              "reviewerType": { "enum": ["human", "model-assisted", "future-detector"] }
+            }
+          }
+        },
+        "mustNotTrigger": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$" }
+        }
+      }
+    },
+    "rationale": { "type": "string", "minLength": 30, "maxLength": 1000 },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generatedForProposal", "cleanRoom", "noCopiedInterface"],
+      "properties": {
+        "generatedForProposal": { "const": true },
+        "cleanRoom": { "const": true },
+        "noCopiedInterface": { "const": true },
+        "notes": { "type": "string", "maxLength": 500 }
+      }
+    }
+  }
+}

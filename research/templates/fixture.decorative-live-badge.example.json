@@ -1,0 +1,41 @@
+{
+  "$schema": "../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.badges.decorative-live-state.violation.static-saas-hero",
+  "proposalId": "proposal.badges.decorative-live-state",
+  "caseType": "violation",
+  "profile": "marketing",
+  "surface": "saas-landing-page",
+  "sourceFiles": [
+    {
+      "path": "fixture-source/violation/index.html",
+      "language": "html",
+      "bytes": 577,
+      "sha256": "73c837d16f122cef8a563fb77083447f854d210881f2053c09f1dcbd0b2091c3"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "The badge presents a live state without a real-time process, timestamp, broadcast, or operational status nearby.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "The fixture isolates deceptive status decoration while avoiding unrelated gradients, shadows, generic copy, and accessibility failures.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic fixture source is included beside the example manifest."
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design-canon.dev/schema/research-source.schema.json",
+  "title": "Design Canon Research Source",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "sourceId",
+    "sourceType",
+    "title",
+    "accessedAt",
+    "licenseStatus",
+    "summary",
+    "supportingClaims",
+    "independence"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^source\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "sourceType": {
+      "enum": [
+        "official-standard",
+        "official-guidance",
+        "research-paper",
+        "open-source-project",
+        "public-design-system",
+        "public-example",
+        "public-article",
+        "original-observation"
+      ]
+    },
+    "title": { "type": "string", "minLength": 3, "maxLength": 200 },
+    "publisher": { "type": "string", "minLength": 2, "maxLength": 120 },
+    "url": { "type": "string", "format": "uri" },
+    "sourceLocation": { "type": "string", "minLength": 3, "maxLength": 300 },
+    "accessedAt": { "type": "string", "format": "date-time" },
+    "publishedAt": { "type": "string", "format": "date-time" },
+    "licenseStatus": {
+      "enum": [
+        "explicit-open-license",
+        "publicly-readable",
+        "unknown",
+        "not-applicable"
+      ]
+    },
+    "license": { "type": "string", "maxLength": 100 },
+    "summary": { "type": "string", "minLength": 40, "maxLength": 1200 },
+    "supportingClaims": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": { "type": "string", "minLength": 15, "maxLength": 400 }
+    },
+    "shortExcerpt": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Optional evidence excerpt. Keep under 25 words and use only when necessary."
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publiclyAccessible",
+        "noPaywallBypass",
+        "noLeakedMaterial",
+        "notDerivedFromPrivateEpsteinMd",
+        "independentSynthesis"
+      ],
+      "properties": {
+        "publiclyAccessible": { "const": true },
+        "noPaywallBypass": { "const": true },
+        "noLeakedMaterial": { "const": true },
+        "notDerivedFromPrivateEpsteinMd": { "const": true },
+        "independentSynthesis": { "const": true },
+        "notes": { "type": "string", "maxLength": 500 }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "sourceType": { "const": "original-observation" } },
+        "required": ["sourceType"]
+      },
+      "then": { "required": ["sourceLocation"] },
+      "else": { "required": ["url", "publisher"] }
+    }
+  ]
+}

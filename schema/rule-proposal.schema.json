@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design-canon.dev/schema/rule-proposal.schema.json",
+  "title": "Design Canon Candidate Rule Proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "proposalId",
+    "title",
+    "status",
+    "category",
+    "surfaces",
+    "summary",
+    "instruction",
+    "rationale",
+    "claimType",
+    "sourceIds",
+    "examples",
+    "exceptions",
+    "universalBan",
+    "detector",
+    "impact",
+    "falsePositiveRisk",
+    "fixturePlan",
+    "provenanceAttestation"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^proposal\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+    },
+    "proposedRuleId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$",
+      "description": "A suggestion only. Maintainers assign stable rule IDs."
+    },
+    "title": { "type": "string", "minLength": 8, "maxLength": 120 },
+    "status": { "enum": ["draft", "researched", "review-ready"] },
+    "category": {
+      "enum": [
+        "accessibility",
+        "badges",
+        "borders",
+        "color",
+        "components",
+        "copy",
+        "data-integrity",
+        "depth",
+        "editorial",
+        "forms",
+        "hierarchy",
+        "layout",
+        "marketing",
+        "mobile",
+        "motion",
+        "navigation",
+        "radius",
+        "responsive",
+        "spacing",
+        "states",
+        "tables",
+        "tokens",
+        "typography"
+      ]
+    },
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "universal",
+          "marketing",
+          "product-app",
+          "editorial",
+          "mobile",
+          "commerce",
+          "documentation",
+          "public-sector"
+        ]
+      }
+    },
+    "summary": { "type": "string", "minLength": 30, "maxLength": 500 },
+    "instruction": { "type": "string", "minLength": 20, "maxLength": 500 },
+    "rationale": { "type": "string", "minLength": 50, "maxLength": 1200 },
+    "claimType": { "enum": ["research-backed", "original-observation", "hybrid"] },
+    "sourceIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^source\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$"
+      }
+    },
+    "examples": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["violations", "controls", "borderline"],
+      "properties": {
+        "violations": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string", "minLength": 5, "maxLength": 500 }
+        },
+        "controls": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string", "minLength": 5, "maxLength": 500 }
+        },
+        "borderline": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 5, "maxLength": 500 }
+        }
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "examples"],
+        "properties": {
+          "description": { "type": "string", "minLength": 15, "maxLength": 400 },
+          "examples": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 3, "maxLength": 300 }
+          }
+        }
+      }
+    },
+    "universalBan": { "type": "boolean" },
+    "universalBanJustification": { "type": "string", "minLength": 80, "maxLength": 800 },
+    "detector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feasibility", "signalDescription", "matcherProposal", "limitations"],
+      "properties": {
+        "feasibility": { "enum": ["mechanical", "semantic", "visual", "manual-only"] },
+        "signalDescription": { "type": "string", "minLength": 20, "maxLength": 800 },
+        "matcherProposal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "patterns"],
+          "properties": {
+            "kind": { "enum": ["exact-word", "phrase", "token-sequence", "css-property", "dom-structure", "heuristic"] },
+            "patterns": {
+              "type": "array",
+              "maxItems": 100,
+              "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+            },
+            "caseSensitive": { "type": "boolean" },
+            "wordBoundary": { "type": "boolean" }
+          },
+          "description": "Describe matcher intent. Do not submit executable regular expressions."
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 10, "maxLength": 400 }
+        }
+      }
+    },
+    "copyPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["patternClass", "replacementStrategy"],
+      "properties": {
+        "patternClass": {
+          "enum": [
+            "empty-adjective",
+            "generic-hero",
+            "unsupported-superlative",
+            "fake-urgency",
+            "vague-transformation",
+            "business-abstraction",
+            "repetitive-cta",
+            "fake-social-proof",
+            "filler-transition",
+            "anthropomorphic-product-claim"
+          ]
+        },
+        "replacementStrategy": { "type": "string", "minLength": 30, "maxLength": 600 }
+      }
+    },
+    "impact": { "enum": ["nuisance", "degraded", "serious", "blocking"] },
+    "falsePositiveRisk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "scenarios", "mitigations"],
+      "properties": {
+        "level": { "enum": ["low", "medium", "high"] },
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 10, "maxLength": 400 }
+        },
+        "mitigations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 10, "maxLength": 400 }
+        }
+      }
+    },
+    "fixturePlan": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["fixtureId", "caseType", "description"],
+        "properties": {
+          "fixtureId": {
+            "type": "string",
+            "pattern": "^fixture\\.[a-z0-9.-]+\\.(violation|control|borderline|profile)\\.[a-z][a-z0-9-]*$"
+          },
+          "caseType": { "enum": ["violation", "control", "borderline", "profile"] },
+          "description": { "type": "string", "minLength": 15, "maxLength": 400 }
+        }
+      }
+    },
+    "provenanceAttestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cleanRoom",
+        "notCopiedFromPrivateCorpus",
+        "notReverseEngineeredFromEpsteinMd",
+        "sourcesRecorded",
+        "originalSynthesis"
+      ],
+      "properties": {
+        "cleanRoom": { "const": true },
+        "notCopiedFromPrivateCorpus": { "const": true },
+        "notReverseEngineeredFromEpsteinMd": { "const": true },
+        "sourcesRecorded": { "const": true },
+        "originalSynthesis": { "const": true },
+        "notes": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "notes": { "type": "array", "items": { "type": "string", "maxLength": 500 } }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "claimType": { "enum": ["research-backed", "hybrid"] } },
+        "required": ["claimType"]
+      },
+      "then": { "properties": { "sourceIds": { "minItems": 1 } } }
+    },
+    {
+      "if": {
+        "properties": { "universalBan": { "const": true } },
+        "required": ["universalBan"]
+      },
+      "then": { "required": ["universalBanJustification"] }
+    },
+    {
+      "if": {
+        "properties": { "category": { "const": "copy" } },
+        "required": ["category"]
+      },
+      "then": { "required": ["copyPattern"] }
+    }
+  ]
+}
