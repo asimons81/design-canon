@@ -1,9 +1,9 @@
 # ADR-001: Candidate Production Architecture
 
-**Status:** Draft for maintainer review  
-**Date:** 2026-07-18  
-**Branch:** `decision/candidate-production-architecture`  
-**PR:** (draft)  
+**Status:** Accepted
+**Date:** 2026-07-18
+**Branch:** `decision/candidate-production-architecture`
+**PR:** #14
 
 ## Context
 
@@ -28,6 +28,51 @@ Each candidate is evaluated against five dimensions:
 5. **Implementation sequencing** — urgency, impact, and dependency
 
 ---
+
+## Architecture Authority
+
+### Authorized Analysis Techniques
+
+Design Canon's dependency-free static linter is authorized to implement lightweight structural analyzers for the following inputs, provided they require zero runtime dependencies and operate on source text alone:
+
+- **HTML-like markup:** Tag matching, attribute extraction, element-type classification, `id`/`for` reference matching, hierarchical parent/child relationship detection within source files
+- **CSS source text:** Declaration block extraction, `@media` query scope detection, property/value pair matching, `@keyframes` name resolution, selector-type classification
+- **Component template syntax (JSX, Vue, Svelte):** Attribute extraction from template expressions (`aria-label`, `:label`, etc.), style scoping detection for SFC components
+
+These analyzers must:
+- Operate on source text without a DOM parser, CSS parser, or runtime environment
+- Use deterministic string and regex operations only
+- Respect existing file-size caps, directory exclusions, and source-extension allowlists
+- Produce deterministic output identical across platforms and environments
+
+### What Pattern Matching Cannot Do
+
+The following are **not** achievable with source-text pattern matching alone under the current architecture:
+
+| Capability | Why Pattern Matching Is Insufficient |
+|---|---|
+| **Label association** (matching `for` attribute to `id`) | Requires reference resolution: finding the element with the matching `id`, which may be in a different part of the file or a different file. Simple keyword matching cannot confirm the target exists or is an accessible label element. |
+| **`aria-labelledby` resolution** | The attribute value is a space-separated list of one or more element IDs that collectively form the accessible name. Resolving this reference chain to compute the computed name string requires DOM-level traversal, not source-text scanning. |
+| **Media-query scope analysis** (matching animation rules to their enclosing `@media` block) | Requires block-level structural understanding: matching `@media` open/close braces to determine which declarations fall inside which query. A simple regex scanning the whole file for `@media (prefers-reduced-motion)` cannot determine which specific `@keyframes` or `transition` declarations are enclosed by it. |
+| **CSS cascade resolution** | Determining the computed style of an element requires combining declarations across selectors, specificity calculation, inheritance, and origin — beyond static pattern matching. |
+| **Cross-file reference resolution** | Finding an element defined in one file that is referenced by an attribute in another file. |
+
+### Non-Negotiable Architecture Boundaries
+
+The following constraints are preserved for all Tranche 1 implementations. These are final:
+
+- **Zero runtime dependencies:** No npm packages beyond the current zero dependencies. No DOM parser, CSS parser, browser, or rendering engine.
+- **Local-only operation:** All file analysis must be local. No network requests, no API calls, no telemetry.
+- **Deterministic output:** Identical source files must produce identical findings on any platform, any Node.js version, any locale.
+- **File-size caps:** The existing `MAX_SOURCE_FILE_BYTES = 1024 * 1024` (1 MB) applies. Files exceeding this limit are skipped with a documented reason.
+- **Source-extension allowlist:** Only files with extensions in the existing allowed set (`.css`, `.html`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.vue`, `.svelte`) are scanned.
+- **Current CLI contract:** No changes to `--profile`, `--format`, `--config`, `--output`, `profiles`, `--version` flags or their behavior.
+- **Current suppression contract:** All findings remain suppressible per-rule + per-file-pattern with rationale requirement. No new suppression mechanisms are introduced.
+
+These boundaries mean:
+- A label-association detector can verify that a `<label for="X">` element exists AND that an element with `id="X"` exists in the same file. It cannot verify that the label:input relationship functions correctly in a browser.
+- A reduced-motion detector can check whether `@media (prefers-reduced-motion)` wraps animation declarations. It can use brace-depth tracking to determine scope, but it cannot evaluate nested `@supports` or dynamic CSSOM injection.
+
 
 ## Candidate 1: `forms.input-labels-required`
 
@@ -409,6 +454,24 @@ The rendered touch-target area cannot be determined from source CSS alone. What 
 | `accessibility.text-contrast-minimum` | Partial static + browser | Needs careful scope messaging; partial findings risk overconfidence |
 | `accessibility.skip-navigation-link` | Static + advisory | Finding message must be carefully bounded to avoid implying WCAG failure |
 | `mobile.touch-target-minimum` | Browser-assisted | Cannot be meaningfully implemented under current architecture |
+
+
+
+### Framework Scope Decision
+
+**HTML and plain CSS in Tranche 1. JSX, Vue SFC, and Svelte staged in a follow-up.**
+
+The first implementation PR for each Tranche 1 candidate must handle:
+- **`forms.input-labels-required`:** `.html` files only. JSX `aria-label`, Vue `:label`, and Svelte label slots are staged for a follow-up PR.
+- **`motion.respect-reduced-motion`:** `.html` (inline `<style>` and `<link>`) and `.css` files only. CSS-in-JS template literals (styled-components, Emotion), Vue scoped styles, and Svelte component styles are staged for a follow-up PR.
+
+**Rationale:** The current fixture coverage provides violation, control, and borderline cases for core HTML and CSS. Framework-specific patterns require additional fixtures, detector patterns, and false-positive analysis that would delay the initial implementation. Staging them as follow-ups lets the core detector ship, gather feedback, and then expand incrementally — consistent with Design Canon's principle of progressive disclosure.
+
+**Acceptance gates for framework expansion:**
+1. Core HTML/CSS detector passes review and ships
+2. Framework-specific fixtures exist (JSX component with `aria-label`, Vue SFC with `:label`, Svelte with label slot)
+3. Framework pattern tests pass alongside the core HTML tests
+4. Documentation updated for the new template syntax coverage
 
 ### Why Start with Input Labels
 

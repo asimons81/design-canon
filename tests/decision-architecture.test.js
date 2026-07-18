@@ -186,3 +186,73 @@ test('decision matrix includes deferred-architecture map', async () => {
   const keys = Object.keys(data.deferredArchitecture);
   assert.equal(keys.length, 5);
 });
+
+test('ADR status is Accepted and references PR #14', async () => {
+  const data = JSON.parse(await readFile(DECISION_PATH, 'utf8'));
+  assert.equal(data.adrStatus, 'Accepted');
+  assert.equal(data.adrPr, '#14');
+});
+
+test('architecture boundaries section exists with authorized analysis', async () => {
+  const data = JSON.parse(await readFile(DECISION_PATH, 'utf8'));
+  assert.ok(data.architectureBoundaries, 'Missing architectureBoundaries');
+  assert.ok(
+    Array.isArray(data.architectureBoundaries.authorizedAnalysis),
+    'authorizedAnalysis must be an array'
+  );
+  assert.ok(data.architectureBoundaries.authorizedAnalysis.length >= 2);
+});
+
+test('pattern matching limitations are documented in architecture boundaries', async () => {
+  const data = JSON.parse(await readFile(DECISION_PATH, 'utf8'));
+  const unsupported = data.architectureBoundaries.notSupportedByPatternMatching;
+  assert.ok(Array.isArray(unsupported), 'notSupportedByPatternMatching must be an array');
+  assert.ok(unsupported.length >= 3, 'Must document at least 3 pattern-matching limitations');
+
+  const topics = unsupported.join(' ').toLowerCase();
+  assert.ok(topics.includes('label') || topics.includes('for'), 'Must mention label association limitation');
+  assert.ok(topics.includes('aria-labelledby'), 'Must mention aria-labelledby limitation');
+  assert.ok(topics.includes('media') || topics.includes('scope'), 'Must mention media-query scope limitation');
+});
+
+test('non-negotiable architecture boundaries are documented', async () => {
+  const data = JSON.parse(await readFile(DECISION_PATH, 'utf8'));
+  const boundaries = data.architectureBoundaries.nonNegotiableBoundaries;
+  assert.ok(Array.isArray(boundaries), 'nonNegotiableBoundaries must be an array');
+  assert.ok(boundaries.length >= 5, 'Must document at least 5 architecture boundaries');
+
+  const text = boundaries.join(' ').toLowerCase();
+  assert.ok(text.includes('zero runtime'), 'Must include zero runtime dependencies');
+  assert.ok(text.includes('deterministic'), 'Must include deterministic output');
+  assert.ok(text.includes('local'), 'Must include local-only operation');
+});
+
+test('framework scope decision exists with HTML/CSS in Tranche 1', async () => {
+  const data = JSON.parse(await readFile(DECISION_PATH, 'utf8'));
+  assert.ok(data.frameworkScope, 'Missing frameworkScope');
+  assert.equal(data.frameworkScope.tranche1, 'HTML and plain CSS only');
+  assert.ok(
+    Array.isArray(data.frameworkScope.stagedAfter),
+    'frameworkScope.stagedAfter must be an array'
+  );
+  assert.ok(data.frameworkScope.stagedAfter.length >= 2);
+});
+
+test('framework expansion acceptance gates are defined', async () => {
+  const data = JSON.parse(await readFile(DECISION_PATH, 'utf8'));
+  const gates = data.frameworkScope.acceptanceGates;
+  assert.ok(Array.isArray(gates), 'acceptanceGates must be an array');
+  assert.ok(gates.length >= 3, 'Must define at least 3 acceptance gates');
+});
+
+test('ADR-001 human-readable document mentions Authorized Analysis Techniques', async () => {
+  // Derive the ADR path from the test file location
+  const adrPath = join(ROOT, '..', 'docs', 'decisions', 'ADR-001-candidate-production-architecture.md');
+  const adr = await readFile(adrPath, 'utf8');
+  assert.ok(adr.includes('Authorized Analysis Techniques'), 'ADR must document authorized analysis techniques');
+  assert.ok(adr.includes('What Pattern Matching Cannot Do'), 'ADR must document pattern matching limitations');
+  assert.ok(adr.includes('Non-Negotiable Architecture Boundaries'), 'ADR must document non-negotiable boundaries');
+  assert.ok(adr.includes('Framework Scope Decision'), 'ADR must document framework scope decision');
+  assert.ok(adr.match(/Status.*Accepted/), 'ADR status must be Accepted');
+  assert.ok(adr.match(/PR.*?#14/) || adr.includes('PR #14'), 'ADR must reference PR #14');
+});

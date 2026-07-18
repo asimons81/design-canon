@@ -6,24 +6,62 @@
       "proposalId": "proposal.forms.input-labels-required",
       "proposedRuleId": "forms.input-labels-required",
       "disposition": "accept-for-static-implementation",
-      "architecture": ["static-dom-analysis"],
+      "architecture": [
+        "static-dom-analysis"
+      ],
       "confidenceBoundary": {
         "canProve": "No supported accessible-name source (label, aria-label, aria-labelledby) was found in the analyzed source file for a given input element.",
         "cannotProve": "The absence of a static label means the control is inaccessible at runtime. Framework-generated labels, dynamically injected ARIA attributes, or programmatic focus-name mappings may create accessible names outside the source text."
       },
-      "requiredInputs": ["HTML source text", "Input/textarea/select element declarations", "Label, aria-label, aria-labelledby attribute values"],
-      "exclusions": ["type=hidden inputs", "type=submit/button/reset inputs", "Custom form controls with internal ARIA management", "Framework-generated DOM (runtime labels)"],
-      "profileRecommendations": ["universal", "marketing", "product-app"],
+      "requiredInputs": [
+        "HTML source text",
+        "Input/textarea/select element declarations",
+        "Label, aria-label, aria-labelledby attribute values"
+      ],
+      "exclusions": [
+        "type=hidden inputs",
+        "type=submit/button/reset inputs",
+        "Custom form controls with internal ARIA management",
+        "Framework-generated DOM (runtime labels)"
+      ],
+      "profileRecommendations": [
+        "universal",
+        "marketing",
+        "product-app"
+      ],
       "severityRecommendation": "error",
       "implementationReadiness": "ready-for-implementation",
       "fixtureAssessment": {
-        "violation": { "fixtureId": "fixture.forms.input-labels.violation.signup-form", "usable": true, "gap": "JSX, Vue, Svelte template variants needed" },
-        "control": { "fixtureId": "fixture.forms.input-labels.control.signup-form-labeled", "usable": true, "gap": null },
-        "borderline": { "fixtureId": "fixture.forms.input-labels.borderline.settings-form", "usable": true, "gap": "Dynamic-label JS test needed" }
+        "violation": {
+          "fixtureId": "fixture.forms.input-labels.violation.signup-form",
+          "usable": true,
+          "gap": "JSX, Vue, Svelte template variants needed"
+        },
+        "control": {
+          "fixtureId": "fixture.forms.input-labels.control.signup-form-labeled",
+          "usable": true,
+          "gap": null
+        },
+        "borderline": {
+          "fixtureId": "fixture.forms.input-labels.borderline.settings-form",
+          "usable": true,
+          "gap": "Dynamic-label JS test needed"
+        }
       },
       "acceptanceCriteria": {
-        "requiredTests": ["Violation fixture triggers finding", "Control fixture produces no finding", "Borderline fixture produces no finding", "Suppression by rule and file pattern", "CLI JSON output includes finding", "Framework template syntax (JSX, Vue, Svelte)"],
-        "requiredFixtures": ["JSX aria-label pattern", "Vue :label binding", "Svelte label slot"],
+        "requiredTests": [
+          "Violation fixture triggers finding",
+          "Control fixture produces no finding",
+          "Borderline fixture produces no finding",
+          "Suppression by rule and file pattern",
+          "CLI JSON output includes finding",
+          "Framework template syntax (JSX, Vue, Svelte)"
+        ],
+        "requiredFixtures": [
+          "JSX aria-label pattern",
+          "Vue :label binding",
+          "Svelte label slot"
+        ],
         "cliBehavior": "Lint triggers warning or error finding with evidence showing the unmatched input",
         "suppressionBehavior": "Per-rule, per-file-pattern, with rationale requirement",
         "performanceConstraints": "Single-file scan, no network, no rendering",
@@ -35,24 +73,62 @@
       "proposalId": "proposal.motion.respect-reduced-motion",
       "proposedRuleId": "motion.respect-reduced-motion",
       "disposition": "accept-for-static-implementation",
-      "architecture": ["static-css-analysis"],
+      "architecture": [
+        "static-css-analysis"
+      ],
       "confidenceBoundary": {
         "canProve": "CSS @keyframes, animation, or transition declarations exist in the scanned source without a corresponding prefers-reduced-motion media query wrapper.",
         "cannotProve": "The absence of a prefers-reduced-motion wrapper means motion is not handled at runtime. JavaScript animation libraries (GSAP, Framer Motion, anime.js), canvas/WebGL rendering, video autoplay, and runtime-injected styles are invisible to static CSS analysis."
       },
-      "requiredInputs": ["CSS source text", "@keyframes declarations", "animation property declarations", "transition property declarations", "@media (prefers-reduced-motion) queries"],
-      "exclusions": ["Micro-interactions under 300ms (hover scale, button press)", "Single-play load animations (non-looping)", "User-initiated video playback", "Progress indicators during file operations"],
-      "profileRecommendations": ["universal", "marketing", "editorial"],
+      "requiredInputs": [
+        "CSS source text",
+        "@keyframes declarations",
+        "animation property declarations",
+        "transition property declarations",
+        "@media (prefers-reduced-motion) queries"
+      ],
+      "exclusions": [
+        "Micro-interactions under 300ms (hover scale, button press)",
+        "Single-play load animations (non-looping)",
+        "User-initiated video playback",
+        "Progress indicators during file operations"
+      ],
+      "profileRecommendations": [
+        "universal",
+        "marketing",
+        "editorial"
+      ],
       "severityRecommendation": "warning",
       "implementationReadiness": "ready-for-implementation",
       "fixtureAssessment": {
-        "violation": { "fixtureId": "fixture.motion.reduced-motion.violation.no-preference", "usable": true, "gap": "CSS-in-JS template literal variants needed" },
-        "control": { "fixtureId": "fixture.motion.reduced-motion.control.with-preference", "usable": true, "gap": null },
-        "borderline": { "fixtureId": "fixture.motion.reduced-motion.borderline.essential-animation", "usable": true, "gap": null }
+        "violation": {
+          "fixtureId": "fixture.motion.reduced-motion.violation.no-preference",
+          "usable": true,
+          "gap": "CSS-in-JS template literal variants needed"
+        },
+        "control": {
+          "fixtureId": "fixture.motion.reduced-motion.control.with-preference",
+          "usable": true,
+          "gap": null
+        },
+        "borderline": {
+          "fixtureId": "fixture.motion.reduced-motion.borderline.essential-animation",
+          "usable": true,
+          "gap": null
+        }
       },
       "acceptanceCriteria": {
-        "requiredTests": ["Violation fixture triggers finding", "Control fixture produces no finding", "Borderline fixture produces no finding", "CSS-in-JS syntax (styled-components)", "Vue scoped style animation"],
-        "requiredFixtures": ["CSS-in-JS animation via template literal", "Vue SFC with scoped animation"],
+        "requiredTests": [
+          "Violation fixture triggers finding",
+          "Control fixture produces no finding",
+          "Borderline fixture produces no finding",
+          "CSS-in-JS syntax (styled-components)",
+          "Vue scoped style animation"
+        ],
+        "requiredFixtures": [
+          "CSS-in-JS animation via template literal",
+          "Vue SFC with scoped animation"
+        ],
         "cliBehavior": "Lint triggers warning finding with evidence showing the unmatched animation declaration",
         "suppressionBehavior": "Per-rule, per-file-pattern, with rationale requirement",
         "performanceConstraints": "Single-file scan, no network, no rendering",
@@ -64,24 +140,63 @@
       "proposalId": "proposal.accessibility.text-contrast-minimum",
       "proposedRuleId": "accessibility.text-contrast-minimum",
       "disposition": "accept-for-partial-static-implementation",
-      "architecture": ["static-css-analysis", "browser-rendered-fallback"],
+      "architecture": [
+        "static-css-analysis",
+        "browser-rendered-fallback"
+      ],
       "confidenceBoundary": {
         "canProve": "A statically resolvable CSS color/background-color pair in the same rule falls below the WCAG AA threshold when computed against the standard WCAG relative-luminance formula.",
         "cannotProve": "The rendered text actually has that contrast ratio. Cascade, inheritance, opacity, images, gradients, pseudo-elements, and runtime values may produce different rendered contrast. A static finding is not a WCAG conformance failure."
       },
-      "requiredInputs": ["CSS color declarations", "CSS background-color declarations", "WCAG relative luminance computation (same-rule pairs only)"],
-      "exclusions": ["CSS custom properties (unresolvable statically)", "Background images", "Gradient backgrounds", "Opacity composition", "currentColor references", "Disabled/readonly form controls", "Decorative text", "Pseudo-element text"],
-      "profileRecommendations": ["universal"],
+      "requiredInputs": [
+        "CSS color declarations",
+        "CSS background-color declarations",
+        "WCAG relative luminance computation (same-rule pairs only)"
+      ],
+      "exclusions": [
+        "CSS custom properties (unresolvable statically)",
+        "Background images",
+        "Gradient backgrounds",
+        "Opacity composition",
+        "currentColor references",
+        "Disabled/readonly form controls",
+        "Decorative text",
+        "Pseudo-element text"
+      ],
+      "profileRecommendations": [
+        "universal"
+      ],
       "severityRecommendation": "warning",
       "implementationReadiness": "ready-after-architecture-support",
       "fixtureAssessment": {
-        "violation": { "fixtureId": "fixture.accessibility.text-contrast.violation.light-gray-text", "usable": true, "gap": "Additional opacity-cascade and custom-property tests needed" },
-        "control": { "fixtureId": "fixture.accessibility.text-contrast.control.dark-text-white-bg", "usable": true, "gap": null },
-        "borderline": { "fixtureId": "fixture.accessibility.text-contrast.borderline.gradient-overlay", "usable": true, "gap": "Gradient case is explicitly out of static scope — good documentation fixture" }
+        "violation": {
+          "fixtureId": "fixture.accessibility.text-contrast.violation.light-gray-text",
+          "usable": true,
+          "gap": "Additional opacity-cascade and custom-property tests needed"
+        },
+        "control": {
+          "fixtureId": "fixture.accessibility.text-contrast.control.dark-text-white-bg",
+          "usable": true,
+          "gap": null
+        },
+        "borderline": {
+          "fixtureId": "fixture.accessibility.text-contrast.borderline.gradient-overlay",
+          "usable": true,
+          "gap": "Gradient case is explicitly out of static scope \u2014 good documentation fixture"
+        }
       },
       "acceptanceCriteria": {
-        "requiredTests": ["Same-rule solid-color pair below threshold triggers finding", "Same-rule solid-color pair above threshold produces no finding", "Custom-property declaration produces no finding (unresolvable)", "Gradient declaration produces no finding"],
-        "requiredFixtures": ["Opacity cascade test", "Custom property resolution test", "Multiple selector specificity test"],
+        "requiredTests": [
+          "Same-rule solid-color pair below threshold triggers finding",
+          "Same-rule solid-color pair above threshold produces no finding",
+          "Custom-property declaration produces no finding (unresolvable)",
+          "Gradient declaration produces no finding"
+        ],
+        "requiredFixtures": [
+          "Opacity cascade test",
+          "Custom property resolution test",
+          "Multiple selector specificity test"
+        ],
         "cliBehavior": "Lint triggers warning with evidence showing the color pair and computed ratio. Message must state scope limitation.",
         "suppressionBehavior": "Per-rule, per-file-pattern, with rationale requirement",
         "performanceConstraints": "Single-file scan; contrast computation is O(n) over CSS declarations",
@@ -93,24 +208,60 @@
       "proposalId": "proposal.accessibility.skip-navigation-link",
       "proposedRuleId": "accessibility.skip-navigation-link",
       "disposition": "accept-as-advisory-only",
-      "architecture": ["static-dom-analysis", "manual-review"],
+      "architecture": [
+        "static-dom-analysis",
+        "manual-review"
+      ],
       "confidenceBoundary": {
         "canProve": "A recognized skip-link structure (anchor with href=# targeting a main-content element) exists and is positioned as the first focusable element in the source.",
         "cannotProve": "Absence of a skip link means the page fails WCAG 2.4.1 (Bypass Blocks). Proper heading structure, ARIA landmarks, or programmatic focus management may satisfy the requirement. A static scan cannot evaluate these alternatives."
       },
-      "requiredInputs": ["HTML source text", "Anchor elements with # href", "ID attributes on target elements", "role=main elements", "Adjacent skip-link CSS/position properties"],
-      "exclusions": ["SPAs with programmatic focus management", "Pages with ARIA landmark structure", "Single-content pages with no repeated navigation blocks", "Screen-reader-only applications"],
-      "profileRecommendations": ["universal"],
+      "requiredInputs": [
+        "HTML source text",
+        "Anchor elements with # href",
+        "ID attributes on target elements",
+        "role=main elements",
+        "Adjacent skip-link CSS/position properties"
+      ],
+      "exclusions": [
+        "SPAs with programmatic focus management",
+        "Pages with ARIA landmark structure",
+        "Single-content pages with no repeated navigation blocks",
+        "Screen-reader-only applications"
+      ],
+      "profileRecommendations": [
+        "universal"
+      ],
       "severityRecommendation": "warning",
       "implementationReadiness": "ready-after-architecture-support",
       "fixtureAssessment": {
-        "violation": { "fixtureId": "fixture.accessibility.skip-link.violation.no-skip", "usable": true, "gap": "Must produce advisory finding, not error" },
-        "control": { "fixtureId": "fixture.accessibility.skip-link.control.with-skip", "usable": true, "gap": null },
-        "borderline": { "fixtureId": "fixture.accessibility.skip-link.borderline.spa-routing", "usable": true, "gap": "Should not trigger — demonstrates alternative bypass" }
+        "violation": {
+          "fixtureId": "fixture.accessibility.skip-link.violation.no-skip",
+          "usable": true,
+          "gap": "Must produce advisory finding, not error"
+        },
+        "control": {
+          "fixtureId": "fixture.accessibility.skip-link.control.with-skip",
+          "usable": true,
+          "gap": null
+        },
+        "borderline": {
+          "fixtureId": "fixture.accessibility.skip-link.borderline.spa-routing",
+          "usable": true,
+          "gap": "Should not trigger \u2014 demonstrates alternative bypass"
+        }
       },
       "acceptanceCriteria": {
-        "requiredTests": ["Skip-link presence detected correctly", "Skip-link absence produces advisory, not error", "ARIA-landmarked page produces no finding", "SPA with focus management produces no finding"],
-        "requiredFixtures": ["ARIA landmark page without skip link", "Proper heading hierarchy bypass"],
+        "requiredTests": [
+          "Skip-link presence detected correctly",
+          "Skip-link absence produces advisory, not error",
+          "ARIA-landmarked page produces no finding",
+          "SPA with focus management produces no finding"
+        ],
+        "requiredFixtures": [
+          "ARIA landmark page without skip link",
+          "Proper heading hierarchy bypass"
+        ],
         "cliBehavior": "Absence finding must be warning-level with message about alternative bypass mechanisms",
         "suppressionBehavior": "Per-rule, per-file-pattern, with rationale requirement",
         "performanceConstraints": "Single-file scan, no network",
@@ -122,24 +273,60 @@
       "proposalId": "proposal.mobile.touch-target-minimum",
       "proposedRuleId": "mobile.touch-target-minimum",
       "disposition": "accept-for-browser-assisted-implementation",
-      "architecture": ["browser-rendered-analysis"],
+      "architecture": [
+        "browser-rendered-analysis"
+      ],
       "confidenceBoundary": {
         "canProve": "At a defined mobile viewport width, an interactive element has a rendered bounding box smaller than 44x44 CSS pixels.",
         "cannotProve": "Anything about rendered touch target size from static CSS analysis alone. CSS width/height/padding declarations may differ from rendered size due to cascade, content overflow, border-box, transforms, and responsive rules."
       },
-      "requiredInputs": ["Rendered bounding boxes (getBoundingClientRect)", "Viewport dimensions", "Interactive element classification", "Responsive breakpoint context"],
-      "exclusions": ["Desktop-only interfaces at non-mobile viewports", "Inline text links in paragraphs", "Non-interactive elements", "Parent-handled touch delegation"],
-      "profileRecommendations": ["mobile"],
+      "requiredInputs": [
+        "Rendered bounding boxes (getBoundingClientRect)",
+        "Viewport dimensions",
+        "Interactive element classification",
+        "Responsive breakpoint context"
+      ],
+      "exclusions": [
+        "Desktop-only interfaces at non-mobile viewports",
+        "Inline text links in paragraphs",
+        "Non-interactive elements",
+        "Parent-handled touch delegation"
+      ],
+      "profileRecommendations": [
+        "mobile"
+      ],
       "severityRecommendation": "warning",
       "implementationReadiness": "ready-after-architecture-support",
       "fixtureAssessment": {
-        "violation": { "fixtureId": "fixture.mobile.touch-targets.violation.small-buttons", "usable": false, "gap": "Requires browser rendering to determine actual touch area. Static CSS declarations are insufficient." },
-        "control": { "fixtureId": "fixture.mobile.touch-targets.control.adequate-sizing", "usable": false, "gap": "Same limitation — rendered size may differ from declared CSS." },
-        "borderline": { "fixtureId": "fixture.mobile.touch-targets.borderline.data-table", "usable": false, "gap": "Table density tradeoff requires rendered measurement." }
+        "violation": {
+          "fixtureId": "fixture.mobile.touch-targets.violation.small-buttons",
+          "usable": false,
+          "gap": "Requires browser rendering to determine actual touch area. Static CSS declarations are insufficient."
+        },
+        "control": {
+          "fixtureId": "fixture.mobile.touch-targets.control.adequate-sizing",
+          "usable": false,
+          "gap": "Same limitation \u2014 rendered size may differ from declared CSS."
+        },
+        "borderline": {
+          "fixtureId": "fixture.mobile.touch-targets.borderline.data-table",
+          "usable": false,
+          "gap": "Table density tradeoff requires rendered measurement."
+        }
       },
       "acceptanceCriteria": {
-        "requiredTests": ["Rendered target below 44x44 at mobile viewport triggers finding", "Rendered target above 44x44 produces no finding", "Responsive size change at different breakpoints", "Transform scale() affecting rendered size"],
-        "requiredFixtures": ["Transform scale() target", "Viewport-responsive target", "Overlapping touch targets", "Box-sizing border-box vs content-box comparison"],
+        "requiredTests": [
+          "Rendered target below 44x44 at mobile viewport triggers finding",
+          "Rendered target above 44x44 produces no finding",
+          "Responsive size change at different breakpoints",
+          "Transform scale() affecting rendered size"
+        ],
+        "requiredFixtures": [
+          "Transform scale() target",
+          "Viewport-responsive target",
+          "Overlapping touch targets",
+          "Box-sizing border-box vs content-box comparison"
+        ],
         "cliBehavior": "Not applicable under current architecture. Requires browser-assisted or visual-review pipeline.",
         "suppressionBehavior": "Not applicable under current architecture.",
         "performanceConstraints": "Browser rendering pipeline, not static file scan.",
@@ -148,14 +335,17 @@
       }
     }
   ],
-  "tranche1": ["proposal.forms.input-labels-required", "proposal.motion.respect-reduced-motion"],
+  "tranche1": [
+    "proposal.forms.input-labels-required",
+    "proposal.motion.respect-reduced-motion"
+  ],
   "tranche1Rationale": "Input labels have the cleanest detector path, definitive findings, WCAG Level A, and highest user impact. Reduced motion adds complementary accessibility coverage with a well-bounded CSS pattern and low false-positive risk.",
   "deferredArchitecture": {
-    "forms.input-labels-required": "static-dom-analysis — ready now",
-    "motion.respect-reduced-motion": "static-css-analysis — ready now",
-    "accessibility.text-contrast-minimum": "partial-static + browser-fallback — needs scope documentation",
-    "accessibility.skip-navigation-link": "bounded-static + advisory — needs careful finding message",
-    "mobile.touch-target-minimum": "browser-rendered — needs new infrastructure"
+    "forms.input-labels-required": "static-dom-analysis \u2014 ready now",
+    "motion.respect-reduced-motion": "static-css-analysis \u2014 ready now",
+    "accessibility.text-contrast-minimum": "partial-static + browser-fallback \u2014 needs scope documentation",
+    "accessibility.skip-navigation-link": "bounded-static + advisory \u2014 needs careful finding message",
+    "mobile.touch-target-minimum": "browser-rendered \u2014 needs new infrastructure"
   },
   "notes": [
     "This decision record assigns architectural disposition only. It does not modify rules/core.json, profile files, linter implementation, or detector code.",
@@ -163,5 +353,47 @@
     "Profile recommendations are advisory. Final profile membership occurs during profile PR.",
     "The 39 non-review-ready proposals require a separate disposition report.",
     "Copy proposals require a policy decision about a separate copy-quality profile."
-  ]
+  ],
+  "adrStatus": "Accepted",
+  "adrPr": "#14",
+  "architectureBoundaries": {
+    "authorizedAnalysis": [
+      "HTML-like markup: tag matching, attribute extraction, element-type classification, id/for reference matching",
+      "CSS source text: declaration block extraction, @media query scope detection, property/value pair matching",
+      "Component template syntax: attribute extraction (JSX, Vue, Svelte)"
+    ],
+    "notSupportedByPatternMatching": [
+      "label for/id association requires reference resolution beyond keyword matching",
+      "aria-labelledby resolution requires DOM-level reference chain traversal",
+      "media-query scope analysis requires block-level structural understanding",
+      "CSS cascade resolution requires full parser and specificity engine",
+      "Cross-file reference resolution"
+    ],
+    "nonNegotiableBoundaries": [
+      "zero runtime dependencies",
+      "local-only operation",
+      "deterministic output",
+      "file-size caps (MAX_SOURCE_FILE_BYTES = 1MB)",
+      "source-extension allowlist only",
+      "current CLI contract unchanged",
+      "current suppression contract unchanged"
+    ]
+  },
+  "frameworkScope": {
+    "tranche1": "HTML and plain CSS only",
+    "stagedAfter": [
+      "JSX aria-label patterns",
+      "Vue :label bindings",
+      "Svelte label slots",
+      "CSS-in-JS template literals",
+      "Vue scoped styles",
+      "Svelte component styles"
+    ],
+    "acceptanceGates": [
+      "Core HTML/CSS detector passes review",
+      "Framework-specific fixtures exist",
+      "Framework pattern tests pass alongside core tests",
+      "Documentation updated for new template syntax"
+    ]
+  }
 }
