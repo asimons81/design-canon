@@ -29,16 +29,65 @@ const MOTION_PROPERTIES = new Set([
 ]);
 
 // Values that disable motion
+function splitTopLevelValues(value) {
+  const parts = [];
+  let current = '';
+  let depth = 0;
+  let inStr = null;
+  for (let i = 0; i < value.length; i++) {
+    const c = value[i];
+    if (inStr) {
+      if (c === '\\') { current += value[i] + (value[i + 1] || ''); i++; continue; }
+      if (c === inStr) inStr = null;
+      current += c; continue;
+    }
+    if (c === '"' || c === "'") { inStr = c; current += c; continue; }
+    if (c === '(') { depth++; current += c; continue; }
+    if (c === ')') { depth--; current += c; continue; }
+    if (c === ',' && depth === 0) { parts.push(current.trim()); current = ''; continue; }
+    current += c;
+  }
+  if (current.trim()) parts.push(current.trim());
+  return parts;
+}
+
 function isDisabledValue(property, value) {
   const v = value.trim().toLowerCase();
   const p = property.toLowerCase();
+
+  // Split comma-separated values (top-level commas only)
+  const parts = splitTopLevelValues(v);
+  // If there are multiple parts, ALL must be disabled
+  if (parts.length > 1) {
+    return parts.every(part => isDisabledValue(p, part.trim()));
+  }
 
   if ((p === 'animation' || p === 'animation-name') && v === 'none') return true;
   if (p === 'transition' && v === 'none') return true;
   if (p === 'transition-property' && v === 'none') return true;
   if ((p === 'animation-duration' || p === 'transition-duration') &&
       (v === '0s' || v === '0ms' || v === '0.01ms')) return true;
-  if (p === 'animation' && v === 'none') return true;
+
+  // Check for zero-duration animation/transition shorthands
+  // animation: 0s, animation: none 0s, transition: 0s, transition: none 0s
+  if (p === 'animation') {
+    if (v === '0s' || v === '0ms' || v === '0.01ms') return true;
+    const animParts = v.split(/\s+/);
+    const nonNone = animParts.filter(part => part !== 'none');
+    if (nonNone.length === 0) return true;
+    const durations = animParts.filter(part => /^0(?:s|ms|\.01ms)$/.test(part));
+    const names = animParts.filter(part => !/^(?:0(?:s|ms|\.01ms)?|none|infinite|\d+|\d+\.\d+)/.test(part));
+    if (names.length === 0 && durations.length > 0) return true;
+  }
+  if (p === 'transition') {
+    if (v === '0s' || v === '0ms' || v === '0.01ms') return true;
+    const transParts = v.split(/\s+/);
+    const nonNone = transParts.filter(part => part !== 'none');
+    if (nonNone.length === 0) return true;
+    const durations = transParts.filter(part => /^0(?:s|ms|\.01ms)$/.test(part));
+    const props = transParts.filter(part => !/^(?:0(?:s|ms|\.01ms)?|none|infinite|\d+|\d+\.\d+)/.test(part));
+    if (props.length === 0 && durations.length > 0) return true;
+  }
 
   return false;
 }
@@ -84,10 +133,13 @@ export function scanCssMotion(cssText) {
 
       for (const d of currentDecls) {
         const p = d.property;
-        if (p === 'animation') hasAnimShorthand = true;
-        else if (p === 'animation-name' && !isDisabledValue(p, d.value)) hasAnimName = true;
+        if (p === 'animation') {
+          if (!isDisabledValue(p, d.value)) hasAnimShorthand = true;
+        } else if (p === 'animation-name' && !isDisabledValue(p, d.value)) hasAnimName = true;
         else if (p === 'animation-duration' && !isDisabledValue(p, d.value)) hasAnimDuration = true;
-        else if (p === 'transition') hasTransShorthand = true;
+        else if (p === 'transition') {
+          if (!isDisabledValue(p, d.value)) hasTransShorthand = true;
+        }
         else if (p === 'transition-property' && !isDisabledValue(p, d.value)) hasTransProp = true;
         else if (p === 'transition-duration' && !isDisabledValue(p, d.value)) hasTransDuration = true;
       }
@@ -198,7 +250,7 @@ export function scanCssMotion(cssText) {
     // @media detection
     if (c === '@' && blockDepth === 0) {
       const rest = text.slice(i);
-      const mediaMatch = rest.match(/@media\s*\(/i);
+      const mediaMatch = rest.match(/@media\s+(?:(?:only\s+)?screen\s+and\s+)?\(/i);
       if (mediaMatch) {
         inMedia = true;
         const mediaContent = rest.slice(mediaMatch.index + mediaMatch[0].length);
@@ -207,6 +259,14 @@ export function scanCssMotion(cssText) {
           const condition = mediaContent.slice(0, closeParen).toLowerCase();
           mediaIsReducedMotion = condition.includes('prefers-reduced-motion') &&
                                  /\breduce\b/.test(condition);
+          // Check for additional constraints after the closing paren
+          // e.g. @media (reduce) and (min-width: 600px) is NOT unconditional
+          if (mediaIsReducedMotion) {
+            const after = mediaContent.slice(closeParen + 1).trim();
+            if (after && (after.startsWith('and') || after.startsWith('or') || after.startsWith(','))) {
+              mediaIsReducedMotion = false;
+            }
+          }
           i += mediaMatch.index + mediaMatch[0].length + closeParen + 1;
           continue;
         }
