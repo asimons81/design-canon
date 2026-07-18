@@ -93,5 +93,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization revision: Apple HIG source (44pt minimum) confirmed. Impact 'serious' is appropriate for mobile accessibility failure."
+  ]
 }

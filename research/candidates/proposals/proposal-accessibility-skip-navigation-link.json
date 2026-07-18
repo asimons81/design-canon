@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization revision: impact and detection verified against WCAG 2.4.1. Source reference confirmed. Detector correctly scoped to DOM structure check."
+  ]
 }

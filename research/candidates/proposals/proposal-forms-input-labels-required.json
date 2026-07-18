@@ -56,7 +56,7 @@
       "Dynamically added labels via JavaScript may not appear in static DOM analysis."
     ]
   },
-  "impact": "blocking",
+  "impact": "serious",
   "falsePositiveRisk": {
     "level": "low",
     "scenarios": [
@@ -91,5 +91,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization revision: impact corrected from 'blocking' to 'serious'. WCAG 3.3.2 failure is serious (affects task completion) but does not block system access. WAI-ARIA source confirmed."
+  ]
 }

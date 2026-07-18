@@ -4,7 +4,7 @@
   "proposalId": "proposal.responsive.image-overflow",
   "proposedRuleId": "responsive.image-overflow",
   "title": "Images must not overflow their container on narrow viewports",
-  "status": "review-ready",
+  "status": "researched",
   "category": "responsive",
   "surfaces": [
     "universal",
@@ -95,5 +95,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization downgrade: review-ready \u2192 researched. Impact label 'serious' overstated. A broken image layout is 'degraded' \u2014 users can still access content, it scrolls awkwardly but doesn't block core functionality. Source is generic original-observation; should reference CSS Responsive Design specs (MDN, CSS Intrinsic & Extrinsic Sizing) for proper provenance."
+  ]
 }

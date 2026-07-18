@@ -4,7 +4,7 @@
   "proposalId": "proposal.spacing.rhythmic-scale",
   "proposedRuleId": "spacing.rhythmic-scale",
   "title": "Use a consistent spacing scale",
-  "status": "review-ready",
+  "status": "researched",
   "category": "spacing",
   "surfaces": [
     "universal"
@@ -91,5 +91,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization downgrade: review-ready \u2192 researched. The 'detect dominant scale then flag outliers' detector approach is promising but under-specified: mixed unit systems (em, rem, px), responsive breakpoints producing different values, and shorthand property decomposition are not addressed. Source is a generic observation; Material Design and USWDS define actual spacing scales that should be referenced."
+  ]
 }

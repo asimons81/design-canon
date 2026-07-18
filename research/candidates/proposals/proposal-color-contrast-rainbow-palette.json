@@ -4,7 +4,7 @@
   "proposalId": "proposal.color.contrast-rainbow-palette",
   "proposedRuleId": "color.contrast-rainbow-palette",
   "title": "Reject rainbow palettes that ignore contrast",
-  "status": "review-ready",
+  "status": "researched",
   "category": "color",
   "surfaces": [
     "universal",
@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization downgrade: review-ready \u2192 researched. The 'restrict hues to one-third of the wheel' instruction is an invented heuristic not backed by cited sources. The hue-bin detection concept is interesting but unproven in practice. Semantic detector at medium FP risk without sufficient mitigation detail. Source is a generic observation lacking data-visualization color research."
+  ]
 }

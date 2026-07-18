@@ -54,7 +54,8 @@
     },
     "limitations": [
       "JavaScript-based animation libraries (GSAP, Framer Motion) may not expose animations in static CSS.",
-      "Video autoplay is a separate concern not detectable from CSS alone."
+      "Video autoplay is a separate concern not detectable from CSS alone.",
+      "JavaScript-based animation libraries (GSAP, Framer Motion, anime.js) may not expose animations in static CSS analysis. The detector covers CSS @keyframes and transition declarations but cannot detect animations injected via JS runtime calls."
     ]
   },
   "impact": "serious",
@@ -91,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization revision: added honest limitation about JS animation libraries being invisible to CSS-static detection. WCAG 2.3.3 source confirmed."
+  ]
 }

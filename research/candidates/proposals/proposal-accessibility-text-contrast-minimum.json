@@ -55,10 +55,11 @@
     "limitations": [
       "Dynamic colors from CSS custom properties require runtime computation.",
       "Background images with text overlays cannot be statically analyzed.",
-      "Multi-layer backgrounds (gradient over image) require rendering."
+      "Multi-layer backgrounds (gradient over image) require rendering.",
+      "Text on gradient backgrounds, multi-layer backgrounds, or background images cannot be statically analyzed. These cases require rendered pixel sampling. The mechanical detector only handles simple solid-color pairs reliably."
     ]
   },
-  "impact": "blocking",
+  "impact": "serious",
   "falsePositiveRisk": {
     "level": "low",
     "scenarios": [
@@ -92,5 +93,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization revision: impact corrected from 'blocking' to 'serious'. Added honest limitation about gradient/image backgrounds being invisible to static analysis. WCAG 1.4.3 source confirmed for solid-color pairs only."
+  ]
 }

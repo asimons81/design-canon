@@ -4,7 +4,7 @@
   "proposalId": "proposal.layout.proportional-columns",
   "proposedRuleId": "layout.proportional-columns",
   "title": "Size columns proportionally to content importance",
-  "status": "review-ready",
+  "status": "researched",
   "category": "layout",
   "surfaces": [
     "product-app",
@@ -90,5 +90,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization downgrade: review-ready \u2192 researched. Visual-only detection is the weakest detector path; no mechanical or semantic signal proposed. The proposal does not specify how 'content importance' should be determined for column sizing. Source is a generic observation. The instruction is sound design guidance but better suited for visual review than a lint rule."
+  ]
 }

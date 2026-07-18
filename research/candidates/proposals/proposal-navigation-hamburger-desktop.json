@@ -4,7 +4,7 @@
   "proposalId": "proposal.navigation.hamburger-desktop",
   "proposedRuleId": "navigation.hamburger-desktop",
   "title": "Do not hide navigation behind hamburger on desktop viewports",
-  "status": "review-ready",
+  "status": "researched",
   "category": "navigation",
   "surfaces": [
     "marketing",
@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization downgrade: review-ready \u2192 researched. The 768px breakpoint threshold is a personal convention, not a standard. Source is a generic observation; NN Group's extensive hamburger-menu usability research should be referenced. Semantic detection with no clear DOM/CSS signal for differentiating 'intentional minimal' from 'default hamburger.'"
+  ]
 }
