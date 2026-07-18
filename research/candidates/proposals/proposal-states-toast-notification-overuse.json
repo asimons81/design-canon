@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.states.toast-notification-overuse",
+  "proposedRuleId": "states.toast-notification-overuse",
+  "title": "Do not use toast notifications for every system message",
+  "status": "researched",
+  "category": "states",
+  "surfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated interfaces use the four-color toast notification (success green, error red, info blue, warning yellow) for every message, regardless of urgency or actionability.",
+  "instruction": "Use toast notifications only for messages that need immediate, temporary attention. Inline messages, banners, and status indicators are better for persistent or context-relevant information. Not every system event needs a toast.",
+  "rationale": "When every operation from 'Email sent' to 'Server error' to 'New feature available' produces a toast, the notification channel becomes noise. Users learn to dismiss toasts without reading them. Persistent inline messages and contextual banners communicate without interrupting.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A dashboard showing a toast for every data refresh, every filter change, and every export request.",
+      "An app that uses toast for informational messages that do not require user action and disappear too quickly to read."
+    ],
+    "controls": [
+      "A settings page using inline success messages next to changed fields rather than toasts.",
+      "An app using a persistent banner for important system messages and toasts only for time-sensitive actions."
+    ],
+    "borderline": [
+      "An error toast for a failed payment is appropriate \u2014 it needs immediate attention and is time-sensitive."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Time-sensitive errors requiring immediate attention (payment failures, security events). Undo-capable actions where the toast provides the undo entry point.",
+      "examples": [
+        "Payment failure notification",
+        "Undo after email deletion",
+        "Security alert"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find toast-like UI components (fixed-position, auto-dismiss notification elements). Count their density \u2014 how many distinct toast types appear? Flag as overuse when toasts are the only feedback mechanism for every operation type.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "toast",
+        "notification",
+        "snackbar"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish important toasts from noise without understanding the severity of each message.",
+      "Javascript-driven toast systems may not expose all toast types in static HTML."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "An app where every operation genuinely needs notification (audit logging, compliance).",
+      "Accessibility requirements where multiple confirmation channels are needed."
+    ],
+    "mitigations": [
+      "Count distinct toast types per page. Flag when 4+ distinct toast types exist (success, error, info, warning) as overuse."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.states.toast.violation.every-operation",
+      "caseType": "violation",
+      "description": "A dashboard with toasts for data refresh, filter change, export request, and error."
+    },
+    {
+      "fixtureId": "fixture.states.toast.control.selective",
+      "caseType": "control",
+      "description": "Same dashboard using inline feedback for filter changes, toast only for significant operations."
+    },
+    {
+      "fixtureId": "fixture.states.toast.borderline.audit-trail",
+      "caseType": "borderline",
+      "description": "A compliance app where every operation needs a visible confirmation for audit purposes."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

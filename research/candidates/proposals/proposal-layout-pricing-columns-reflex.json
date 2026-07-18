@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.layout.pricing-columns-reflex",
+  "proposedRuleId": "layout.pricing-columns-reflex",
+  "title": "Do not default to three-column pricing tables with middle tier highlighted",
+  "status": "researched",
+  "category": "layout",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated pricing sections default to three identical columns with the middle plan highlighted as 'Popular' regardless of the product's actual pricing strategy.",
+  "instruction": "Choose a pricing layout that reflects the product's actual pricing logic: tier differences, feature groupings, and the plan most users should choose. The three-column reflex with a highlighted middle tier is a template, not a pricing strategy.",
+  "rationale": "The three-column pricing card with a 'Most Popular' middle badge is the most recognizable AI-generation template in SaaS marketing. It makes every pricing page look like every other pricing page, regardless of whether the product has three meaningful tiers or a different optimal plan structure.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A pricing page with three equal-width columns, middle column highlighted with a 'Most Popular' badge, identical layout regardless of actual pricing differences.",
+      "A product with two pricing tiers and a 'Contact Us' enterprise option -- forced into three columns with the enterprise column having no price."
+    ],
+    "controls": [
+      "A pricing page with two columns for the actual plan tiers plus a separate 'Enterprise' callout section.",
+      "A single-plan pricing page with a simple CTA, no column layout needed."
+    ],
+    "borderline": [
+      "A product with three genuinely distinct pricing tiers where the three-column layout accurately represents the offering."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Products with three genuinely distinct tiers where the three-column layout accurately reflects real pricing differences. A/B tested layouts where three columns outperformed alternatives.",
+      "examples": [
+        "Legitimate three-tier SaaS with meaningful feature differences",
+        "Documented A/B test showing three-column preference"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "visual",
+    "signalDescription": "Detect three equal-width card columns in a section with pricing-adjacent labels (price, month, plan, tier). Flag when middle column has a distinct visual treatment (highlighted border, badge).",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "pricing",
+        "plans",
+        "month",
+        "price"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish genuine three-tier pricing from template reflex without understanding the product's actual pricing model.",
+      "Some products have legitimate three-tier offerings that match the template."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A product with three genuinely differentiated pricing tiers.",
+      "An A/B tested layout where three columns and highlighted middle outperformed alternatives."
+    ],
+    "mitigations": [
+      "Check for meaningful feature differentiation between columns beyond badge color. Accept documented A/B results."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.layout.pricing.violation.three-column-reflex",
+      "caseType": "violation",
+      "description": "A pricing page with three equal columns, middle 'Most Popular' highlighted, identical card structure."
+    },
+    {
+      "fixtureId": "fixture.layout.pricing.control.two-plus-enterprise",
+      "caseType": "control",
+      "description": "A pricing page with two plan columns plus an enterprise section below."
+    },
+    {
+      "fixtureId": "fixture.layout.pricing.borderline.genuine-three-tier",
+      "caseType": "borderline",
+      "description": "A product with three genuinely distinct plans documented with feature details."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

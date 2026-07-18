@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.search-placeholder-generic",
+  "proposedRuleId": "copy.search-placeholder-generic",
+  "title": "Use context-specific search placeholders",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated search interfaces default to 'Ask anything...' or 'Search anything...' placeholders that provide no guidance on what the user can search for.",
+  "instruction": "Use search placeholder text that tells users what they can search for: 'Search by name, email, or company', 'Find documentation...', 'Search 500+ integrations...' Generic 'Ask anything...' placeholders provide no guidance.",
+  "rationale": "A search placeholder is a discoverability tool. 'Ask anything...' suggests the search supports natural language queries without confirming it. Context-specific placeholders ('Search by name or email') guide users to productive queries and set correct expectations about search scope.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A SaaS dashboard with 'Ask anything...' as the search placeholder when the search only covers document titles.",
+      "An e-commerce site with 'Search...' placeholder when 'Search by product name, brand, or SKU' would be more helpful."
+    ],
+    "controls": [
+      "A documentation site with 'Search documentation, API references, and guides...' placeholder.",
+      "A user directory with 'Search by name, email, or department' placeholder."
+    ],
+    "borderline": [
+      "A general-purpose search engine (Google, Bing) where 'Search...' or 'Ask anything...' is accurate because the search scope is truly universal."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "General-purpose search engines where the scope is genuinely universal. Voice assistants where 'Ask anything' describes the interaction mode.",
+      "examples": [
+        "Web search engine",
+        "Voice assistant",
+        "AI chat interface"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find search input placeholder text. Compare against generic patterns ('Ask anything', 'Search anything', 'Search'). Flag when generic placeholder does not describe what the user can search for.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "Ask anything",
+        "Search anything",
+        "search..."
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Some search scopes are genuinely broad enough that 'Search anything' is accurate.",
+      "Placeholder text alone cannot confirm whether the search scope matches the promise."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A general-purpose search engine where 'Search anything' is accurate.",
+      "An AI-powered chat interface where 'Ask anything' describes the interaction paradigm."
+    ],
+    "mitigations": [
+      "Check page context \u2014 general search engines and chat interfaces have different page structures than scoped product search."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "empty-adjective",
+    "replacementStrategy": "Replace generic search placeholders with context-specific guidance: 'Search by [attribute], [attribute], or [attribute]', 'Find [content type], [content type], and [content type]'."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.search-placeholder.violation.ask-anything",
+      "caseType": "violation",
+      "description": "A SaaS dashboard with 'Ask anything...' search placeholder when search only covers document titles."
+    },
+    {
+      "fixtureId": "fixture.copy.search-placeholder.control.specific",
+      "caseType": "control",
+      "description": "Same dashboard with 'Search by name, email, or document title' placeholder."
+    },
+    {
+      "fixtureId": "fixture.copy.search-placeholder.borderline.web-search",
+      "caseType": "borderline",
+      "description": "A web search engine where 'Search...' is genuinely general-purpose."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}
