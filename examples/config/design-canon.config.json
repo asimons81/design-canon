@@ -1,0 +1,14 @@
+{
+  "$schema": "../../schema/config.schema.json",
+  "version": 1,
+  "profile": "marketing",
+  "suppressions": [
+    {
+      "rule": "color.purple-gradient-default",
+      "files": ["src/brand/**/*.css"],
+      "reason": "Purple is the documented primary brand color for this campaign.",
+      "approvedBy": "design-systems",
+      "expires": "2099-12-31"
+    }
+  ]
+}

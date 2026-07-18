@@ -39,6 +39,7 @@ The repository already includes:
 - profiles for marketing pages, product applications, and editorial layouts
 - compilation to `DESIGN.md`, `SKILL.md`, or general agent instructions
 - a zero-runtime-dependency linter for mechanical heuristics
+- project-local, rationale-required suppressions that preserve evidence
 - an installable Agent Skill for Codex, Hermes Agent, Claude Code, Cursor, and compatible tools
 - tests and an intentionally terrible example fixture
 
@@ -62,6 +63,37 @@ Available profiles:
 ```bash
 node ./bin/design-canon.js profiles
 ```
+
+## Justified Exceptions
+
+Design Canon does not confuse a detector with an aesthetic law. Projects can suppress a finding only through an explicit, scoped rationale in `design-canon.config.json`:
+
+```json
+{
+  "$schema": "./schema/config.schema.json",
+  "version": 1,
+  "profile": "marketing",
+  "suppressions": [
+    {
+      "rule": "color.purple-gradient-default",
+      "files": ["src/brand/**/*.css"],
+      "reason": "Purple is the documented primary brand color for this campaign.",
+      "approvedBy": "design-systems",
+      "expires": "2099-12-31"
+    }
+  ]
+}
+```
+
+```bash
+node ./bin/design-canon.js lint . \
+  --config design-canon.config.json \
+  --format json
+```
+
+Expired, unknown, duplicated, absolute, or path-escaping suppressions fail closed. Suppressed findings remain in the JSON report with their evidence and rationale. Unused suppressions are reported for cleanup.
+
+See [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) for the complete contract.
 
 ## The Upgrade
 
@@ -87,7 +119,8 @@ skills/design-canon/    portable Agent Skill
 examples/sloppy/        violation fixture
 tests/                  regression tests
 docs/ARCHITECTURE.md    system design
-ROADMAP.md              path to visual QA and taste memory
+docs/CONFIGURATION.md   configuration and suppression contract
+ROADMAP.md              path to visual QA, benchmarks, and taste memory
 ```
 
 ## Philosophy

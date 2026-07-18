@@ -2,6 +2,14 @@ export const PROFILE_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const RULE_ID_PATTERN = /^[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
 const ALLOWED_SEVERITIES = new Set(['error', 'warning', 'info']);
 const ALLOWED_REGEX_FLAGS = new Set(['g', 'i', 'm', 's', 'u', 'y']);
+const CONFIG_KEYS = new Set(['$schema', 'version', 'profile', 'suppressions']);
+const SUPPRESSION_KEYS = new Set([
+  'rule',
+  'files',
+  'reason',
+  'approvedBy',
+  'expires'
+]);
 
 function fail(message) {
   throw new Error(`Invalid Design Canon data: ${message}`);
@@ -19,6 +27,60 @@ function requireStringArray(value, label, { allowEmpty = false } = {}) {
   }
   for (const [index, entry] of value.entries()) {
     requireString(entry, `${label}[${index}]`);
+  }
+}
+
+function requireObject(value, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    fail(`${label} must be an object.`);
+  }
+}
+
+function rejectUnknownKeys(value, allowed, label) {
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key)) {
+      fail(`${label} contains unknown property '${key}'.`);
+    }
+  }
+}
+
+function validateRuleId(value, label) {
+  requireString(value, label);
+  if (!RULE_ID_PATTERN.test(value)) {
+    fail(`${label} '${value}' contains unsupported characters.`);
+  }
+}
+
+function normalizeReferenceDate(referenceDate) {
+  const date = referenceDate instanceof Date ? referenceDate : new Date(referenceDate);
+  if (Number.isNaN(date.getTime())) {
+    throw new TypeError('referenceDate must be a valid date.');
+  }
+  return date.toISOString().slice(0, 10);
+}
+
+function validateIsoDate(value, label) {
+  requireString(value, label);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    fail(`${label} must use YYYY-MM-DD.`);
+  }
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== value) {
+    fail(`${label} must be a real calendar date.`);
+  }
+}
+
+function validateSuppressionFilePattern(pattern, label) {
+  requireString(pattern, label);
+  const normalized = pattern.replaceAll('\\', '/');
+  if (normalized.startsWith('/') || /^[a-zA-Z]:\//.test(normalized)) {
+    fail(`${label} must be relative to the project root.`);
+  }
+  if (normalized.split('/').includes('..')) {
+    fail(`${label} must not escape the project root.`);
+  }
+  if (normalized.includes('\0')) {
+    fail(`${label} must not contain null bytes.`);
   }
 }
 
@@ -63,10 +125,7 @@ export function validateRule(rule, index) {
   if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
     fail(`rules[${index}] must be an object.`);
   }
-  requireString(rule.id, `rules[${index}].id`);
-  if (!RULE_ID_PATTERN.test(rule.id)) {
-    fail(`rule id '${rule.id}' contains unsupported characters.`);
-  }
+  validateRuleId(rule.id, `rules[${index}].id`);
   requireString(rule.category, `rule '${rule.id}'.category`);
   requireString(rule.title, `rule '${rule.id}'.title`);
   requireString(rule.instruction, `rule '${rule.id}'.instruction`);
@@ -81,9 +140,7 @@ export function validateRule(rule, index) {
     requireStringArray(rule.verify, `rule '${rule.id}'.verify`, { allowEmpty: true });
   }
   if (rule.detect !== undefined) {
-    if (!rule.detect || typeof rule.detect !== 'object' || Array.isArray(rule.detect)) {
-      fail(`rule '${rule.id}'.detect must be an object.`);
-    }
+    requireObject(rule.detect, `rule '${rule.id}'.detect`);
     requireString(rule.detect.message, `rule '${rule.id}'.detect.message`);
     if (!Array.isArray(rule.detect.patterns) || rule.detect.patterns.length === 0) {
       fail(`rule '${rule.id}'.detect.patterns must be a non-empty array.`);
@@ -96,9 +153,7 @@ export function validateRule(rule, index) {
 }
 
 export function validateCatalog(catalog) {
-  if (!catalog || typeof catalog !== 'object' || Array.isArray(catalog)) {
-    fail('catalog must be an object.');
-  }
+  requireObject(catalog, 'catalog');
   if (!Number.isInteger(catalog.version) || catalog.version < 1) {
     fail('catalog.version must be a positive integer.');
   }
@@ -117,9 +172,7 @@ export function validateCatalog(catalog) {
 }
 
 export function validateProfile(profile, expectedId) {
-  if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
-    fail('profile must be an object.');
-  }
+  requireObject(profile, 'profile');
   requireString(profile.id, 'profile.id');
   assertSafeProfileName(profile.id);
   if (expectedId && profile.id !== expectedId) {
@@ -129,14 +182,85 @@ export function validateProfile(profile, expectedId) {
   requireString(profile.intent, `profile '${profile.id}'.intent`);
   for (const field of ['includeRules', 'excludeRules', 'includeCategories']) {
     if (profile[field] !== undefined) {
-      requireStringArray(profile[field], `profile '${profile.id}'.${field}`, { allowEmpty: true });
+      requireStringArray(profile[field], `profile '${profile.id}'.${field}`, {
+        allowEmpty: true
+      });
     }
   }
-  if (
-    profile.overrides !== undefined &&
-    (!profile.overrides || typeof profile.overrides !== 'object' || Array.isArray(profile.overrides))
-  ) {
-    fail(`profile '${profile.id}'.overrides must be an object.`);
+  if (profile.overrides !== undefined) {
+    requireObject(profile.overrides, `profile '${profile.id}'.overrides`);
   }
   return profile;
+}
+
+export function validateConfig(config, catalog, options = {}) {
+  const { referenceDate = new Date() } = options;
+  requireObject(config, 'config');
+  rejectUnknownKeys(config, CONFIG_KEYS, 'config');
+
+  if (config.version !== 1) {
+    fail('config.version must be 1.');
+  }
+  if (config.$schema !== undefined) {
+    requireString(config.$schema, 'config.$schema');
+  }
+  if (config.profile !== undefined) {
+    assertSafeProfileName(config.profile);
+  }
+  if (config.suppressions !== undefined && !Array.isArray(config.suppressions)) {
+    fail('config.suppressions must be an array.');
+  }
+
+  const ruleIds = new Set(catalog.rules.map((rule) => rule.id));
+  const today = normalizeReferenceDate(referenceDate);
+  const duplicateKeys = new Set();
+  const suppressions = (config.suppressions ?? []).map((suppression, index) => {
+    const label = `config.suppressions[${index}]`;
+    requireObject(suppression, label);
+    rejectUnknownKeys(suppression, SUPPRESSION_KEYS, label);
+    validateRuleId(suppression.rule, `${label}.rule`);
+    if (!ruleIds.has(suppression.rule)) {
+      fail(`${label}.rule references unknown rule '${suppression.rule}'.`);
+    }
+    requireStringArray(suppression.files, `${label}.files`);
+    suppression.files.forEach((pattern, patternIndex) => {
+      validateSuppressionFilePattern(pattern, `${label}.files[${patternIndex}]`);
+    });
+    requireString(suppression.reason, `${label}.reason`);
+    if (suppression.reason.trim().length < 12) {
+      fail(`${label}.reason must contain at least 12 characters of rationale.`);
+    }
+    if (suppression.approvedBy !== undefined) {
+      requireString(suppression.approvedBy, `${label}.approvedBy`);
+    }
+    if (suppression.expires !== undefined) {
+      validateIsoDate(suppression.expires, `${label}.expires`);
+      if (suppression.expires <= today) {
+        fail(`${label} expired on ${suppression.expires}.`);
+      }
+    }
+
+    const normalizedFiles = suppression.files.map((pattern) =>
+      pattern.replaceAll('\\', '/')
+    );
+    if (new Set(normalizedFiles).size !== normalizedFiles.length) {
+      fail(`${label}.files must not contain duplicate patterns.`);
+    }
+    const duplicateKey = JSON.stringify([suppression.rule, [...normalizedFiles].sort()]);
+    if (duplicateKeys.has(duplicateKey)) {
+      fail(`${label} duplicates an earlier suppression for '${suppression.rule}'.`);
+    }
+    duplicateKeys.add(duplicateKey);
+
+    return {
+      ...suppression,
+      files: normalizedFiles,
+      reason: suppression.reason.trim()
+    };
+  });
+
+  return {
+    ...config,
+    suppressions
+  };
 }

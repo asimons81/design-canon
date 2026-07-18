@@ -1,5 +1,6 @@
 import { open } from 'node:fs/promises';
 import { relative } from 'node:path';
+import { findSuppression, loadConfig } from './config.js';
 import {
   collectSourceFiles,
   loadCatalog,
@@ -10,6 +11,10 @@ import { selectRules } from './select.js';
 
 const MAX_FINDINGS = 10000;
 
+function normalizePath(value) {
+  return value.replaceAll('\\', '/');
+}
+
 function lineNumber(text, index) {
   return text.slice(0, index).split('\n').length;
 }
@@ -18,6 +23,13 @@ function compilePattern(pattern) {
   const flags = new Set(pattern.flags ?? 'gim');
   flags.add('g');
   return new RegExp(pattern.source, [...flags].join(''));
+}
+
+function publicSuppression(suppression) {
+  const publicFields = { ...suppression };
+  delete publicFields.matchers;
+  delete publicFields.index;
+  return publicFields;
 }
 
 async function readBoundedFile(file) {
@@ -48,9 +60,16 @@ async function readBoundedFile(file) {
   }
 }
 
-export async function lintPath({ path, profile: profileName }) {
-  const [catalog, profile, files] = await Promise.all([
-    loadCatalog(),
+export async function lintPath({
+  path,
+  profile: requestedProfile = null,
+  configPath = null,
+  referenceDate = new Date()
+}) {
+  const catalog = await loadCatalog();
+  const loadedConfig = await loadConfig(configPath, { catalog, referenceDate });
+  const profileName = requestedProfile ?? loadedConfig.config.profile ?? 'product-app';
+  const [profile, files] = await Promise.all([
     loadProfile(profileName),
     collectSourceFiles(path)
   ]);
@@ -58,13 +77,16 @@ export async function lintPath({ path, profile: profileName }) {
     (rule) => rule.detect?.patterns?.length
   );
   const findings = [];
+  const suppressedFindings = [];
   const skipped = [];
+  const usedSuppressionIndexes = new Set();
+  let observedFindings = 0;
 
   outer: for (const file of files) {
     const { info, text, reason } = await readBoundedFile(file);
     if (reason) {
       skipped.push({
-        file: relative(process.cwd(), file),
+        file: normalizePath(relative(process.cwd(), file)),
         reason,
         bytes: info.size
       });
@@ -75,15 +97,27 @@ export async function lintPath({ path, profile: profileName }) {
       for (const pattern of rule.detect.patterns) {
         const regex = compilePattern(pattern);
         for (const match of text.matchAll(regex)) {
-          findings.push({
-            file: relative(process.cwd(), file),
+          const finding = {
+            file: normalizePath(relative(process.cwd(), file)),
             line: lineNumber(text, match.index ?? 0),
             rule: rule.id,
             severity: rule.severity,
             message: rule.detect.message,
             evidence: String(match[0]).replace(/\s+/g, ' ').slice(0, 160)
-          });
-          if (findings.length >= MAX_FINDINGS) {
+          };
+          const suppression = findSuppression(loadedConfig.suppressions, finding);
+          if (suppression) {
+            usedSuppressionIndexes.add(suppression.index);
+            suppressedFindings.push({
+              ...finding,
+              suppression: publicSuppression(suppression)
+            });
+          } else {
+            findings.push(finding);
+          }
+
+          observedFindings += 1;
+          if (observedFindings >= MAX_FINDINGS) {
             skipped.push({
               file: '*',
               reason: `Finding limit of ${MAX_FINDINGS} reached.`
@@ -96,28 +130,39 @@ export async function lintPath({ path, profile: profileName }) {
     }
   }
 
-  findings.sort(
-    (a, b) =>
-      a.file.localeCompare(b.file) ||
-      a.line - b.line ||
-      a.rule.localeCompare(b.rule)
-  );
+  const sortFindings = (a, b) =>
+    a.file.localeCompare(b.file) ||
+    a.line - b.line ||
+    a.rule.localeCompare(b.rule);
+  findings.sort(sortFindings);
+  suppressedFindings.sort(sortFindings);
+
+  const unusedSuppressions = loadedConfig.suppressions
+    .filter((suppression) => !usedSuppressionIndexes.has(suppression.index))
+    .map(publicSuppression);
 
   return {
     profile: profile.id,
+    config: loadedConfig.path,
     filesDiscovered: files.length,
     filesScanned:
       files.length - skipped.filter((entry) => entry.file !== '*').length,
     skipped,
     findings,
+    suppressedFindings,
+    suppressions: {
+      configured: loadedConfig.suppressions.length,
+      used: usedSuppressionIndexes.size,
+      unused: unusedSuppressions
+    },
     errors: findings.filter((finding) => finding.severity === 'error').length,
     warnings: findings.filter((finding) => finding.severity === 'warning').length,
     info: findings.filter((finding) => finding.severity === 'info').length
   };
 }
 
-export async function lintCommand({ path, profile, format }) {
-  const result = await lintPath({ path, profile });
+export async function lintCommand({ path, profile, format, configPath = null }) {
+  const result = await lintPath({ path, profile, configPath });
   if (format === 'json') {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return result;
@@ -125,7 +170,7 @@ export async function lintCommand({ path, profile, format }) {
 
   if (!result.findings.length) {
     console.log(
-      `Design Canon: no detectable violations in ${result.filesScanned} file(s).`
+      `Design Canon: no unsuppressed detectable violations in ${result.filesScanned} file(s).`
     );
   } else {
     for (const finding of result.findings) {
@@ -139,6 +184,16 @@ export async function lintCommand({ path, profile, format }) {
 
   for (const entry of result.skipped) {
     console.error(`SKIPPED ${entry.file}: ${entry.reason}`);
+  }
+  for (const suppression of result.suppressions.unused) {
+    console.error(
+      `UNUSED SUPPRESSION ${suppression.rule}: ${suppression.files.join(', ')}`
+    );
+  }
+  if (result.suppressedFindings.length) {
+    console.log(
+      `${result.suppressedFindings.length} finding(s) suppressed by ${result.suppressions.used} justified exception(s).`
+    );
   }
   console.log(
     `${result.errors} error(s), ${result.warnings} warning(s), ${result.info} info, ${result.filesScanned} file(s) scanned.`

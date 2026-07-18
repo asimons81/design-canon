@@ -12,7 +12,7 @@ const HELP = `Design Canon v${packageJson.version}
 
 Usage:
   design-canon compile --profile <name> [--target design|skill|agents] [--output <path>]
-  design-canon lint [path] [--profile <name>] [--format text|json]
+  design-canon lint [path] [--profile <name>] [--config <path>] [--format text|json]
   design-canon profiles
   design-canon --version
 
@@ -20,6 +20,7 @@ Examples:
   design-canon compile --profile marketing --target design --output DESIGN.md
   design-canon compile --profile product-app --target skill --output SKILL.md
   design-canon lint ./src --profile product-app
+  design-canon lint . --config design-canon.config.json
 `;
 
 function parseOptions(args, allowed, defaults = {}) {
@@ -101,9 +102,10 @@ async function main() {
   if (command === 'lint') {
     const { values, positionals } = parseOptions(
       args.slice(1),
-      new Set(['--profile', '--format']),
+      new Set(['--profile', '--config', '--format']),
       {
-        '--profile': 'product-app',
+        '--profile': null,
+        '--config': null,
         '--format': 'text'
       }
     );
@@ -118,6 +120,7 @@ async function main() {
     const result = await lintCommand({
       path: positionals[0] ?? '.',
       profile: values['--profile'],
+      configPath: values['--config'],
       format: values['--format']
     });
     process.exitCode = result.errors > 0 ? 1 : 0;

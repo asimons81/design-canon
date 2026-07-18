@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const cli = fileURLToPath(new URL('../bin/design-canon.js', import.meta.url));
@@ -75,4 +78,40 @@ test('lint uses exit code one for error findings', async () => {
   assert.equal(result.code, 1);
   const payload = JSON.parse(result.stdout);
   assert.ok(payload.errors >= 1);
+});
+
+test('justified config suppression removes the failing exit code', async (t) => {
+  const directory = await mkdtemp(join(tmpdir(), 'design-canon-cli-config-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const configPath = join(directory, 'design-canon.config.json');
+  await writeFile(
+    configPath,
+    JSON.stringify({
+      version: 1,
+      profile: 'marketing',
+      suppressions: [
+        {
+          rule: 'a11y.visible-focus',
+          files: ['examples/sloppy/index.html'],
+          reason: 'The fixture intentionally demonstrates removal of visible focus.',
+          approvedBy: 'test-suite',
+          expires: '2099-01-01'
+        }
+      ]
+    }),
+    'utf8'
+  );
+
+  const result = await run([
+    'lint',
+    './examples/sloppy',
+    '--config',
+    configPath,
+    '--format',
+    'json'
+  ]);
+  assert.equal(result.code, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.errors, 0);
+  assert.equal(payload.suppressedFindings.length, 1);
 });
