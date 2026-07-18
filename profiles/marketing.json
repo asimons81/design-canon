@@ -1,0 +1,6 @@
+{
+  "id": "marketing",
+  "name": "Marketing and Landing Pages",
+  "intent": "Create a distinctive, persuasive page with one clear promise and one primary action. Visual novelty must support comprehension and brand memory rather than becoming decorative noise.",
+  "includeCategories": ["accessibility", "color", "content", "depth", "direction", "hierarchy", "layout", "motion", "shape", "tokens", "typography"]
+}

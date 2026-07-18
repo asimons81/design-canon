@@ -1,0 +1,27 @@
+{
+  "name": "design-canon",
+  "version": "0.1.0-alpha.0",
+  "description": "Open design-policy compiler and linter for AI coding agents.",
+  "type": "module",
+  "bin": {
+    "design-canon": "./bin/design-canon.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "compile:marketing": "node ./bin/design-canon.js compile --profile marketing --target design --output ./DESIGN.md",
+    "lint:example": "node ./bin/design-canon.js lint ./examples/sloppy"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ai-agents",
+    "design-system",
+    "design-lint",
+    "design-md",
+    "codex",
+    "claude-code",
+    "hermes-agent"
+  ],
+  "license": "MIT"
+}
