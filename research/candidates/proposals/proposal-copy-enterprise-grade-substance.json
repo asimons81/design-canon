@@ -54,18 +54,20 @@
     },
     "limitations": [
       "Cannot verify whether listed enterprise features are actually implemented.",
-      "'Enterprise' as a plan name (e.g., 'Enterprise plan') is legitimate and should not trigger."
+      "'Enterprise' as a plan name (e.g., 'Enterprise plan') is legitimate and should not trigger.",
+      "Keyword matching against a fixed enterprise-feature list cannot verify that the listed features are actually implemented at enterprise scale. A page may mention SOC 2 without being certified."
     ]
   },
   "impact": "degraded",
   "falsePositiveRisk": {
-    "level": "low",
+    "level": "medium",
     "scenarios": [
-      "'Enterprise' as a pricing tier name.",
-      "A genuine enterprise product with detailed feature documentation on a linked page."
+      "'Enterprise' as a pricing tier name \u2014 plan-name parsing may flag legitimate tier labels.",
+      "A genuine enterprise product with detailed feature documentation on a linked page rather than inline.",
+      "A product that lists enterprise features using different terminology than the keyword list expects (e.g., 'directory integration' instead of 'SSO')."
     ],
     "mitigations": [
-      "Exclude pricing-page plan names. Check for enterprise feature keywords in the surrounding section."
+      "Exclude pricing-page plan names. Local keyword checks (SSO, audit, SOC, SLA) can suggest but not confirm enterprise substance. Accept linked documentation as supplementary evidence."
     ]
   },
   "copyPattern": {

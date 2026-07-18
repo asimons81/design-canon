@@ -53,18 +53,20 @@
     },
     "limitations": [
       "Context may be visually present but not structurally adjacent in DOM.",
-      "Known brands may not need product description because context is assumed."
+      "Known brands may not need product description because context is assumed.",
+      "The detector must inspect the full hero section or viewport-level context rather than matching CTA text alone. A waitlist button may be valid when the product is clearly named in the heading or navigation."
     ]
   },
   "impact": "degraded",
   "falsePositiveRisk": {
-    "level": "low",
+    "level": "medium",
     "scenarios": [
-      "A known brand launching a clearly understood product extension.",
-      "An internal tool with a known audience that already understands the product."
+      "A known brand launching a clearly understood product extension where brand context is sufficient.",
+      "An internal tool with a known audience that already understands the product \u2014 the hero may appear content-less to an external auditor.",
+      "A teaser campaign where the product context is established through prior marketing (social media, email, press) not visible on the landing page itself."
     ],
     "mitigations": [
-      "Check for brand-name recognition in page title or navigation as implicit context."
+      "Inspect the full hero section and surrounding navigation, not just CTA button text. Check for product-name context in the page title, navigation branding, or preceding paragraph. Accept known-brand recognition (logos, brand name in nav) as implicit context."
     ]
   },
   "copyPattern": {

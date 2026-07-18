@@ -56,13 +56,14 @@
   },
   "impact": "nuisance",
   "falsePositiveRisk": {
-    "level": "low",
+    "level": "medium",
     "scenarios": [
-      "A textile/clothing context where 'seamless' is literal.",
-      "An integration marketplace where each integration card says 'Seamless integration' but clicking opens detailed setup docs."
+      "A textile/clothing context where 'seamless' is literal \u2014 requires context detection.",
+      "An integration marketplace where each card says 'Seamless integration' but clicking opens detailed setup docs \u2014 evidence lives in adjacent doc, not inline.",
+      "A product page linking to a dedicated setup guide where the integration specifics are documented \u2014 the landing page uses 'seamless' as a summary header."
     ],
     "mitigations": [
-      "Check for actionable integration detail (click-to-connect buttons, setup docs) nearby. Flag only when 'seamless' is the only descriptor."
+      "Check for actionable integration detail (click-to-connect buttons, setup docs, integration guides) on the page or linked from it. Flag only when 'seamless' is the only descriptor with no mechanism evidence in the section or adjacent documentation."
     ]
   },
   "copyPattern": {

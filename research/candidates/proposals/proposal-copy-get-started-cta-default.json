@@ -11,7 +11,7 @@
   ],
   "summary": "AI-generated copy uses 'Get Started' as the universal CTA regardless of context, telling users nothing about what they are starting or what happens next.",
   "instruction": "Use CTAs that reflect the user's actual first action: 'Build your first dashboard', 'Create your workspace', 'Import your data' \u2014 not the generic 'Get Started'.",
-  "rationale": "'Get Started' is the web's least informative CTA. It does not tell users what they are starting, what will happen when they click, or whether they are committing to anything. A context-specific CTA ('Build your first report') sets expectations and improves click-through quality.",
+  "rationale": "'Get Started' is the web's least informative CTA. It does not tell users what they are starting or what will happen when they click. A context-specific CTA ('Build your first report') gives users actionable information about what the action entails.",
   "claimType": "original-observation",
   "sourceIds": [
     "source.original-observation.ai-default-patterns"
@@ -57,13 +57,14 @@
   },
   "impact": "nuisance",
   "falsePositiveRisk": {
-    "level": "low",
+    "level": "medium",
     "scenarios": [
-      "Multi-step onboarding where 'Get Started' is the first step label.",
-      "A/B test results showing 'Get Started' outperforms more specific alternatives."
+      "Multi-step onboarding where 'Get Started' is the first step label \u2014 appropriate for flow context.",
+      "A/B test results showing 'Get Started' outperforms alternatives \u2014 documented preference should suppress.",
+      "A well-known consumer product where 'Get Started' is part of a consistent brand pattern with sufficient supporting context."
     ],
     "mitigations": [
-      "Check for step-progression context. Accept documented A/B test results as suppressible exceptions."
+      "Check for step-progression context (progress bar, step count). Accept documented A/B results as suppressible. Check for 200+ characters of surrounding product description before the CTA."
     ]
   },
   "copyPattern": {
