@@ -1,0 +1,101 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.product-knows-anthropomorphism",
+  "proposedRuleId": "copy.product-knows-anthropomorphism",
+  "title": "Products do not 'know' things",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "AI-generated copy describes products as 'knowing' user preferences, implying human cognition rather than data processing.",
+  "instruction": "Describe what the product does with data: 'Learns your preferences from past selections' not 'Knows what you like.' Products process, match, and predict \u2014 they do not know in the human sense.",
+  "rationale": "Attributing knowledge to software implies sentience or understanding that the product does not possess. This sets unrealistic expectations and can mislead users about the product's capabilities. Accurate descriptions of data processing ('recommends based on your history') are both more honest and more informative.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'Our AI knows what you need before you ask.'",
+      "'The platform knows your customers better than they know themselves.'"
+    ],
+    "controls": [
+      "'Uses your viewing history to predict similar content you will enjoy.'",
+      "'Analyzes support ticket patterns to identify common issues.'"
+    ],
+    "borderline": [
+      "Fiction or creative writing ('The ship knew its captain's thoughts') where anthropomorphism is a deliberate literary device."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Fiction, narrative, or creative writing where anthropomorphism is a deliberate literary device. Instructional copy ('Know your numbers') where 'know' is directed at the user, not the product.",
+      "examples": [
+        "Science fiction UI",
+        "Dashboard title 'Know your metrics' (user-directed, not product-directed)"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find 'knows', 'understands', 'learns', 'thinks', 'remembers' where the subject is the product or its AI component, not the user.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "knows your",
+        "knows what",
+        "understands your",
+        "learns your"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Requires distinguishing product-as-subject from user-as-subject ('Your account knows' vs 'You know your data').",
+      "Creative or narrative contexts may use anthropomorphism deliberately."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "high",
+    "scenarios": [
+      "User-directed copy ('Know your metrics') where 'know' addresses the reader, not the product.",
+      "Technical documentation accurately describing ML model behavior ('The model learns from training data').",
+      "Natural language in quotes from users or interviews."
+    ],
+    "mitigations": [
+      "Check the grammatical subject of the sentence. Only flag when the product or its AI is the subject of the cognition verb."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "anthropomorphic-product-claim",
+    "replacementStrategy": "Replace product-knowledge claims with specific mechanism descriptions: 'Recommends based on your history', 'Matches patterns in your data', 'Generates predictions from training examples'."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.anthropomorphic.knows.violation.product-subject",
+      "caseType": "violation",
+      "description": "A product page saying 'Our AI knows your taste in music.'"
+    },
+    {
+      "fixtureId": "fixture.copy.anthropomorphic.knows.control.mechanism",
+      "caseType": "control",
+      "description": "Same page saying 'Recommends songs based on your listening history and ratings.'"
+    },
+    {
+      "fixtureId": "fixture.copy.anthropomorphic.knows.borderline.user-directed",
+      "caseType": "borderline",
+      "description": "A dashboard header saying 'Know your key metrics' where 'know' addresses the user."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

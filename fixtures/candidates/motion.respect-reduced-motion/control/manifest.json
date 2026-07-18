@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.motion.reduced-motion.control.with-preference",
+  "proposalId": "proposal.motion.respect-reduced-motion",
+  "caseType": "control",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 831,
+      "sha256": "b97e3821d400af27a8972a43b40be39a25baabf32508c520db3c23258cf00c77"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "Same page with all animations wrapped in prefers-reduced-motion and reduced alternatives.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "Same page with all animations wrapped in prefers-reduced-motion and reduced alternatives.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic control fixture for proposal.motion.respect-reduced-motion."
+  }
+}

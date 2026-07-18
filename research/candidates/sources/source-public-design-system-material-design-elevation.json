@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.public-design-system.material-design-elevation",
+  "sourceType": "public-design-system",
+  "title": "Material Design 3 \u2014 Elevation",
+  "publisher": "Google",
+  "url": "https://m3.material.io/styles/elevation",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "explicit-open-license",
+  "license": "CC-BY-4.0",
+  "summary": "Material Design defines elevation levels mapped to semantic component roles, with consistent shadow values per level and guidance on using elevation to communicate hierarchy.",
+  "supportingClaims": [
+    "Elevation values should map to semantic importance: lower for background surfaces, higher for interactive overlays.",
+    "Consistent elevation language prevents visual noise and reinforces the interface's spatial model."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

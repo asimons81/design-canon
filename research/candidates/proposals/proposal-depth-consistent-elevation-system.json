@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.depth.consistent-elevation-system",
+  "proposedRuleId": "depth.consistent-elevation-system",
+  "title": "Use a consistent elevation system",
+  "status": "researched",
+  "category": "depth",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated interfaces apply shadows at varying intensities without a clear elevation system, making depth feel arbitrary rather than hierarchical.",
+  "instruction": "Define a small set of elevation levels \u2014 Design Canon recommends 2-4 \u2014 mapped to semantic component roles (rest, interactive, overlay). Apply the same shadow values to all components at the same level. Most surfaces should have no elevation.",
+  "rationale": "Shadows communicate what users can interact with and what is above the surface. When every element has a different shadow intensity, depth loses meaning. Material Design demonstrates elevation as a semantic system with defined levels; the specific number of levels should fit the project's complexity. Design Canon recommends keeping the elevation system small enough that each level has a distinct role.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.public-design-system.material-design-elevation",
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A card with 10px blur, floating button with 8px, modal with 24px, tooltip with 6px, dropdown with 12px -- five different elevations with no system.",
+      "An alert banner with heavier shadow than the modal it overlays, inverting expected depth hierarchy."
+    ],
+    "controls": [
+      "Three elevations: level 0 (flat for all cards and panels), level 1 (4px blur on hover), level 2 (12px blur for modals and drawers).",
+      "A marketing page using zero shadows on all surfaces, depth communicated through color and size contrast."
+    ],
+    "borderline": [
+      "A component library that needs 4-5 elevations for different interactive states (rest, hover, active, focus, drag) -- the key is that these map to state, not arbitrary values."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Custom OS-level chrome (title bar overlays, system dialogs). 3D or spatial interfaces where depth is literal.",
+      "examples": [
+        "OS window manager",
+        "3D product viewer",
+        "Map with elevation data"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Parse all box-shadow declarations, extract blur radius values, group by approximate level. Flag if more than 4 distinct elevation levels exist across the project.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "box-shadow",
+        "shadow"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Multiple comma-separated shadows on one element may create a single elevation effect from multiple blur values.",
+      "Tailwind-style utility shadows have defined blur values that map to semantic levels.",
+      "filter: drop-shadow() uses a different CSS mechanism not covered by box-shadow analysis."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "A button design using multiple shadows for a single elevation effect (ambient + directional).",
+      "A design system with 5 defined elevation tokens that only uses 2-3 in practice."
+    ],
+    "mitigations": [
+      "Count distinct elevation levels (blur values within 15% tolerance as the same level), not raw blur values. Flag only when 5+ distinct groups exist."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.depth.elevation.violation.scattered-shadows",
+      "caseType": "violation",
+      "description": "A page using shadows with blur values 4px, 8px, 10px, 16px, 20px, 24px across different components."
+    },
+    {
+      "fixtureId": "fixture.depth.elevation.control.three-level-system",
+      "caseType": "control",
+      "description": "A page using only 0px (flat), 6px (card), 16px (modal) shadows."
+    },
+    {
+      "fixtureId": "fixture.depth.elevation.borderline.tailwind-system",
+      "caseType": "borderline",
+      "description": "A page using shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl where some are composition shadows."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.dashboard-metric-overload",
+  "sourceType": "original-observation",
+  "title": "Metric overload in AI-generated dashboards",
+  "sourceLocation": "Review of AI-generated analytics and operations dashboard code",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI-generated dashboards display 10-15 metrics simultaneously in equal-weight card grids, overwhelming decision-makers rather than prioritizing by importance.",
+  "supportingClaims": [
+    "When every metric has equal visual weight, users cannot identify which metric is most important for their current decision.",
+    "The 5-7 item cognitive load limit applies to simultaneous metric display."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

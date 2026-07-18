@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.trusted-by-without-names",
+  "proposedRuleId": "copy.trusted-by-without-names",
+  "title": "'Trusted by' requires named entities",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated marketing uses 'Trusted by thousands' or 'Trusted by leading companies' without naming specific customers, making the claim unverifiable.",
+  "instruction": "When claiming 'Trusted by', name specific customers (with permission) or use independently verified social proof (review platform scores, case studies). Avoid unverifiable aggregate claims.",
+  "rationale": "'Trusted by thousands' cannot be verified or falsified. Named customers, G2 ratings, or specific case studies provide verifiable social proof. The specificity gap between 'Trusted by leading enterprises' and 'Trusted by design teams at Google, Apple, and Airbnb' determines the credibility difference.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'Trusted by over 10,000 companies worldwide' with no named logos or customers.",
+      "'Trusted by leading enterprises' with no specific names or evidence."
+    ],
+    "controls": [
+      "'Trusted by design teams at Google, Apple, and Airbnb' with named customer logos and permission.",
+      "'4.8/5 on G2 from 500+ reviews \u2014 94% recommend to a colleague' with independent platform attribution."
+    ],
+    "borderline": [
+      "A startup in stealth mode that cannot name customers yet \u2014 should use alternative framing like 'Designed for product teams of 10-50' rather than 'Trusted by'."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "NDA-bound enterprise customers where logos cannot be disclosed \u2014 use aggregate statistics or anonymized industry counts instead. Internal tools where the audience already knows the customer base.",
+      "examples": [
+        "Enterprise NDA-bound case study (anonymized)",
+        "Internal tool for known stakeholders"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "manual-only",
+    "signalDescription": "Find 'trusted by' or 'loved by' patterns in marketing copy. Check for named entities, customer logos with alt text, or review platform citations within the same section.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "trusted by",
+        "loved by",
+        "chosen by"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Customer logos without alt text may not be detectable as named entities.",
+      "Review platform scores (G2, Capterra) provide legitimate evidence but require platform-specific recognition."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "An enterprise with universally recognizable customers (logo-only, no names needed for recognizable brands).",
+      "A startup with permission to use names but no logos yet."
+    ],
+    "mitigations": [
+      "Accept known customer logos as named entities even without alt text. Flag only when both names AND recognizable logos are absent."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "fake-social-proof",
+    "replacementStrategy": "Replace 'Trusted by [vague count] [group]' with specific named customers (with permission), independent review scores, or specific case study references."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.trusted-by.violation.vague",
+      "caseType": "violation",
+      "description": "A landing page saying 'Trusted by thousands of companies' with no logos, names, or evidence."
+    },
+    {
+      "fixtureId": "fixture.copy.trusted-by.control.named",
+      "caseType": "control",
+      "description": "Same page with logo grid of known companies and a G2 rating with review count."
+    },
+    {
+      "fixtureId": "fixture.copy.trusted-by.borderline.recognizable-logos",
+      "caseType": "borderline",
+      "description": "A page with unlabeled but recognizable logo set (Apple, Google, Microsoft) \u2014 name context from logos is sufficient."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

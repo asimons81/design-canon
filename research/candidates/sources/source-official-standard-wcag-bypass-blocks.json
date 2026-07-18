@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.official-standard.wcag-bypass-blocks",
+  "sourceType": "official-standard",
+  "title": "WCAG 2.4.1 Bypass Blocks",
+  "publisher": "W3C",
+  "url": "https://www.w3.org/TR/WCAG22/#bypass-blocks",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "explicit-open-license",
+  "license": "CC-BY-4.0",
+  "summary": "WCAG requires a mechanism to skip repeated content blocks, typically a skip-to-content link as the first focusable element.",
+  "supportingClaims": [
+    "Keyboard users navigating through repeated navigation blocks need a bypass mechanism on every page.",
+    "Skip links must be visible on focus to support sighted keyboard users."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

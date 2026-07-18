@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.accessibility.text-contrast.violation.light-gray-text",
+  "proposalId": "proposal.accessibility.text-contrast-minimum",
+  "caseType": "violation",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 440,
+      "sha256": "52a2d0aee1940f226bd58f6f9c5738ea267d6cfc2a89b2a925086d17c470f142"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A page with body text at #999 on white background and light gray placeholder text.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A page with body text at #999 on white background and light gray placeholder text.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic violation fixture for proposal.accessibility.text-contrast-minimum."
+  }
+}

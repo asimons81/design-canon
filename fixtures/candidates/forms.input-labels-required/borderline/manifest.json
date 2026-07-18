@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.forms.input-labels.borderline.settings-form",
+  "proposalId": "proposal.forms.input-labels-required",
+  "caseType": "borderline",
+  "profile": "marketing",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 445,
+      "sha256": "8ac7ebf290d46e8575c877f65a4df71ef743d9fdf3825df34598dc2abe04badc"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A settings form with section headings that implicitly label the fields below.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A settings form with section headings that implicitly label the fields below.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic borderline fixture for proposal.forms.input-labels-required."
+  }
+}

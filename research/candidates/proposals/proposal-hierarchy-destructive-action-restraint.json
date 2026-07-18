@@ -1,0 +1,96 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.hierarchy.destructive-action-restraint",
+  "proposedRuleId": "hierarchy.destructive-action-restraint",
+  "title": "Destructive actions must not dominate visual hierarchy",
+  "status": "researched",
+  "category": "hierarchy",
+  "surfaces": [
+    "product-app",
+    "marketing"
+  ],
+  "summary": "AI-generated interfaces sometimes render destructive actions (delete, remove, cancel) with primary button styling, making accidental errors more likely.",
+  "instruction": "When a destructive action appears alongside a constructive action, the destructive action must use lower visual prominence. Use outline or neutral styling for destructive actions. Reserve filled primary styling for the recommended constructive action.",
+  "rationale": "Users scanning a page will gravitate toward the most visually prominent button. When 'Delete Account' uses a filled red button and 'Save Changes' uses a ghost link, the destructive action dominates and errors become more likely. Visual hierarchy should guide users toward the safe default.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A settings page with a filled red 'Delete Account' button and a ghost-style 'Save Changes' link.",
+      "A confirmation dialog with filled red 'Delete' and ghost 'Cancel' -- the destructive action dominates."
+    ],
+    "controls": [
+      "A settings page with 'Save Changes' as filled primary and 'Delete Account' as ghost danger link.",
+      "A confirmation dialog with 'Cancel' as filled neutral and 'Delete' as outlined danger."
+    ],
+    "borderline": [
+      "A dedicated account deletion page where deletion IS the primary action and should be prominent, but the confirmation step should still use lower-prominence styling."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "A collection of all destructive actions (danger zone section) where no constructive alternative exists. A single-action destructive page where the destructive action is the only task.",
+      "examples": [
+        "Account deletion confirmation page",
+        "Danger zone section with only destructive actions"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find buttons with destructive labels (delete, remove, cancel, archive, clear, reset). Compare their visual weight (filled vs outline, contrast, size) to nearby constructive buttons. Flag if destructive action is more prominent.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "delete",
+        "remove",
+        "cancel",
+        "archive"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Requires understanding of which action is 'constructive' and which is 'destructive' in a given context.",
+      "Red-filled buttons that match the brand color for non-destructive calls-to-action need brand-context awareness."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Red-filled buttons in a brand whose primary color is red (not communicating danger).",
+      "A color-coded action list where red indicates priority, not danger."
+    ],
+    "mitigations": [
+      "Check for destructive label text as an additional signal beyond color alone. Exclude brands with documented red-primary design systems."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.hierarchy.destructive.violation.delete-prominent",
+      "caseType": "violation",
+      "description": "A settings page with filled red 'Delete Account' and outlined 'Save Changes'."
+    },
+    {
+      "fixtureId": "fixture.hierarchy.destructive.control.save-prominent",
+      "caseType": "control",
+      "description": "Same page with filled blue 'Save Changes' and outlined gray 'Delete Account'."
+    },
+    {
+      "fixtureId": "fixture.hierarchy.destructive.borderline.delete-page",
+      "caseType": "borderline",
+      "description": "A 'Cancel Subscription' page where cancel IS the primary action."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

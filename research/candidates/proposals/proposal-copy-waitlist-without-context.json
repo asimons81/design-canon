@@ -1,0 +1,100 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.waitlist-without-context",
+  "proposedRuleId": "copy.waitlist-without-context",
+  "title": "Do not use waitlist CTAs without product context",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated marketing pages use 'Join the waitlist' as a standalone hero CTA without explaining what the product does or why waiting is worthwhile.",
+  "instruction": "When using a waitlist or early-access CTA, pair it with specific product context: what the product does, what waitlist access means, and a reason to join now rather than later.",
+  "rationale": "A bare 'Join the Waitlist' CTA provides no information for the user's decision. Context-specific waitlist copy ('Join 5,000+ designers waiting for our Figma plugin') gives users a reason to act and sets expectations.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A landing page hero with 'Join the Waitlist' as the only CTA and no product description or value proposition.",
+      "A splash page with only an email input and 'Get Early Access' button, no context about the product."
+    ],
+    "controls": [
+      "A waitlist page explaining 'We are building a collaborative design tool for product teams. Join 5,000+ designers on the waitlist for early access in Q3.'",
+      "A product tease with timeline and benefit: 'Private beta starts March 2026. Early access includes priority support and discounted lifetime pricing.'"
+    ],
+    "borderline": [
+      "A waitlist for a well-known company's sequel product where brand recognition provides sufficient context."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Teaser campaigns for known brands where the product is already understood from context. Confirmed-viral referrals where the network is the value.",
+      "examples": [
+        "Apple product announcement teaser",
+        "Invite-only social platform with known reputation"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find waitlist CTA patterns ('Join the waitlist', 'Get early access', 'Sign up for beta'). Check for nearby product-description context within the same section.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "join the waitlist",
+        "get early access",
+        "join waitlist"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Context may be visually present but not structurally adjacent in DOM.",
+      "Known brands may not need product description because context is assumed.",
+      "The detector must inspect the full hero section or viewport-level context rather than matching CTA text alone. A waitlist button may be valid when the product is clearly named in the heading or navigation."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A known brand launching a clearly understood product extension where brand context is sufficient.",
+      "An internal tool with a known audience that already understands the product \u2014 the hero may appear content-less to an external auditor.",
+      "A teaser campaign where the product context is established through prior marketing (social media, email, press) not visible on the landing page itself."
+    ],
+    "mitigations": [
+      "Inspect the full hero section and surrounding navigation, not just CTA button text. Check for product-name context in the page title, navigation branding, or preceding paragraph. Accept known-brand recognition (logos, brand name in nav) as implicit context."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "generic-hero",
+    "replacementStrategy": "Pair waitlist CTAs with specific context: what the product does, timeline, benefits of early access, or the community already waiting."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.waitlist.violation.bare-cta",
+      "caseType": "violation",
+      "description": "A landing page hero with 'Join the Waitlist' button and no product description."
+    },
+    {
+      "fixtureId": "fixture.copy.waitlist.control.contextual",
+      "caseType": "control",
+      "description": "Same page with product description, timeline, and community count before the waitlist CTA."
+    },
+    {
+      "fixtureId": "fixture.copy.waitlist.borderline.brand-known",
+      "caseType": "borderline",
+      "description": "A known company's product teaser where brand provides sufficient context."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

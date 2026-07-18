@@ -1,0 +1,97 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.mobile.five-bottom-tabs",
+  "proposedRuleId": "mobile.five-bottom-tabs",
+  "title": "Do not default to five bottom tab navigation",
+  "status": "researched",
+  "category": "mobile",
+  "surfaces": [
+    "mobile"
+  ],
+  "summary": "AI-generated mobile navigation universally defaults to five bottom tabs with icon-plus-label, regardless of the number of primary sections.",
+  "instruction": "Choose bottom tab count based on the app's primary sections. Tab count is an information architecture decision, not a design default. Five tabs that include filler sections ('Profile', 'Settings') suggest padding rather than deliberate IA.",
+  "rationale": "When an app has three primary sections but displays five bottom tabs, the two extra tabs (commonly 'Profile' and 'Settings') suggest the tab count was chosen as a default rather than derived from the app's information architecture. Tab count should reflect the number of primary sections the user navigates between, not a convention.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "An app with only three primary sections displaying five bottom tabs (two filler: Profile, Settings).",
+      "An app with six primary sections crammed into five tabs with a 'More' overflow."
+    ],
+    "controls": [
+      "An app with three primary sections and three bottom tabs.",
+      "An app with five primary sections displayed as five tabs without filler."
+    ],
+    "borderline": [
+      "An app whose IA genuinely has five primary sections."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Apps whose information architecture genuinely produces five primary sections. Platforms (iOS, Android) tab-bar guidance does not mandate a specific count.",
+      "examples": [
+        "A messaging app with five sections",
+        "HIG does not mandate five tabs"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "visual",
+    "signalDescription": "Detect bottom-positioned tab navigation with 5 tab items (icon + label pattern). Flag when filler tabs ('Profile', 'Settings') suggest padding.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "tab bar",
+        "bottom nav",
+        "five tabs"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Some apps genuinely have five primary sections.",
+      "Cannot distinguish filler tabs from legitimate navigation items without understanding the app's IA."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "high",
+    "scenarios": [
+      "An app whose IA genuinely produces five primary navigation items.",
+      "Platform conventions that encourage tab-bar navigation for certain app categories."
+    ],
+    "mitigations": [
+      "Check for filler labels (Profile, Settings) in tabs 4-5 as padding signals. Accept documented IA rationale."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.mobile.tabs.violation.five-filler",
+      "caseType": "violation",
+      "description": "A mobile app with five bottom tabs where two are filler (Profile, Settings) for a 3-section app."
+    },
+    {
+      "fixtureId": "fixture.mobile.tabs.control.three-tabs",
+      "caseType": "control",
+      "description": "Same app with three bottom tabs matching the three primary sections."
+    },
+    {
+      "fixtureId": "fixture.mobile.tabs.borderline.legitimate-five",
+      "caseType": "borderline",
+      "description": "An app whose IA genuinely requires five bottom tabs."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization correction: removed unsupported 'three to five tabs is normal' claim. Preserved IA-follows-tab-count principle. High FP risk retained."
+  ]
+}

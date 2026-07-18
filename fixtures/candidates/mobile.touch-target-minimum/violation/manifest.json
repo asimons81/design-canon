@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.mobile.touch-targets.violation.small-buttons",
+  "proposalId": "proposal.mobile.touch-target-minimum",
+  "caseType": "violation",
+  "profile": "marketing",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 771,
+      "sha256": "2ae42acb436eab698709a047862c11b5e481e0c92d4643d0b3257977f31affe6"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A mobile form with 32px submit button, 28px icon buttons, 24px navigation links.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A mobile form with 32px submit button, 28px icon buttons, 24px navigation links.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic violation fixture for proposal.mobile.touch-target-minimum."
+  }
+}

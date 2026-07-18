@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.accessibility.text-contrast.borderline.gradient-overlay",
+  "proposalId": "proposal.accessibility.text-contrast-minimum",
+  "caseType": "borderline",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 482,
+      "sha256": "b3d171c87b6c3f3aa7891ec54e3ed802b7e9ed5b1b5f4bb95d93e40eb94dca49"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A card with text over a gradient where contrast passes on dark end but fails on light end.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A card with text over a gradient where contrast passes on dark end but fails on light end.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic borderline fixture for proposal.accessibility.text-contrast-minimum."
+  }
+}

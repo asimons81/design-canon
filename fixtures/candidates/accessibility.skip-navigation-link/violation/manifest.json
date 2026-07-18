@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.accessibility.skip-link.violation.no-skip",
+  "proposalId": "proposal.accessibility.skip-navigation-link",
+  "caseType": "violation",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 746,
+      "sha256": "d23495f10e409c661636d3920ea992adcc94001305135ab7cf2ebec8c92f783e"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "A page with 10 navigation links followed by main content, no skip link present.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "A page with 10 navigation links followed by main content, no skip link present.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic violation fixture for proposal.accessibility.skip-navigation-link."
+  }
+}

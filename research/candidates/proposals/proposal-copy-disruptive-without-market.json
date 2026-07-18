@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.disruptive-without-market",
+  "proposedRuleId": "copy.disruptive-without-market",
+  "title": "Specify what makes a product 'disruptive'",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated copy calls products 'disruptive' without explaining which market convention is being overturned or how.",
+  "instruction": "If using 'disruptive', specify the market convention being overturned, the underserved segment, and how the product differs from incumbent solutions. Describe the disruption mechanism, not just the label.",
+  "rationale": "Clayton Christensen's theory defines disruption as serving overlooked markets with simpler, cheaper, or more accessible alternatives. Casual use of 'disruptive' for any new product empties the term of meaning. A specific description of the market change ('Makes professional design tools accessible to non-designers') is more credible and informative.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'A disruptive platform for modern teams' without specifying the market or approach.",
+      "'Disrupting the [industry] space' as a standalone claim."
+    ],
+    "controls": [
+      "'Makes professional design tools accessible to product managers and developers who don't have design training.'",
+      "'Disrupting the $50B CAD market by bringing real-time collaboration to 3D modeling \u2014 a category that has had zero native multiplayer support.'"
+    ],
+    "borderline": [
+      "A genuinely innovative product entering a market with entrenched incumbents \u2014 'disruptive' may be accurate but should still be backed by specific market analysis."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Academic or analytical writing referencing Christensen's theory of disruption. Market analysis reports using 'disruptive' as a defined category term.",
+      "examples": [
+        "Harvard Business Review article on disruption theory",
+        "Market analysis identifying disruption candidates"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "manual-only",
+    "signalDescription": "Find 'disruptive', 'disruption', 'disrupt' in marketing copy. Check for specific market context, incumbent description, or underserved-segment identification nearby.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "disruptive",
+        "disrupt",
+        "disruption"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Determining whether a product genuinely disrupts a market requires domain knowledge beyond static analysis.",
+      "Academic uses of 'disruption' as a defined theoretical term should not be flagged."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "high",
+    "scenarios": [
+      "A genuinely innovative product with a well-articulated disruption thesis.",
+      "Academic or analytical writing using 'disruption' as a defined theory term.",
+      "Investor pitch decks where 'disruption' is a category expectation."
+    ],
+    "mitigations": [
+      "Flag only egregious cases where 'disruptive' appears without any market context in the same section. Accept well-researched disruption claims."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "unsupported-superlative",
+    "replacementStrategy": "Replace 'Disrupt [industry]' with specific market thesis: the incumbent limitation being overcome, the overlooked segment being served, and the mechanism that makes the new approach different."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.disruptive.violation.bare-claim",
+      "caseType": "violation",
+      "description": "A landing page saying 'Disrupting the enterprise software space' with no market specifics."
+    },
+    {
+      "fixtureId": "fixture.copy.disruptive.control.specific-thesis",
+      "caseType": "control",
+      "description": "Same page with 'Bringing real-time collaboration to an industry that has relied on email attachments for 20 years.'"
+    },
+    {
+      "fixtureId": "fixture.copy.disruptive.borderline.genuine-innovation",
+      "caseType": "borderline",
+      "description": "A truly novel product entering a stagnant market with a clear thesis \u2014 'disruptive' may be accurate with supporting context."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

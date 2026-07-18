@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.product-dashboard-sharp-corners",
+  "sourceType": "original-observation",
+  "title": "Product dashboard overcorrection to zero-radius",
+  "sourceLocation": "Review of AI-generated enterprise and product-application interfaces",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI agents generating professional/business interfaces default to 0px border-radius on all elements, overcorrecting from the pill-radius default. This creates harsh, unapproachable interfaces.",
+  "supportingClaims": [
+    "Zero-radius on every surface is as much a reflex default as pill-radius on everything.",
+    "Interactive elements benefit from slight rounding for visual approachability; sharp corners signal precision and are appropriate for data containers."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

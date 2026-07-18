@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.forms.input-labels-required",
+  "proposedRuleId": "forms.input-labels-required",
+  "title": "Every input must have an accessible label",
+  "status": "review-ready",
+  "category": "forms",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated forms use placeholder text as the sole identifier for input fields, failing WCAG accessible name requirements.",
+  "instruction": "Every input element must have an accessible name. Provide it via a <label> element, aria-label, or aria-labelledby. Do not rely on placeholder text as the sole input identifier.",
+  "rationale": "Placeholder text disappears on input, leaving users without a referent. WCAG requires every interactive control to have an accessible name computed via label, aria-label, or aria-labelledby (SC 4.1.2, 3.3.2). A label element is preferred because it provides both a visible label and an accessible name; aria-label supplies an accessible name without visible text.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-guidance.wai-aria-labels"
+  ],
+  "examples": {
+    "violations": [
+      "A signup form with email and password inputs using only placeholder='Enter your email' and no label, aria-label, or aria-labelledby on either field.",
+      "A search form with no accessible name: a magnifying glass icon button with no aria-label and no visible label text for screen readers."
+    ],
+    "controls": [
+      "A signup form using <label for='email'>Email</label> with a matching input id, providing both visible label and accessible name.",
+      "A search form using <input aria-label='Search documentation' placeholder='Search...'> where aria-label provides the accessible name."
+    ],
+    "borderline": [
+      "A settings form with clear section headings and visible descriptions beside each field may be accessible without explicit labels if visual grouping is unambiguous."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Fields where the label is part of surrounding visual context and duplication would create redundancy, evaluated on a case-by-case basis.",
+      "examples": [
+        "Inline confirmation dialogs with a single text field",
+        "Visual-only filter controls with visible icon labels"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Find all input, textarea, and select elements. Check for associated label via for/id, wrapping label element, aria-label, or aria-labelledby. Flag if none of these exist.",
+    "matcherProposal": {
+      "kind": "dom-structure",
+      "patterns": [
+        "input:not([type=hidden]):not([type=submit]):not([type=button])",
+        "textarea",
+        "select"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Custom form controls (rich text editors, date pickers) may handle accessibility internally via ARIA.",
+      "Dynamically added labels via JavaScript may not appear in static DOM analysis."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Custom form controls that manage accessibility internally.",
+      "A single search input with a visible label outside the immediate DOM context."
+    ],
+    "mitigations": [
+      "Accept aria-label and aria-labelledby as valid label mechanisms beyond just for/id associations.",
+      "Check the enclosing parent container for implicit labeling text."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.forms.input-labels.violation.signup-form",
+      "caseType": "violation",
+      "description": "A signup form with email and password inputs using placeholder-only labeling, no labels, no aria-labels."
+    },
+    {
+      "fixtureId": "fixture.forms.input-labels.control.signup-form-labeled",
+      "caseType": "control",
+      "description": "Same signup form with proper label associations and visible text labels above each input."
+    },
+    {
+      "fixtureId": "fixture.forms.input-labels.borderline.settings-form",
+      "caseType": "borderline",
+      "description": "A settings form with section headings that implicitly label the fields below."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization correction: reframed from visible-label requirement to accessible-name requirement per maintainer review. aria-label and aria-labelledby are valid name sources even without visible label text."
+  ]
+}

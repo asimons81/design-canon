@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.limited-time-without-expiration",
+  "proposedRuleId": "copy.limited-time-without-expiration",
+  "title": "'Limited time' requires an expiration",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing",
+    "commerce"
+  ],
+  "summary": "AI-generated copy uses 'Limited time offer' without specifying the expiration, creating fake urgency that erodes trust when the offer never expires.",
+  "instruction": "When using time-limited language, specify the actual deadline. 'Limited time offer' without an expiration date is fake urgency. Use a specific date, countdown, or quantity cap.",
+  "rationale": "A 'Limited time offer' that never expires destroys credibility. Users who return to find the same 'limited time' offer weeks later learn the product's claims are unreliable. Specific deadlines ('Save 30% through March 31') create genuine urgency and respect user intelligence.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'Limited time offer' on a SaaS pricing page with no expiration date visible.",
+      "'Early bird pricing' with no deadline or expiration."
+    ],
+    "controls": [
+      "'Early bird pricing ends March 15: save 30% on annual plans.' with a specific date.",
+      "'First 100 customers get lifetime discount \u2014 42 remaining.' with a quantity cap."
+    ],
+    "borderline": [
+      "'Limited time' in a perishable goods context (daily deals on fresh food) where the time limitation is intrinsic to the product."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Clearance and liquidation sales where inventory is genuinely finite. Perishable service inventory (flight upgrades, hotel rooms) where time-limitation is intrinsic.",
+      "examples": [
+        "Flash sale with countdown timer matching a real promotional calendar",
+        "Flight upgrade availability count"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find 'limited time', 'offer ends', 'expires', 'while supplies last' patterns. Check for nearby date, countdown timer, or quantity counter. Flag if urgency language exists without expiration evidence.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "limited time",
+        "offer ends",
+        "for a limited"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Expiration may be in fine print or legal terms rather than visible near the CTA.",
+      "Countdown timers rendered via JavaScript may not appear in static HTML."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A flash sale page where the expiration is shown via a JavaScript countdown that isn't in static HTML.",
+      "A true limited supply (event tickets) where the time limit is the event date itself."
+    ],
+    "mitigations": [
+      "Check for nearby date patterns, countdown CSS classes, or quantity indicators as alternative evidence."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "fake-urgency",
+    "replacementStrategy": "Replace vague 'Limited time' with specific deadlines: 'Save 30% through [date]', 'First [number] customers get [benefit]', or 'Pricing increases [date]'."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.limited-time.violation.no-date",
+      "caseType": "violation",
+      "description": "A SaaS pricing page with 'Limited time offer \u2014 save 40%' and no expiration date."
+    },
+    {
+      "fixtureId": "fixture.copy.limited-time.control.with-date",
+      "caseType": "control",
+      "description": "Same page with 'Save 40% through June 30, 2026' and a countdown timer."
+    },
+    {
+      "fixtureId": "fixture.copy.limited-time.borderline.countdown-js",
+      "caseType": "borderline",
+      "description": "A flash sale page with a JavaScript countdown timer but no static date text."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

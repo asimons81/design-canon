@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.official-guidance.css-env-safe-area",
+  "sourceType": "official-guidance",
+  "title": "CSS Environment Variables Module Level 1 \u2014 Safe Area Insets",
+  "publisher": "W3C",
+  "url": "https://www.w3.org/TR/css-env-1/",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "explicit-open-license",
+  "license": "CC-BY-4.0",
+  "summary": "W3C specification defining env(safe-area-inset-*) environment variables that provide the distance between the viewport and the device's notch, rounded corners, or home indicator on mobile devices.",
+  "supportingClaims": [
+    "The env() CSS function provides viewport-relative inset values that adapt to each device's physical display shape.",
+    "Fixed-position elements at viewport edges require safe-area padding to avoid occlusion by device hardware features."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

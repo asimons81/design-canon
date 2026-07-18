@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.badges.color-only-status",
+  "proposedRuleId": "badges.color-only-status",
+  "title": "Status indicators must combine color with text or icon",
+  "status": "researched",
+  "category": "badges",
+  "surfaces": [
+    "universal",
+    "product-app"
+  ],
+  "summary": "AI-generated interfaces use colored status dots without text labels, excluding colorblind users and failing WCAG 1.4.1.",
+  "instruction": "Every status indicator must combine color with a text label, icon, or pattern. Do not use color as the sole differentiator for status, state, or category.",
+  "rationale": "Approximately 8% of users have color vision deficiency. Color-only indicators also fail when viewed on grayscale screens, in high-contrast mode, or when printed. The fix is simple: add a text label, icon, or positional cue alongside the color.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-standard.wcag-contrast"
+  ],
+  "examples": {
+    "violations": [
+      "A deployment dashboard showing status as red/green/yellow dots without text labels.",
+      "A user table with a Status column showing only green or red circles."
+    ],
+    "controls": [
+      "A deployment dashboard with colored dots AND text labels ('Active', 'Error', 'Pending') AND icon indicators.",
+      "A user table with colored badges that include text and subtle icons."
+    ],
+    "borderline": [
+      "Real-time status indicators on hardware devices (cameras, sensors) where space is extremely limited - should have tooltip text."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Gaming platform status indicators where color convention is widely established with position as secondary coding. Physical-device UI emulators with extreme space constraints.",
+      "examples": [
+        "Health bar (position + color)",
+        "Traffic-light convention with position coding"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find small colored elements (under 24px, circular) positioned as status indicators. Check for adjacent text or aria-label within the same container.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "colored dot",
+        "status badge",
+        "indicator circle"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Decorative colored elements may be mistaken for status indicators.",
+      "Some properly implemented color+pattern combinations need pattern detection beyond basic CSS analysis."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Brand decorative accent elements that are not status indicators.",
+      "Step indicators where numbered steps provide non-color differentiation."
+    ],
+    "mitigations": [
+      "Limit to elements within badge/indicator/status contexts. Exclude decorative elements and step indicators."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.badges.color-only.violation.status-dots",
+      "caseType": "violation",
+      "description": "A user management page with Status column showing only colored circles: red, green, yellow."
+    },
+    {
+      "fixtureId": "fixture.badges.color-only.control.labeled-badges",
+      "caseType": "control",
+      "description": "Same page with colored circles AND text labels."
+    },
+    {
+      "fixtureId": "fixture.badges.color-only.borderline.server-rack",
+      "caseType": "borderline",
+      "description": "A server rack dashboard with colored dots without labels but with a position legend."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is correct. Distinguishing status indicators from decorative elements requires element role/context analysis that static CSS cannot determine reliably. The detector should note that elements without role='status', aria-label, or nearby descriptive text cannot be confidently classified as status indicators."
+  ]
+}

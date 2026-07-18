@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.hierarchy.button-visual-levels",
+  "proposedRuleId": "hierarchy.button-visual-levels",
+  "title": "Use distinct button styles for primary and secondary actions",
+  "status": "researched",
+  "category": "hierarchy",
+  "surfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "AI-generated interfaces use the same button style for all actions, making it impossible to identify the recommended action.",
+  "instruction": "Define at least two distinct button visual levels: primary (filled, high contrast) and secondary (outlined, lower contrast). Reserve primary for the most important action per section.",
+  "rationale": "When every button uses the same style, users cannot distinguish the recommended next step. Button hierarchy is the visual equivalent of a CTA gradient. Flat hierarchies reduce conversion and increase decision time.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A marketing section with 'Sign Up Free', 'Learn More', 'Watch Demo' all using identical filled buttons.",
+      "A settings page with 'Save Changes', 'Reset', 'Cancel' all using the same style."
+    ],
+    "controls": [
+      "A CTA section with one filled primary ('Start Free Trial') and two outline secondary links.",
+      "A settings footer with filled 'Save Changes', outlined 'Reset', plain text 'Cancel'."
+    ],
+    "borderline": [
+      "A page with a single action (single CTA) where one button style suffices."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Toolbars where all buttons are icon-only with equal importance. Command palettes with text-only action lists. Navigation menus with equal-weight links.",
+      "examples": [
+        "Formatting toolbar",
+        "Command palette",
+        "Top navigation bar"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Group buttons by section proximity. Compare computed styles. If 3+ buttons share identical styling and one should be logically primary, flag.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "button",
+        "btn",
+        "cta"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot determine the logical primary action without semantic understanding.",
+      "Some button groups have genuinely equal-weight actions."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "A toolbar where all buttons are equally weighted.",
+      "A pricing page with three equally styled 'Choose Plan' buttons."
+    ],
+    "mitigations": [
+      "Check for section context. Flag only if the section has one primary goal AND multiple equally styled buttons."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.hierarchy.buttons.violation.all-primary",
+      "caseType": "violation",
+      "description": "A hero section with all buttons styled as filled primary."
+    },
+    {
+      "fixtureId": "fixture.hierarchy.buttons.control.layered",
+      "caseType": "control",
+      "description": "Same hero with filled primary, outline secondary, text tertiary."
+    },
+    {
+      "fixtureId": "fixture.hierarchy.buttons.borderline.pricing-equal",
+      "caseType": "borderline",
+      "description": "A pricing page with three equally styled 'Choose Plan' buttons where each plan is independently promoted."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Feasibility should be visual, not semantic. Detecting which button in a group is 'logically primary' requires understanding the section's purpose, which static CSS analysis cannot determine. A mechanical detector can count equally styled buttons but cannot recommend which should be demoted. Consider visual review as the primary detection mechanism."
+  ]
+}

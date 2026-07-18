@@ -1,0 +1,102 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.responsive.image-overflow",
+  "proposedRuleId": "responsive.image-overflow",
+  "title": "Images must not overflow their container on narrow viewports",
+  "status": "researched",
+  "category": "responsive",
+  "surfaces": [
+    "universal",
+    "marketing",
+    "editorial"
+  ],
+  "summary": "AI-generated layouts include images without max-width:100%, causing horizontal overflow on mobile viewports.",
+  "instruction": "Every image, video, and embedded media element must have max-width:100% and height:auto to prevent overflow.",
+  "rationale": "Fixed-width images exceeding viewport width cause horizontal scrolling, one of the most common responsive failures. The fix is a single CSS rule.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "An <img> with width=1200 height=600 and no max-width:100% CSS, causing mobile overflow.",
+      "A marketing section with a fixed 800px wide illustration overflowing the 375px viewport."
+    ],
+    "controls": [
+      "An <img> with max-width:100%; height:auto scaling down on mobile.",
+      "A picture element with responsive srcset and max-width:100% fallback."
+    ],
+    "borderline": [
+      "Background images via CSS background-image that need background-size:cover instead of max-width."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Images inside canvas/SVG with programmatic rendering, print stylesheets with fixed dimensions, and thumbnail lists where the container controls size.",
+      "examples": [
+        "SVG icons with viewBox scaling",
+        "Canvas-rendered charts",
+        "Print stylesheets"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Find img, video, iframe, embed elements without max-width:100% or width:100% in their CSS.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "max-width",
+        "width",
+        "img",
+        "video",
+        "iframe"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "External stylesheet CSS may be unreachable by static analysis.",
+      "Some frameworks apply responsive styles through utility classes not matching max-width:100%."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Images inside width:100% containers where the parent constrains them.",
+      "SVG elements scaling with viewBox."
+    ],
+    "mitigations": [
+      "Check for both max-width:100% and width:100% (which implies max-width in a constrained parent)."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.responsive.image-overflow.violation.fixed-width",
+      "caseType": "violation",
+      "description": "A responsive page with <img src='hero.jpg' width=1200 height=600> and no max-width CSS."
+    },
+    {
+      "fixtureId": "fixture.responsive.image-overflow.control.max-width",
+      "caseType": "control",
+      "description": "Same page with img { max-width: 100%; height: auto; }."
+    },
+    {
+      "fixtureId": "fixture.responsive.image-overflow.borderline.container-constrained",
+      "caseType": "borderline",
+      "description": "A page with <img style='width:100%'> inside a parent with max-width:1200px."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization downgrade: review-ready \u2192 researched. Impact label 'serious' overstated. A broken image layout is 'degraded' \u2014 users can still access content, it scrolls awkwardly but doesn't block core functionality. Source is generic original-observation; should reference CSS Responsive Design specs (MDN, CSS Intrinsic & Extrinsic Sizing) for proper provenance."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.forms.input-labels.control.signup-form-labeled",
+  "proposalId": "proposal.forms.input-labels-required",
+  "caseType": "control",
+  "profile": "marketing",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 401,
+      "sha256": "4869e49ceb9925c99bc9ebbea235f3ee411f6ce66fb701e7701c4610778d21f8"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "Same signup form with proper label associations and visible text labels above each input.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "Same signup form with proper label associations and visible text labels above each input.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic control fixture for proposal.forms.input-labels-required."
+  }
+}

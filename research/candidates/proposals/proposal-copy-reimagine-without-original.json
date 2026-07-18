@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.reimagine-without-original",
+  "proposedRuleId": "copy.reimagine-without-original",
+  "title": "Describe the transformation behind 'reimagine'",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated copy uses 'Reimagine [noun]' assuming the user agrees the current state needs reimagining, without specifying what changes.",
+  "instruction": "When using 'reimagine', describe what changes: the current approach, its limitations, and how the product changes it. 'Reimagine' alone is an empty promise.",
+  "rationale": "'Reimagine your workflow' presumes the current workflow is worth reimagining and that the product provides a genuinely new approach. Without specifics, the claim is interchangeable with any other product. Naming the before state ('Reimagine supply chain management with real-time visibility across 50+ carriers') grounds the claim.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'Reimagine your workflow' for a basic task management app.",
+      "'Reimagine customer engagement' for an email marketing tool with no novel approach."
+    ],
+    "controls": [
+      "'Reimagine your supply chain with real-time visibility across 50+ carriers and AI-powered delay prediction.'",
+      "'Reimagine the in-store shopping experience with AR try-ons that reduce returns by 30%.'"
+    ],
+    "borderline": [
+      "An art exhibit titled 'Reimagining the Renaissance' where reimagination is the creative medium \u2014 not a product claim."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Literary, artistic, or academic contexts where 'reimagine' describes creative reinterpretation. Product launches that genuinely change a category with a documented thesis.",
+      "examples": [
+        "Art exhibition title",
+        "Academic paper on restructuring a field",
+        "Well-articulated product vision"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find 'reimagine' in marketing copy. Check for specific mechanism, before-state, or transformation details nearby.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "reimagine",
+        "re-imagine"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish creative/artistic usage from product marketing.",
+      "Some legitimate product transformations have detailed vision documents not visible on the landing page."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Artistic or creative contexts where 'reimagine' describes the medium.",
+      "A genuine product transformation with a well-documented thesis on a linked page."
+    ],
+    "mitigations": [
+      "Check for transformation specifics within the same section. Accept linked case studies or vision pages as supporting context."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "vague-transformation",
+    "replacementStrategy": "Replace bare 'Reimagine [noun]' with a specific before/after description: what the current approach looks like, its limitations, and how the product changes it."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.reimagine.violation.bare-claim",
+      "caseType": "violation",
+      "description": "A landing page saying 'Reimagine customer support' with no specifics."
+    },
+    {
+      "fixtureId": "fixture.copy.reimagine.control.specific",
+      "caseType": "control",
+      "description": "Same page saying 'Reimagine support with AI that resolves 80% of tickets before a human touches them.'"
+    },
+    {
+      "fixtureId": "fixture.copy.reimagine.borderline.artistic",
+      "caseType": "borderline",
+      "description": "An art website using 'Reimagining the gallery experience' in a literal creative context."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

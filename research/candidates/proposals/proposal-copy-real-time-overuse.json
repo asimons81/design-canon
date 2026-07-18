@@ -1,0 +1,100 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.real-time-overuse",
+  "proposedRuleId": "copy.real-time-overuse",
+  "title": "Do not call 30-second sync 'real-time'",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "AI-generated copy labels features 'real-time' when near-real-time, periodic sync, or on-demand refresh would be accurate descriptions.",
+  "instruction": "Use 'real-time' only for sub-second latency on user-critical operations. For periodic sync, use accurate timing language ('syncs every 30 seconds', 'updates every 5 minutes').",
+  "rationale": "When a feature described as 'real-time' has a 5-minute refresh interval, users learn that the product's terminology is unreliable. Accurate latency descriptions build trust and set correct expectations.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'Real-time collaboration' on a document editor where changes sync every 5 seconds.",
+      "'Real-time dashboard' that refreshes every 15 minutes via cron job."
+    ],
+    "controls": [
+      "'Real-time audio processing for live captioning' with sub-200ms actual latency.",
+      "'Real-time stock prices' from a sub-second streaming data source."
+    ],
+    "borderline": [
+      "'Near real-time' as an accurate descriptor for a system with 1-3 second latency \u2014 acceptable if the term is used accurately to set expectations."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Real-time strategy games where 'real-time' is a genre label. Live event coverage where 'live' is accurate. Systems with documented sub-second latency.",
+      "examples": [
+        "RTS game genre label",
+        "Live sports scores from a low-latency API",
+        "WebSocket-based chat application"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Match 'real-time' in feature descriptions. Check for counter-signals: refresh intervals, sync schedules, or batch processing terminology within the same description.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "real-time",
+        "realtime",
+        "real time"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot measure actual system latency from static copy.",
+      "Some systems accurately use 'real-time' with documented sub-second latency."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Systems that legitimately operate at sub-second latency and document it.",
+      "Hardware monitoring dashboards where 'real-time' is technically accurate for sensor polling rates."
+    ],
+    "mitigations": [
+      "Flag only when 'real-time' appears without latency evidence or with counter-signals like 'refreshes every'."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "empty-adjective",
+    "replacementStrategy": "Replace 'real-time [feature]' with specific timing language: 'syncs every N seconds', 'streams live at sub-second latency', or 'updates automatically within N seconds'."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.real-time.violation.slow-sync",
+      "caseType": "violation",
+      "description": "A dashboard describing 'Real-time analytics' with a footnote 'Refreshes every 15 minutes'."
+    },
+    {
+      "fixtureId": "fixture.copy.real-time.control.accurate-timing",
+      "caseType": "control",
+      "description": "Same dashboard describing 'Auto-refreshing analytics (15-minute updates)'."
+    },
+    {
+      "fixtureId": "fixture.copy.real-time.borderline.streaming",
+      "caseType": "borderline",
+      "description": "A chat app with 'Real-time messaging' that uses WebSocket with sub-second delivery."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

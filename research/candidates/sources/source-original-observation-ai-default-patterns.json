@@ -1,0 +1,23 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.ai-default-patterns",
+  "sourceType": "original-observation",
+  "title": "AI-generated interface default patterns",
+  "sourceLocation": "Review of AI-generated marketing pages, dashboards, and product UIs from public code-generation outputs",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI coding agents consistently produce interfaces with centered layouts, purple gradients, pill-shaped elements, generic fonts, weak hierarchy, and templated copy patterns across marketing, product, and dashboard surfaces.",
+  "supportingClaims": [
+    "AI-generated UIs converge on a narrow set of visual defaults regardless of brand or content context.",
+    "The pattern set includes centered hero stacks, three-column pricing tables, feature cards with icon-headline-body stacks, and stat-card dashboards."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true,
+    "notes": "Original observation of AI-generated interface patterns across publicly shared code generation outputs."
+  }
+}

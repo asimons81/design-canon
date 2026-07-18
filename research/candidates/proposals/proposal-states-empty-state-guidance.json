@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.states.empty-state-guidance",
+  "proposedRuleId": "states.empty-state-guidance",
+  "title": "Empty states should guide not greet",
+  "status": "researched",
+  "category": "states",
+  "surfaces": [
+    "product-app",
+    "mobile"
+  ],
+  "summary": "AI-generated empty states use generic 'Nothing here yet' with decorative illustration, missing the chance to guide users.",
+  "instruction": "Every empty state should explain why content is absent, what the user can do, and provide a clear action. Avoid purely decorative illustrations without functional guidance.",
+  "rationale": "An empty state is a user's first interaction with a feature. Generic empty states waste this opportunity. Effective empty states reduce time-to-value by directing users to the first productive action.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "An empty dashboard with illustration of a person looking at an empty box, 'Nothing here yet', subtle 'Get Started' link.",
+      "An empty project list with 'No projects' without explanation or creation action."
+    ],
+    "controls": [
+      "An empty dashboard with 'Import your first data source' with an illustration of data flowing and a 'Connect Data' button.",
+      "An empty project list with 'Create your first project' with a prominent 'New Project' button and template gallery link."
+    ],
+    "borderline": [
+      "An error-based empty state ('No results found') where guidance is about refining the query, not creating content."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Error-based empty states (search no results) where guidance is about refining the query. System-notification panels that are genuinely empty.",
+      "examples": [
+        "No search results page with alternative queries",
+        "Disabled feature state with upgrade prompt"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Locate empty state sections (centered illustration + heading + optional body + optional CTA). Check if heading explains absence vs generic greeting.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "No * yet",
+        "Nothing here",
+        "Empty *",
+        "Get Started"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Some truly empty features have no user action available.",
+      "Decorative illustrations are hard to distinguish from functional ones programmatically."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "A genuinely empty feature where no action exists (disabled feature).",
+      "A system notification panel that is empty by nature."
+    ],
+    "mitigations": [
+      "Flag only when the empty state has both generic message AND no CTA or a generic CTA."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.states.empty-state.violation.generic-greeting",
+      "caseType": "violation",
+      "description": "An empty inbox with illustration of empty envelope, text 'No messages yet', and a 'Browse' link."
+    },
+    {
+      "fixtureId": "fixture.states.empty-state.control.actionable",
+      "caseType": "control",
+      "description": "Same page showing 'Send your first message' with a 'Compose Message' button."
+    },
+    {
+      "fixtureId": "fixture.states.empty-state.borderline.search-results",
+      "caseType": "borderline",
+      "description": "An empty search result with 'No results for query' with suggestions and 'Clear filters'."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is correctly assigned. Pattern matching against generic phrases ('Nothing here yet', 'No * yet') will miss custom implementations and generate false positives for legitimate empty states. The detector is a review trigger, not a definitive finding. Custom implementations may require human review."
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.data-integrity.human-readable-format",
+  "proposedRuleId": "data-integrity.human-readable-format",
+  "title": "Format data for human consumption",
+  "status": "researched",
+  "category": "data-integrity",
+  "surfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated interfaces display raw data values without formatting, localization, or contextual labels.",
+  "instruction": "Format every data value for its context: numbers with appropriate precision, currencies with symbols, dates in user locale, percentages with clear baselines.",
+  "rationale": "Timestamps like '2026-07-18T11:24:00Z' are machine-readable but user-hostile. Currency without symbols, raw floats, and unformatted dates all reduce comprehension and trust.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A dashboard showing revenue: 1234567.89 without currency symbol or separators.",
+      "A user activity feed showing ISO 8601 timestamps instead of relative or formatted dates."
+    ],
+    "controls": [
+      "Dashboard showing revenue as $1,234,567.89 with currency formatting.",
+      "Activity feed showing '2 hours ago' or 'Yesterday at 2:30 PM'."
+    ],
+    "borderline": [
+      "Developer consoles or API debug panels that intentionally show raw values."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Debug modes, data export views where raw values aid spreadsheet import, and scientific instruments where precision is the user's purpose.",
+      "examples": [
+        "API response viewer",
+        "CSV export preview",
+        "Scientific sensor readout"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Pattern-match ISO 8601 dates, float numbers with excessive precision, and unformatted numbers in visible text content.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "T",
+        "Z",
+        "000Z",
+        "ISO"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Data may be formatted by JavaScript Intl APIs at runtime.",
+      "Scientific interfaces legitimately need high precision."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Code examples in documentation (within <code> blocks).",
+      "Scientific dashboards with raw sensor readings."
+    ],
+    "mitigations": [
+      "Exclude <code>, <pre>, <samp> elements. Check for Intl API usage in JavaScript."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.data-integrity.format.violation.raw-data",
+      "caseType": "violation",
+      "description": "A user profile showing raw ISO dates, unformatted floats, and unseparated numbers."
+    },
+    {
+      "fixtureId": "fixture.data-integrity.format.control.formatted",
+      "caseType": "control",
+      "description": "Same profile showing formatted dates, percentages, and currency."
+    },
+    {
+      "fixtureId": "fixture.data-integrity.format.borderline.debug-panel",
+      "caseType": "borderline",
+      "description": "A dev dashboard showing raw JSON payload alongside formatted summaries."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is overstated. Phrase matching ('T', 'Z', 'ISO') will generate significant false positives in technical content, code blocks, and API documentation. A practical detector would need context exclusion rules and may still miss many violations. Consider narrowing to visible content outside <code>/<pre> elements only."
+  ]
+}

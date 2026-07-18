@@ -1,0 +1,99 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.ai-powered-modifier",
+  "proposedRuleId": "copy.ai-powered-modifier",
+  "title": "Do not use 'AI-powered' as a default feature modifier",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing",
+    "product-app"
+  ],
+  "summary": "AI-generated copy appends 'AI-powered' to every feature description regardless of whether AI is the primary mechanism or a meaningful differentiator.",
+  "instruction": "Use 'AI-powered' only when AI/ML is the core mechanism and meaningful differentiator of the feature. Describe what the feature actually does rather than slapping 'AI' on it.",
+  "rationale": "When every feature is 'AI-powered', the term loses all differentiation. Users cannot distinguish genuinely AI-driven capabilities from conventional features. Describing the actual function ('Summarizes 50-page documents in 8 seconds') is more informative and honest.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "'AI-powered analytics dashboard' where the analytics are standard aggregations and SQL queries.",
+      "'AI-powered email responses' for a template-based reply system with no ML component."
+    ],
+    "controls": [
+      "'AI-powered background removal' using a real computer vision model \u2014 AI is the core mechanism and differentiator.",
+      "'AI-powered translation in 95 languages' where the AI model is the primary technology."
+    ],
+    "borderline": [
+      "A feature description for an AI company where 'AI-powered' is part of the brand promise and the entire product IS AI \u2014 should still describe the specific mechanism."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Products whose core technology IS AI (e.g., OpenAI, Anthropic) where 'AI-powered' is a category descriptor, not a feature modifier. Academic or technical documentation specifying the ML approach.",
+      "examples": [
+        "API documentation for an AI model endpoint",
+        "Product description for an AI-first company"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Match 'AI-powered' or 'AI driven' as a feature modifier in marketing copy. Check if the surrounding description explains the AI mechanism or just uses the phrase decoratively.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "AI-powered",
+        "AI driven",
+        "powered by AI"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot determine whether AI is genuinely the core mechanism without product understanding.",
+      "Some features legitimately use AI as the primary differentiator."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "An AI-first company where every feature is genuinely AI-driven.",
+      "Technical documentation accurately describing the AI component."
+    ],
+    "mitigations": [
+      "Flag only marketing copy, not technical docs. Check for specificity in the 50 characters following 'AI-powered'."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "empty-adjective",
+    "replacementStrategy": "Replace 'AI-powered [feature]' with a specific description of what the feature does and how it achieves it. Reserve 'AI' for features where it's the genuine differentiator."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.ai-powered.violation.decorative",
+      "caseType": "violation",
+      "description": "A SaaS page listing 'AI-powered analytics, AI-powered reports, AI-powered dashboards' with no mechanism description."
+    },
+    {
+      "fixtureId": "fixture.copy.ai-powered.control.specific",
+      "caseType": "control",
+      "description": "Same page describing 'Real-time analytics' and 'Automated report generation' without the AI prefix, with one genuinely AI feature described specifically."
+    },
+    {
+      "fixtureId": "fixture.copy.ai-powered.borderline.ai-company",
+      "caseType": "borderline",
+      "description": "An AI API company's landing page where 'AI-powered' describes the platform category."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

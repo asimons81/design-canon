@@ -1,0 +1,100 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.mobile.touch-target-minimum",
+  "proposedRuleId": "mobile.touch-target-minimum",
+  "title": "Touch targets must meet minimum size requirements",
+  "status": "review-ready",
+  "category": "mobile",
+  "surfaces": [
+    "mobile"
+  ],
+  "summary": "AI-generated mobile interfaces often have touch targets smaller than 44x44px, causing user frustration on touch devices.",
+  "instruction": "On mobile interfaces, ensure every interactive element has a rendered touch target of at least 44x44 CSS pixels. Use padding to extend the hit area beyond the visible element. This is an Apple HIG recommendation for comfortable touch interaction.",
+  "rationale": "Apple HIG recommends a minimum 44x44pt touch target for comfortable interaction across iOS device sizes. Users with larger fingers, reduced dexterity, or using the device one-handed need generous tap areas. Small targets increase error rates disproportionately. This rule applies the Apple guideline as a mobile-specific design standard.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-guidance.apple-touch-targets"
+  ],
+  "examples": {
+    "violations": [
+      "A mobile navigation with 24px-tall links and 4px gaps between them.",
+      "Icon buttons (edit, delete, share) at 28x28px without padding extending the hit area."
+    ],
+    "controls": [
+      "Mobile navigation links with 48px height and 8px gap between interactive rows.",
+      "Icon buttons at 24x24px visible size with total 44x44px touch target through transparent padding."
+    ],
+    "borderline": [
+      "Interactive elements in a scrollable data table where 44px row height reduces data density - needs documented tradeoff."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Desktop-only interfaces where touch is not the primary input. Elements inside scrollable containers where the parent handles touch. Inline text links within paragraphs.",
+      "examples": [
+        "Desktop admin panel",
+        "Map pin markers",
+        "Inline hyperlinks in article text"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "For interactive elements (a, button, input, select, [role=button]), compute the rendered box-model touch area including padding and border. Flag if the total area is smaller than 44x44 CSS pixels at mobile viewport breakpoints.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "computed touch area",
+        "rendered box size",
+        "hit region"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Static CSS analysis can approximate dimensions but only the rendered box model gives the actual touch target size.",
+      "JavaScript-determined touch areas and custom gesture handlers may not appear in static source.",
+      "Responsive elements that resize at different breakpoints must be evaluated per breakpoint.",
+      "Overlapping elements may have effective touch areas differing from their box-model dimensions."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Desktop-only interfaces where touch is not the primary input.",
+      "Inline text links where 44px would break paragraph flow."
+    ],
+    "mitigations": [
+      "Apply only at mobile viewport breakpoints (<768px). Exclude inline text links."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.mobile.touch-targets.violation.small-buttons",
+      "caseType": "violation",
+      "description": "A mobile form with 32px submit button, 28px icon buttons, 24px navigation links."
+    },
+    {
+      "fixtureId": "fixture.mobile.touch-targets.control.adequate-sizing",
+      "caseType": "control",
+      "description": "Same page with 48px submit button, 44px icon buttons via padding, 44px nav links."
+    },
+    {
+      "fixtureId": "fixture.mobile.touch-targets.borderline.data-table",
+      "caseType": "borderline",
+      "description": "A mobile data table with 36px row heights but 44px touch-friendly checkboxes leading each row."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization correction: scoped to mobile surfaces and Apple HIG only. Removed Material Design reference (no source record). Changed detector from static CSS-property to rendered-box measurement. Maintainer review."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.accessibility.skip-link.borderline.spa-routing",
+  "proposalId": "proposal.accessibility.skip-navigation-link",
+  "caseType": "borderline",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 651,
+      "sha256": "f1aadcadcfe954a3469627be32face3c68b6b55d0593c78f351153f03a00498a"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "An SPA with no skip link but programmatic focus management on route navigation.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "An SPA with no skip link but programmatic focus management on route navigation.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic borderline fixture for proposal.accessibility.skip-navigation-link."
+  }
+}

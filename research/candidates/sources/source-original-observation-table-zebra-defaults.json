@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.table-zebra-defaults",
+  "sourceType": "original-observation",
+  "title": "AI-generated table styling defaults",
+  "sourceLocation": "Review of AI-generated admin panels and data-display code from multiple code-generation tools",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI coding agents apply full-cell borders, alternating row colors, and equal-width columns to every table by default, regardless of data volume or column count.",
+  "supportingClaims": [
+    "Small tables (under 10 rows) with zebra striping add unnecessary visual noise.",
+    "Equal-width columns in tables with uneven content waste horizontal space."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

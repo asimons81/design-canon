@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.accessibility.skip-link.control.with-skip",
+  "proposalId": "proposal.accessibility.skip-navigation-link",
+  "caseType": "control",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 967,
+      "sha256": "5fce7466b15a8f7fb344ca0b71c00160583bbabb631ba566be7564c97563e9cf"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "Same page with a visible-on-focus skip-to-content link as the first element after body.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "Same page with a visible-on-focus skip-to-content link as the first element after body.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic control fixture for proposal.accessibility.skip-navigation-link."
+  }
+}

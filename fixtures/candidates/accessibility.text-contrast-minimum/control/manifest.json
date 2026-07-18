@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../schema/candidate-fixture.schema.json",
+  "schemaVersion": 1,
+  "fixtureId": "fixture.accessibility.text-contrast.control.dark-text-white-bg",
+  "proposalId": "proposal.accessibility.text-contrast-minimum",
+  "caseType": "control",
+  "profile": "universal",
+  "surface": "web-interface",
+  "sourceFiles": [
+    {
+      "path": "index.html",
+      "language": "html",
+      "bytes": 513,
+      "sha256": "3da77b8ca5a1868862796edd1c00b24352f6a54ae10aa7a4aedc54efad18c551"
+    }
+  ],
+  "constraints": {
+    "selfContained": true,
+    "externalDependencies": false,
+    "networkAccess": false,
+    "deterministic": true,
+    "syntheticContent": true
+  },
+  "expected": {
+    "currentDeterministic": [],
+    "semanticExpectations": [
+      {
+        "description": "Same page with body text at #333 on white background passing WCAG AA.",
+        "reviewerType": "future-detector"
+      }
+    ],
+    "mustNotTrigger": []
+  },
+  "rationale": "Same page with body text at #333 on white background passing WCAG AA.",
+  "provenance": {
+    "generatedForProposal": true,
+    "cleanRoom": true,
+    "noCopiedInterface": true,
+    "notes": "Synthetic control fixture for proposal.accessibility.text-contrast-minimum."
+  }
+}

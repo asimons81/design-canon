@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.motion.respect-reduced-motion",
+  "proposedRuleId": "motion.respect-reduced-motion",
+  "title": "Respect prefers-reduced-motion",
+  "status": "review-ready",
+  "category": "motion",
+  "surfaces": [
+    "universal"
+  ],
+  "summary": "AI-generated animations often lack prefers-reduced-motion support, ignoring vestibular accessibility needs and causing discomfort.",
+  "instruction": "Wrap non-essential animations in a prefers-reduced-motion media query. Provide a motion-reduced alternative that preserves the interaction's functional outcome without visual movement.",
+  "rationale": "Motion can cause vestibular discomfort, nausea, and disorientation for some users. WCAG 2.3.3 (Animation from Interactions) requires a mechanism to pause or hide motion animations triggered by user interaction, with prefers-reduced-motion as the standard implementation. This rule extends that principle to decorative and non-essential animations as a Design Canon best practice: protecting accessibility without banning motion entirely.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.official-standard.wcag-motion"
+  ],
+  "examples": {
+    "violations": [
+      "A hero with 5-second looping video, parallax scrolling, and animated text reveals, none wrapped in prefers-reduced-motion.",
+      "A dashboard with animated chart transitions, spinning indicators, and sliding notifications that cannot be disabled."
+    ],
+    "controls": [
+      "A marketing page with CSS transitions that respect prefers-reduced-motion, replacing slide animations with crossfades.",
+      "A presentation tool with a global toggle that sets prefers-reduced-motion, disabling non-essential animations."
+    ],
+    "borderline": [
+      "Essential animations like progress bars and loading spinners may remain visible in reduced-motion mode but should stop looping or reduce speed."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Critical-system alerts using animation to draw attention and user-initiated video playback where the user controls playback.",
+      "examples": [
+        "Emergency alert flash",
+        "User-pressed play on a video",
+        "Progress indicator during a file upload"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "mechanical",
+    "signalDescription": "Search for CSS animations, transitions, and @keyframes. Check for prefers-reduced-motion media query wrapping those animations.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "@keyframes",
+        "animation",
+        "transition"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "JavaScript-based animation libraries (GSAP, Framer Motion) may not expose animations in static CSS analysis.",
+      "Video autoplay is a separate concern not detectable from CSS alone."
+    ]
+  },
+  "impact": "serious",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Micro-interactions like button hover effects that are essential to interaction feedback.",
+      "Animations that play only once on page load (not looping) with brief duration."
+    ],
+    "mitigations": [
+      "Exclude micro-interactions (hover states, button presses, focus transitions under 300ms). Focus on looping, continuous, and decorative animations."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.motion.reduced-motion.violation.no-preference",
+      "caseType": "violation",
+      "description": "A landing page with keyframe animations and no prefers-reduced-motion wrapping."
+    },
+    {
+      "fixtureId": "fixture.motion.reduced-motion.control.with-preference",
+      "caseType": "control",
+      "description": "Same page with all animations wrapped in @media (prefers-reduced-motion: no-preference) and reduced alternatives."
+    },
+    {
+      "fixtureId": "fixture.motion.reduced-motion.borderline.essential-animation",
+      "caseType": "borderline",
+      "description": "A page with only a button hover effect (transform: scale) which is essential feedback, no prefers-reduced-motion needed."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization correction: removed unsourced 15-20% prevalence statistic. Aligned WCAG 2.3.3 reference with its actual scope (animations from interactions). De-duplicated JS library limitation. Framed broader motion guidance as Design Canon best practice rather than WCAG conformance claim. Maintainer review."
+  ]
+}

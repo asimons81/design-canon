@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.copy.get-started-cta-default",
+  "proposedRuleId": "copy.get-started-cta-default",
+  "title": "Replace 'Get Started' with a context-specific CTA",
+  "status": "researched",
+  "category": "copy",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated copy uses 'Get Started' as the universal CTA regardless of context, telling users nothing about what they are starting or what happens next.",
+  "instruction": "Use CTAs that reflect the user's actual first action: 'Build your first dashboard', 'Create your workspace', 'Import your data' \u2014 not the generic 'Get Started'.",
+  "rationale": "'Get Started' does not tell users what they are starting or what will happen when they click. A context-specific CTA ('Build your first report') gives users actionable information about what the action entails.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A landing page using 'Get Started' as the primary CTA with no product context.",
+      "Every section CTA on a page uses 'Get Started' for different actions (trial, demo, download)."
+    ],
+    "controls": [
+      "'Build your first dashboard in under 2 minutes' as a CTA that sets expectations.",
+      "'Start your 14-day free trial (no credit card)' with explicit terms."
+    ],
+    "borderline": [
+      "A well-known brand where 'Get Started' is part of a recognizable brand pattern and the user already understands the product."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Brands where 'Get Started' is part of a consistent, tested design pattern with supporting context nearby. Internal tools where the audience already understands the action.",
+      "examples": [
+        "Onboarding flow with 'Get Started' as the first of multi-step labels",
+        "Well-known SaaS with contextual tooltips"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Find 'Get Started' button/link text. Check for nearby descriptive context that explains what the user is starting. Flag when 'Get Started' is the sole CTA descriptor.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "Get Started",
+        "get started"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "An onboarding flow may use 'Get Started' as the first step label, which is appropriate.",
+      "Some A/B tested CTAs show 'Get Started' outperforming alternatives \u2014 these should be documented exceptions."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Multi-step onboarding where 'Get Started' is the first step label \u2014 appropriate for flow context.",
+      "A/B test results showing 'Get Started' outperforms alternatives \u2014 documented preference should suppress.",
+      "A well-known consumer product where 'Get Started' is part of a consistent brand pattern with sufficient supporting context."
+    ],
+    "mitigations": [
+      "Check for step-progression context (progress bar, step count). Accept documented A/B results as suppressible. Inspect enough nearby hero or section context to determine whether the action the CTA starts is described elsewhere in the view."
+    ]
+  },
+  "copyPattern": {
+    "patternClass": "repetitive-cta",
+    "replacementStrategy": "Replace 'Get Started' with a CTA that names the user's first action: 'Build your first [X]', 'Create your [Y]', 'Import your [Z]'."
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.copy.cta.violation.get-started-default",
+      "caseType": "violation",
+      "description": "A landing page with 'Get Started' as the primary hero CTA and no product context."
+    },
+    {
+      "fixtureId": "fixture.copy.cta.control.specific-action",
+      "caseType": "control",
+      "description": "Same page with 'Build your first workflow in 5 minutes' as the primary CTA."
+    },
+    {
+      "fixtureId": "fixture.copy.cta.borderline.onboarding-step",
+      "caseType": "borderline",
+      "description": "An onboarding wizard with 'Get Started' as step 1 of a multi-step flow."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

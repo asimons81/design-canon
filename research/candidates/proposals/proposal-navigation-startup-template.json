@@ -1,0 +1,100 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.navigation.startup-template",
+  "proposedRuleId": "navigation.startup-template",
+  "title": "Do not default to the startup navigation template",
+  "status": "researched",
+  "category": "navigation",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated marketing site navigation universally follows the same template: logo left, four center links (Product, Features, Pricing, About), and two right CTAs (Log In, Get Started).",
+  "instruction": "Navigation labels should reflect the site's actual content, not generic category labels. When navigation consists entirely of Product, Features, Pricing, About, Log In, and Get Started, the labels may be coming from a template rather than the product's information architecture.",
+  "rationale": "Generic navigation labels (Product, Features, Pricing, About) communicate nothing about what makes the product distinctive. Navigation is a content directory \u2014 its labels should name the actual features, sections, or content categories the product offers. This is design-review guidance, not a mechanical check.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A landing page with exactly Logo, Product, Features, Pricing, About, Log In, Get Started in the navigation.",
+      "A B2B enterprise tool with a consumer-startup navigation template (same seven items)."
+    ],
+    "controls": [
+      "A documentation-site navigation reflecting the actual doc structure rather than marketing template.",
+      "A product-specific navigation naming features by their actual names rather than generic labels."
+    ],
+    "borderline": [
+      "A startup where the four-link structure happens to match the actual IA after thoughtful design."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Startups where the four-category structure accurately reflects the information architecture after deliberate design.",
+      "examples": [
+        "A genuinely simple product with four features",
+        "A landing page where IA research validated the structure"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "manual-only",
+    "signalDescription": "As a manual design-review check: extract navigation link labels and compare against the generic set {Product, Features, Pricing, About, Log In, Get Started}. A match of 5+ labels may indicate template-style naming rather than IA-driven navigation. This is a review prompt, not a detector finding.",
+    "matcherProposal": {
+      "kind": "phrase",
+      "patterns": [
+        "Product",
+        "Features",
+        "Pricing",
+        "About",
+        "Log In",
+        "Get Started"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Some products genuinely have Product, Features, Pricing, and About sections.",
+      "Label synonyms ('Plans' vs 'Pricing', 'Sign In' vs 'Log In') may not match exact template names."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "high",
+    "scenarios": [
+      "A product whose actual IA maps naturally to the template labels.",
+      "A/B test results showing the template labels outperform alternatives."
+    ],
+    "mitigations": [
+      "Check for label synonyms. Only flag when labels match the template nearly exactly (5 of 7 items). Accept documented IA rationale."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.navigation.template.violation.startup-nav",
+      "caseType": "violation",
+      "description": "A landing page with exactly Logo, Product, Features, Pricing, About, Log In, Get Started."
+    },
+    {
+      "fixtureId": "fixture.navigation.template.control.custom-ia",
+      "caseType": "control",
+      "description": "Same product with navigation reflecting its actual content structure."
+    },
+    {
+      "fixtureId": "fixture.navigation.template.borderline.genuine-match",
+      "caseType": "borderline",
+      "description": "A product whose IA genuinely maps to the template labels after research."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization correction: removed 'recognizable template' hyperbole. Kept as manual design-review guidance. Detector already correctly assigned as manual-only."
+  ]
+}

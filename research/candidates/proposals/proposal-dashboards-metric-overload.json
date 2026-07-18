@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.dashboards.metric-overload",
+  "proposedRuleId": "dashboards.metric-overload",
+  "title": "Limit visible metrics to the decision-critical few",
+  "status": "researched",
+  "category": "tables",
+  "surfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated dashboards display every possible metric simultaneously, overwhelming users rather than supporting decisions.",
+  "instruction": "Show no more than 7 key metrics on any single dashboard view. Prioritize by decision frequency and impact. Surface secondary metrics through drill-down or dedicated views.",
+  "rationale": "When everything is a KPI, nothing is a KPI. Cognitive load research (Miller's Law applied to dashboards) suggests 5-7 items is the effective scanning limit. Dashboards displaying 15+ metrics force users to find their own signal in noise.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.dashboard-metric-overload"
+  ],
+  "examples": {
+    "violations": [
+      "A business dashboard showing 15 metrics: revenue, users, sessions, conversion rate, bounce rate, churn, NPS, tickets, response time, MRR, ARPU, LTV, CAC, ROI on one screen.",
+      "An analytics dashboard with 12 equal-weight stat cards in a grid."
+    ],
+    "controls": [
+      "A dashboard showing 5 key metrics with secondary metrics accessible from a side panel.",
+      "An operations dashboard with 4 top-level metrics and expandable sections for detailed breakdowns."
+    ],
+    "borderline": [
+      "A monitoring dashboard during incident response may need more metrics visible temporarily."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Executive dashboards where every metric has been explicitly approved. Compliance dashboards displaying mandated regulatory requirements.",
+      "examples": [
+        "Board meeting dashboard with stakeholder-approved KPIs",
+        "GDPR compliance metrics display"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "visual",
+    "signalDescription": "Detect metric-card patterns (number + label + optional mini-chart + optional change indicator). Count them. Flag if >7 are visible at the same viewport.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "stat card",
+        "metric card",
+        "KPI"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Multi-tab dashboards may show different metrics per tab.",
+      "Cannot detect scrollable metric lists below the fold.",
+      "Cannot determine which metrics are decision-critical without semantic context."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Multi-tab dashboards loading 4-5 metrics per tab.",
+      "Operations-center wallboards designed for large displays."
+    ],
+    "mitigations": [
+      "Flag only metrics visible in the initial viewport without scrolling. Check for tab/accordion patterns."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.dashboards.metrics.violation.overloaded",
+      "caseType": "violation",
+      "description": "A dashboard with 12 metric cards in a 4x3 grid showing all available metrics."
+    },
+    {
+      "fixtureId": "fixture.dashboards.metrics.control.focused",
+      "caseType": "control",
+      "description": "A dashboard with 5 prioritized metrics and a View All link to a secondary page."
+    },
+    {
+      "fixtureId": "fixture.dashboards.metrics.borderline.eight-metrics-fold",
+      "caseType": "borderline",
+      "description": "A dashboard with 8 metrics where 5 are above the fold and 3 below (not all visible simultaneously)."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Visual feasibility is correctly assigned. The 7-metric threshold is a design heuristic, not a definitive finding. A detector can estimate metric card count from visual structure but cannot determine decision-criticality. The instruction should frame the principle ('fewer, prioritized metrics') rather than prescribing a hard number."
+  ]
+}

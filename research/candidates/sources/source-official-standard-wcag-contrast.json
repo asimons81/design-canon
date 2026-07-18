@@ -1,0 +1,24 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.official-standard.wcag-contrast",
+  "sourceType": "official-standard",
+  "title": "WCAG 2.2 Success Criterion 1.4.3 Contrast (Minimum)",
+  "publisher": "W3C",
+  "url": "https://www.w3.org/TR/WCAG22/#contrast-minimum",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "explicit-open-license",
+  "license": "CC-BY-4.0",
+  "summary": "WCAG requires a contrast ratio of at least 4.5:1 for normal text and 3:1 for large text (18px bold or 24px regular) between text and its background.",
+  "supportingClaims": [
+    "Text contrast below 4.5:1 fails WCAG AA and is the most common accessibility failure in web interfaces.",
+    "Large text has a relaxed threshold of 3:1 but still requires deliberate color selection."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

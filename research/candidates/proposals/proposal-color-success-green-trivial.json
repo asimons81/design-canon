@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.color.success-green-trivial",
+  "proposedRuleId": "color.success-green-trivial",
+  "title": "Reserve green for semantically meaningful success states",
+  "status": "researched",
+  "category": "color",
+  "surfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated interfaces use green as the default color for every completed operation, from trivial field saves to permanent deletions, diluting the semantic meaning of green across badges, inline states, and transient messages.",
+  "instruction": "Green should indicate a meaningful state change that benefits from confirmation feedback. Trivial operations (field auto-save, item selection) should use neutral feedback. Reserve green for operations that complete a user goal, and use it consistently across color-coded badges, inline indicators, and transient messages.",
+  "rationale": "When green appears for every interaction \u2014 preference saved, email sent, item deleted, password changed \u2014 users cannot distinguish routine system noise from meaningful state changes. The color channel loses its semantic weight. Green should communicate 'goal achieved' consistently whether it appears on a badge, an inline success message, or a transient toast.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.ai-default-patterns"
+  ],
+  "examples": {
+    "violations": [
+      "A settings page showing green success toasts for every field auto-save, including toggling dark mode on and off.",
+      "A file manager showing a green 'Deleted' confirmation for every file removal, including Trash operations."
+    ],
+    "controls": [
+      "A settings page that auto-saves without toast feedback; only showing success for goal-completing actions like 'Password changed'.",
+      "A file manager that shows a green confirmation only for permanent deletion, not for moving to Trash."
+    ],
+    "borderline": [
+      "An e-commerce checkout where every step shows green \u2014 'Item added to cart', 'Shipping saved', 'Payment processed' \u2014 where each is a meaningful milestone."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Multi-step flows where each step completion is a meaningful milestone. Accessibility requirements where users need confirmation cues for all actions.",
+      "examples": [
+        "Checkout flow with step-by-step green indicators",
+        "A user preference needing explicit confirmation"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "manual-only",
+    "signalDescription": "Review the application's green-color usage across all feedback surfaces: badges, inline messages, toasts, and status indicators. Assess whether green is reserved for goal-completing operations or applied reflexively to every completed action.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "success",
+        "saved",
+        "updated",
+        "completed"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Cannot distinguish trivial from meaningful operations without semantic understanding.",
+      "Some users or accessibility settings may request confirmation for all actions."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "medium",
+    "scenarios": [
+      "Multi-step flows where each step is a meaningful milestone.",
+      "Accessibility-driven confirmation requirements."
+    ],
+    "mitigations": [
+      "Review the density of green indicators across the application. If green appears for field-level operations (auto-save, toggle) as frequently as for goal-completing operations (order placed, account created), the semantic distinction has collapsed."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.color.success-green.violation.every-save",
+      "caseType": "violation",
+      "description": "A settings page showing green toast for every toggle and field change."
+    },
+    {
+      "fixtureId": "fixture.color.success-green.control.meaningful-only",
+      "caseType": "control",
+      "description": "Same page with green only for goal-completing actions like password change."
+    },
+    {
+      "fixtureId": "fixture.color.success-green.borderline.checkout-steps",
+      "caseType": "borderline",
+      "description": "An e-commerce checkout where each step gets a green indicator as a meaningful milestone."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  },
+  "notes": [
+    "Normalization correction: rewritten as genuinely color-specific rule covering green semantics across badges, inline states, and transient messages. Detector changed to manual-only. Removed arbitrary 10+ threshold. This rule is now distinct from states.toast-notification-overuse \u2014 it focuses on the color signal itself, not the notification mechanism."
+  ]
+}
