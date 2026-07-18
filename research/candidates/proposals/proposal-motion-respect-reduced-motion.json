@@ -11,7 +11,7 @@
   ],
   "summary": "AI-generated animations often lack prefers-reduced-motion support, ignoring vestibular accessibility needs and causing discomfort.",
   "instruction": "Wrap non-essential animations in a prefers-reduced-motion media query. Provide a motion-reduced alternative that preserves the interaction's functional outcome without visual movement.",
-  "rationale": "Motion can cause vestibular discomfort, nausea, and disorientation for 15-20% of the population. WCAG requires a mechanism to pause or hide non-essential motion. A proper reduced-motion implementation protects accessibility without banning motion entirely, preserving both user comfort and animated interfaces.",
+  "rationale": "Motion can cause vestibular discomfort, nausea, and disorientation for some users. WCAG 2.3.3 (Animation from Interactions) requires a mechanism to pause or hide motion animations triggered by user interaction, with prefers-reduced-motion as the standard implementation. This rule extends that principle to decorative and non-essential animations as a Design Canon best practice: protecting accessibility without banning motion entirely.",
   "claimType": "research-backed",
   "sourceIds": [
     "source.official-standard.wcag-motion"
@@ -53,9 +53,8 @@
       "caseSensitive": false
     },
     "limitations": [
-      "JavaScript-based animation libraries (GSAP, Framer Motion) may not expose animations in static CSS.",
-      "Video autoplay is a separate concern not detectable from CSS alone.",
-      "JavaScript-based animation libraries (GSAP, Framer Motion, anime.js) may not expose animations in static CSS analysis. The detector covers CSS @keyframes and transition declarations but cannot detect animations injected via JS runtime calls."
+      "JavaScript-based animation libraries (GSAP, Framer Motion) may not expose animations in static CSS analysis.",
+      "Video autoplay is a separate concern not detectable from CSS alone."
     ]
   },
   "impact": "serious",
@@ -94,6 +93,6 @@
     "originalSynthesis": true
   },
   "notes": [
-    "Normalization revision: added honest limitation about JS animation libraries being invisible to CSS-static detection. WCAG 2.3.3 source confirmed."
+    "Normalization correction: removed unsourced 15-20% prevalence statistic. Aligned WCAG 2.3.3 reference with its actual scope (animations from interactions). De-duplicated JS library limitation. Framed broader motion guidance as Design Canon best practice rather than WCAG conformance claim. Maintainer review."
   ]
 }

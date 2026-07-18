@@ -3,27 +3,27 @@
   "schemaVersion": 1,
   "proposalId": "proposal.accessibility.skip-navigation-link",
   "proposedRuleId": "accessibility.skip-navigation-link",
-  "title": "Provide a skip-to-content link",
+  "title": "Provide a mechanism to bypass repeated content blocks",
   "status": "review-ready",
   "category": "accessibility",
   "surfaces": [
     "universal"
   ],
-  "summary": "AI-generated interfaces lack skip-navigation links, forcing keyboard users to tab through every navigation item before reaching main content.",
-  "instruction": "Include a visible-on-focus skip-to-content link as the first focusable element on every page. The link must become visible when focused via keyboard navigation.",
-  "rationale": "WCAG 2.4.1 (Bypass Blocks) requires a mechanism to skip repeated content. On a page with 10 navigation links, a keyboard user must tab through every one on every page visit. The standard solution is a skip link, which benefits screen reader users, keyboard navigators, and power users.",
+  "summary": "AI-generated interfaces lack a mechanism to skip repeated navigation blocks, forcing keyboard users to tab through every item before reaching main content.",
+  "instruction": "Provide a mechanism for keyboard users to bypass repeated navigation and header content. A skip-to-content link is the preferred technique: place it as the first focusable element and make it visible on keyboard focus. Other conforming mechanisms include well-structured ARIA landmark regions and proper heading hierarchy. Absence of a skip link alone does not prove a WCAG failure if another bypass mechanism is present.",
+  "rationale": "WCAG 2.4.1 (Bypass Blocks) requires a mechanism to skip repeated content blocks. A skip link is the most widely supported technique, providing a consistent experience across browsers, screen readers, and keyboard navigation modes. ARIA landmarks and proper heading structure can also satisfy the requirement but may not be available in all user agents.",
   "claimType": "research-backed",
   "sourceIds": [
     "source.official-standard.wcag-bypass-blocks"
   ],
   "examples": {
     "violations": [
-      "A marketing page with 8 nav links plus search before main content and no skip link.",
-      "A dashboard with a 15-item sidebar and no skip-link at the top of the page."
+      "A marketing page with 8 navigation links, a search bar, and utility links before the main content, with no skip link and no ARIA landmark structure bypassing the navigation region.",
+      "A dashboard with a 15-item sidebar and no skip-link or other bypass mechanism at the top of the page."
     ],
     "controls": [
-      "A page with <a href='#main-content' class='skip-link'>Skip to content</a> as the first focusable element, visible on focus.",
-      "A page with a skip-link visually hidden via clip/position but visible on keyboard focus."
+      "A page with <a href='#main-content' class='skip-link'>Skip to content</a> as the first focusable element, visible on keyboard focus.",
+      "A page using ARIA landmark regions (role='navigation', role='main') with proper heading structure that enables screen reader landmark navigation."
     ],
     "borderline": [
       "Single-page applications where content regions load dynamically - the skip link should target the content container that updates."
@@ -41,7 +41,7 @@
   "universalBan": false,
   "detector": {
     "feasibility": "mechanical",
-    "signalDescription": "Check if the first focusable element in the DOM is a skip-link (anchor with href targeting a main-content region, or a button with skip text). Verify a target main element or id='content' exists.",
+    "signalDescription": "Check if any bypass mechanism exists: a skip-link (anchor with href targeting main-content), role='main' landmark, or programmatic focus management. Skip-link presence is the primary mechanical signal but absence is not necessarily a WCAG failure.",
     "matcherProposal": {
       "kind": "dom-structure",
       "patterns": [
@@ -49,13 +49,14 @@
         "[role='main']",
         "#content",
         "#main-content",
-        ".skip-link"
+        ".skip-link",
+        "[role='navigation']"
       ],
       "caseSensitive": false
     },
     "limitations": [
-      "Skip links added by JavaScript after page load may not appear in static DOM.",
-      "Some frameworks manage focus programmatically, making skip links unnecessary."
+      "Skip links added by JavaScript after page load may not appear in static DOM analysis.",
+      "Some frameworks manage focus programmatically, making a skip link unnecessary. The detector can verify skip-link presence but cannot prove WCAG failure from absence alone."
     ]
   },
   "impact": "serious",
@@ -94,6 +95,6 @@
     "originalSynthesis": true
   },
   "notes": [
-    "Normalization revision: impact and detection verified against WCAG 2.4.1. Source reference confirmed. Detector correctly scoped to DOM structure check."
+    "Normalization correction: reframed from skip-link mandate to bypass-blocks requirement per WCAG 2.4.1. Skip link described as preferred technique, not sole conforming mechanism. Detector limitations clarified to avoid implying WCAG failure from skip-link absence alone. Maintainer review."
   ]
 }

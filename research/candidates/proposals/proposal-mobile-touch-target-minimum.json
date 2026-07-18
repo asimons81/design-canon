@@ -7,12 +7,11 @@
   "status": "review-ready",
   "category": "mobile",
   "surfaces": [
-    "mobile",
-    "universal"
+    "mobile"
   ],
-  "summary": "AI-generated mobile interfaces often have touch targets smaller than 44x44px, causing user frustration and accessibility failures.",
-  "instruction": "Ensure every interactive element has a touch target of at least 44x44 CSS pixels. Use padding to extend the hit area beyond the visible element.",
-  "rationale": "Apple HIG and Material Design both recommend 44-48px minimum touch targets. Users with larger fingers, reduced dexterity, or using the device one-handed need generous tap areas. Small targets increase error rates disproportionately.",
+  "summary": "AI-generated mobile interfaces often have touch targets smaller than 44x44px, causing user frustration on touch devices.",
+  "instruction": "On mobile interfaces, ensure every interactive element has a rendered touch target of at least 44x44 CSS pixels. Use padding to extend the hit area beyond the visible element. This is an Apple HIG recommendation for comfortable touch interaction.",
+  "rationale": "Apple HIG recommends a minimum 44x44pt touch target for comfortable interaction across iOS device sizes. Users with larger fingers, reduced dexterity, or using the device one-handed need generous tap areas. Small targets increase error rates disproportionately. This rule applies the Apple guideline as a mobile-specific design standard.",
   "claimType": "research-backed",
   "sourceIds": [
     "source.official-guidance.apple-touch-targets"
@@ -43,20 +42,21 @@
   "universalBan": false,
   "detector": {
     "feasibility": "mechanical",
-    "signalDescription": "For interactive elements (a, button, input, select, [role=button]), compute total touch area including padding. Flag if width < 44px or height < 44px at mobile breakpoints.",
+    "signalDescription": "For interactive elements (a, button, input, select, [role=button]), compute the rendered box-model touch area including padding and border. Flag if the total area is smaller than 44x44 CSS pixels at mobile viewport breakpoints.",
     "matcherProposal": {
-      "kind": "css-property",
+      "kind": "heuristic",
       "patterns": [
-        "width",
-        "height",
-        "padding"
+        "computed touch area",
+        "rendered box size",
+        "hit region"
       ],
       "caseSensitive": false
     },
     "limitations": [
-      "JavaScript-determined touch areas may not appear in CSS.",
-      "Responsive elements may change size at different breakpoints.",
-      "Overlapping elements may have effective touch areas differing from the box model."
+      "Static CSS analysis can approximate dimensions but only the rendered box model gives the actual touch target size.",
+      "JavaScript-determined touch areas and custom gesture handlers may not appear in static source.",
+      "Responsive elements that resize at different breakpoints must be evaluated per breakpoint.",
+      "Overlapping elements may have effective touch areas differing from their box-model dimensions."
     ]
   },
   "impact": "serious",
@@ -95,6 +95,6 @@
     "originalSynthesis": true
   },
   "notes": [
-    "Normalization revision: Apple HIG source (44pt minimum) confirmed. Impact 'serious' is appropriate for mobile accessibility failure."
+    "Normalization correction: scoped to mobile surfaces and Apple HIG only. Removed Material Design reference (no source record). Changed detector from static CSS-property to rendered-box measurement. Maintainer review."
   ]
 }

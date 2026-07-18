@@ -10,8 +10,8 @@
     "universal"
   ],
   "summary": "AI-generated interfaces frequently use low-contrast text that fails WCAG AA minimum contrast requirements, creating readability barriers.",
-  "instruction": "Ensure all text meets WCAG AA contrast: 4.5:1 for normal text and 3:1 for large text (18px+ bold or 24px+ regular). Verify with a color contrast tool before choosing text and background combinations.",
-  "rationale": "Low-contrast text is the most common accessibility failure. Users with visual impairments, outdoor lighting, or low-quality displays are disproportionately affected. WCAG AA is the legal minimum in many jurisdictions including the EU and US federal procurement.",
+  "instruction": "Ensure text meets WCAG AA contrast: 4.5:1 for normal text and 3:1 for large text (18pt/24px regular or 14pt/~18.66px bold). Verify solid-color pair contrast before choosing text and background combinations.",
+  "rationale": "Low-contrast text is the most common accessibility failure in web interfaces. Users with visual impairments, outdoor lighting, or low-quality displays are disproportionately affected. WCAG 1.4.3 defines the contrast thresholds this rule checks.",
   "claimType": "research-backed",
   "sourceIds": [
     "source.official-standard.wcag-contrast"
@@ -54,9 +54,8 @@
     },
     "limitations": [
       "Dynamic colors from CSS custom properties require runtime computation.",
-      "Background images with text overlays cannot be statically analyzed.",
-      "Multi-layer backgrounds (gradient over image) require rendering.",
-      "Text on gradient backgrounds, multi-layer backgrounds, or background images cannot be statically analyzed. These cases require rendered pixel sampling. The mechanical detector only handles simple solid-color pairs reliably."
+      "Background images with text overlays and multi-layer backgrounds (gradient over image) cannot be statically analyzed.",
+      "Text on gradient backgrounds where contrast varies across the surface requires rendered pixel sampling."
     ]
   },
   "impact": "serious",
@@ -95,6 +94,6 @@
     "originalSynthesis": true
   },
   "notes": [
-    "Normalization revision: impact corrected from 'blocking' to 'serious'. Added honest limitation about gradient/image backgrounds being invisible to static analysis. WCAG 1.4.3 source confirmed for solid-color pairs only."
+    "Normalization correction: large-text threshold corrected to 18pt/24px regular or 14pt/~18.66px bold per WCAG definition. Removed unsourced legal-minimum claim. De-duplicated gradient limitation. Detector correctly scoped to solid-color pairs. Maintainer review."
   ]
 }
