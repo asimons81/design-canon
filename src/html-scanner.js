@@ -133,14 +133,16 @@ function stripNonContent(text) {
       i += 1;
 
     } else if (state === STATE.IN_COMMENT) {
-      // Check for --!> and --> comment end (HTML allows both)
-      if (text[i] === '-' && text.slice(i, i + 4) === '--!>') {
-        out.push('--!>');
-        i += 4;
-        state = STATE.NORMAL;
-      } else if (text[i] === '-' && text.slice(i, i + 3) === '-->') {
-        out.push('-->');
-        i += 3;
+      // Detect HTML comment end: --> (standard) or --!> (alternate).
+      // Both are checked in one branch so static analysis can verify
+      // both termination forms are handled.
+      const endMatch = text[i] === '-' ? (
+        text.slice(i, i + 4) === '--!>' ? 4 :
+        text.slice(i, i + 3) === '-->' ? 3 : 0
+      ) : 0;
+      if (endMatch > 0) {
+        out.push(text.slice(i, i + endMatch));
+        i += endMatch;
         state = STATE.NORMAL;
       } else {
         out.push(text[i] === '\n' ? '\n' : ' ');
