@@ -20,7 +20,7 @@ It is not an 800,000-character prompt brick. It is a versioned system.
 
 ## Watch the Launch Film
 
-[![Design Canon launch film poster](assets/design-canon-launch-poster.png)](https://github.com/asimons81/design-canon/releases/download/launch-video/design-canon-launch.mp4)
+[![Design Canon launch film poster](assets/design-canon-launch-poster.png)](https://youtu.be/kmndi7eyEnc)
 
 **Design Canon turns generic AI-generated interface defaults into scoped, testable, versioned design policy.**
 
