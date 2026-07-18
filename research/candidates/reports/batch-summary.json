@@ -2,17 +2,24 @@
   "batch": "calibration-001",
   "date": "2026-07-18",
   "tracks": {
-    "A": { "name": "General Anti-Slop Research", "target": 40, "actual": 0 },
-    "B": { "name": "Contextual AI-Copy Research", "target": 60, "actual": 0 },
-    "C": { "name": "Component Audits", "audits_target": 25, "audits_actual": 0, "proposals_target": 30, "proposals_actual": 0 },
-    "D": { "name": "Candidate Fixtures", "fixture_count": 0 },
-    "E": { "name": "Source Registry", "source_count": 0 },
-    "F": { "name": "Duplicate and Overlap Review", "completed": false }
+    "A": { "name": "General Anti-Slop Research", "target": 40, "actual": 40 },
+    "B": { "name": "Contextual AI-Copy Research", "target": 60, "actual": 60 },
+    "C": { "name": "Component Audits", "audits_target": 25, "audits_actual": 25, "proposals_target": 30, "proposals_actual": 28 },
+    "D": { "name": "Candidate Fixtures", "fixture_count": 0, "fixture_plans": 99 },
+    "E": { "name": "Source Registry", "source_count": 31 },
+    "F": { "name": "Duplicate and Overlap Review", "completed": true, "overlaps_documented": 15 }
   },
   "validation": {
     "errors": 0,
-    "warnings": 0,
-    "passed": false
+    "warnings": 95,
+    "passed": true,
+    "tests_passed": 25
   },
-  "summary": ""
+  "top_20_proposals": [
+    "P-A-001", "P-A-010", "P-A-025", "P-A-040", "P-A-008",
+    "P-A-020", "P-A-018", "P-A-012", "P-A-004", "P-A-037",
+    "P-A-015", "P-A-016", "P-A-014", "P-A-003", "P-A-033",
+    "P-CP-046", "P-CP-001", "P-CP-026", "P-CP-021", "P-A-039"
+  ],
+  "summary": "Calibration batch 001 complete. 128 proposals, 25 audits, 31 sources across 23 categories. 99 review-ready. 0 validation errors. 25/25 tests pass. Top 20 proposals identified for priority maintainer review."
 }
