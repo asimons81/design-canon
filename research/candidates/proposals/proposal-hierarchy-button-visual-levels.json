@@ -4,7 +4,7 @@
   "proposalId": "proposal.hierarchy.button-visual-levels",
   "proposedRuleId": "hierarchy.button-visual-levels",
   "title": "Use distinct button styles for primary and secondary actions",
-  "status": "review-ready",
+  "status": "researched",
   "category": "hierarchy",
   "surfaces": [
     "marketing",
@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Feasibility should be visual, not semantic. Detecting which button in a group is 'logically primary' requires understanding the section's purpose, which static CSS analysis cannot determine. A mechanical detector can count equally styled buttons but cannot recommend which should be demoted. Consider visual review as the primary detection mechanism."
+  ]
 }

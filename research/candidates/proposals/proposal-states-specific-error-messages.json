@@ -4,7 +4,7 @@
   "proposalId": "proposal.states.specific-error-messages",
   "proposedRuleId": "states.specific-error-messages",
   "title": "Error messages must explain what happened and how to fix it",
-  "status": "review-ready",
+  "status": "researched",
   "category": "states",
   "surfaces": [
     "product-app"
@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is correct. Phrase matching ('something went wrong', 'an error occurred') is a reasonable heuristic but error messages from backend APIs or JS error handlers may not appear in static frontend source. The detector will miss server-rendered error states and dynamically generated messages."
+  ]
 }

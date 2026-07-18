@@ -4,7 +4,7 @@
   "proposalId": "proposal.states.empty-state-guidance",
   "proposedRuleId": "states.empty-state-guidance",
   "title": "Empty states should guide not greet",
-  "status": "review-ready",
+  "status": "researched",
   "category": "states",
   "surfaces": [
     "product-app",
@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is correctly assigned. Pattern matching against generic phrases ('Nothing here yet', 'No * yet') will miss custom implementations and generate false positives for legitimate empty states. The detector is a review trigger, not a definitive finding. Custom implementations may require human review."
+  ]
 }

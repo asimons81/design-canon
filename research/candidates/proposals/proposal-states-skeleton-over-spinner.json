@@ -4,7 +4,7 @@
   "proposalId": "proposal.states.skeleton-over-spinner",
   "proposedRuleId": "states.skeleton-over-spinner",
   "title": "Use skeleton screens instead of spinners for content areas",
-  "status": "review-ready",
+  "status": "researched",
   "category": "states",
   "surfaces": [
     "product-app",
@@ -93,5 +93,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is honest but the distinction between content-area spinners (target of this rule) and button-level spinners (acceptable) requires context understanding beyond static analysis. A detector can find spinner elements and skeleton elements but cannot determine their functional context without heuristics."
+  ]
 }

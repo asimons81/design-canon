@@ -4,7 +4,7 @@
   "proposalId": "proposal.navigation.breadcrumb-deep-pages",
   "proposedRuleId": "navigation.breadcrumb-deep-pages",
   "title": "Use breadcrumbs on pages three or more levels deep",
-  "status": "review-ready",
+  "status": "researched",
   "category": "navigation",
   "surfaces": [
     "product-app",
@@ -90,5 +90,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is appropriate but the URL-depth heuristic breaks for single-page applications with hash routing. SPA navigation depth cannot be determined from the URL alone. The detector should check for breadcrumb patterns (nav with aria-label='breadcrumb', structured data) rather than inferring depth from URL segments."
+  ]
 }

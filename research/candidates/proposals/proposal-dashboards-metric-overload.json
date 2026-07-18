@@ -4,7 +4,7 @@
   "proposalId": "proposal.dashboards.metric-overload",
   "proposedRuleId": "dashboards.metric-overload",
   "title": "Limit visible metrics to the decision-critical few",
-  "status": "review-ready",
+  "status": "researched",
   "category": "tables",
   "surfaces": [
     "product-app"
@@ -91,5 +91,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Visual feasibility is correctly assigned. The 7-metric threshold is a design heuristic, not a definitive finding. A detector can estimate metric card count from visual structure but cannot determine decision-criticality. The instruction should frame the principle ('fewer, prioritized metrics') rather than prescribing a hard number."
+  ]
 }

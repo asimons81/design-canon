@@ -4,7 +4,7 @@
   "proposalId": "proposal.marketing.verifiable-social-proof",
   "proposedRuleId": "marketing.verifiable-social-proof",
   "title": "Social proof must include verifiable details",
-  "status": "review-ready",
+  "status": "draft",
   "category": "marketing",
   "surfaces": [
     "marketing"
@@ -89,5 +89,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to draft. Manual-only feasibility is correctly assigned. This is a design-review checklist item, not a current linter rule. Verifying that social proof elements include identifiable details requires understanding of brand recognition, industry context, and customer permission boundaries that automation cannot reliably assess. The rule is useful as editorial guidance but should not be implemented as a mechanical detector."
+  ]
 }

@@ -4,7 +4,7 @@
   "proposalId": "proposal.layout.visual-focal-point",
   "proposedRuleId": "layout.visual-focal-point",
   "title": "Every view needs a visual focal point",
-  "status": "review-ready",
+  "status": "researched",
   "category": "layout",
   "surfaces": [
     "marketing",
@@ -92,5 +92,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Visual feasibility is correct. The 1.5x median area heuristic is arbitrary and may not hold across different layout types. Actual focal point detection requires rendered visual analysis (contrast, size, position, whitespace). This rule is better suited for the planned visual review pipeline than static linting."
+  ]
 }

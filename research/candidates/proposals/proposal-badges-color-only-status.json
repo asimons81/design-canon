@@ -4,7 +4,7 @@
   "proposalId": "proposal.badges.color-only-status",
   "proposedRuleId": "badges.color-only-status",
   "title": "Status indicators must combine color with text or icon",
-  "status": "review-ready",
+  "status": "researched",
   "category": "badges",
   "surfaces": [
     "universal",
@@ -91,5 +91,8 @@
     "notReverseEngineeredFromEpsteinMd": true,
     "sourcesRecorded": true,
     "originalSynthesis": true
-  }
+  },
+  "notes": [
+    "Normalization note: status changed from review-ready to researched. Semantic feasibility is correct. Distinguishing status indicators from decorative elements requires element role/context analysis that static CSS cannot determine reliably. The detector should note that elements without role='status', aria-label, or nearby descriptive text cannot be confidently classified as status indicators."
+  ]
 }
