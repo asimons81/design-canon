@@ -18,6 +18,12 @@ Design Canon is an open design-policy compiler, linter, and visual-QA project fo
 
 It is not an 800,000-character prompt brick. It is a versioned system.
 
+## Watch the Launch Film
+
+[![Watch the Design Canon launch film](assets/design-canon-launch-poster.png)](https://github.com/asimons81/design-canon/releases/download/launch-video/design-canon-launch.mp4)
+
+**Design Canon turns generic AI-generated interface defaults into scoped, testable, versioned design policy.**
+
 ## Why
 
 AI agents can generate polished frontend code quickly, but they often converge on the same defaults: centered hero stacks, purple gradients, giant rounded cards, decorative shadows, generic copy, weak focus states, and motion sprayed everywhere.
