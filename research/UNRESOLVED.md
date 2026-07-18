@@ -1,71 +1,48 @@
-# Unresolved Architectural Questions
+# Research Decisions and Open Questions
 
-> Collected during research-track implementation. These require maintainer review
-> before finalization.
+## Decisions made during maintainer review
 
-## Track A — Benchmark Factory
+1. **Design Canon remains local-first open source.** Research tooling may use pinned development dependencies, but the published compiler and linter remain dependency-free unless a separate decision changes that boundary.
+2. **The generic benchmark baseline must be a pinned artifact.** It is identified by version, provenance, size, and SHA-256 hash. It is not defined by an arbitrary token range.
+3. **Official comparison runs require repetition.** The minimum single-model protocol is three repetitions per condition, producing 135 runs across 15 benchmarks.
+4. **Generation manifests are immutable.** Blind human-evaluation results are stored separately.
+5. **Failed and invalid runs remain visible.** They are not silently replaced or discarded.
+6. **`AGENTS.md` is the default portable adapter target.** Native adapters may offer richer scoping where verified.
+7. **Adapters are non-destructive.** Preview is the default, writes use managed blocks or generated files, and uninstall removes only Design Canon-owned content.
+8. **Claude Code support uses `CLAUDE.md` or an import from it.** Claude Code must not be described as automatically loading `AGENTS.md`.
+9. **Google DESIGN.md is a separate future adapter.** The current `design` compiler output is a Design Canon policy document, not a claim of Google-spec conformance.
+10. **Fixture manifests report current facts separately from future goals.** Only current detector output appears in deterministic totals.
+11. **QA certification requires evidence.** A written matrix or green Linux CI run does not certify Windows, WSL, macOS, filesystem-permission, or signal behavior.
 
-1. **Scoring weight allocation** — Should visual hierarchy, typography, accessibility,
-   and originality each receive equal weight, or should they be weighted by surface type?
-   A marketing page vs. a developer dashboard will prioritise different dimensions.
+## Open benchmark questions
 
-2. **Human-preference protocol** — Should reviewers see paired outputs side-by-side
-   (A/B blind) or individually sequenced? Side-by-side is faster but risks anchoring;
-   individual sequencing is cleaner but requires more sessions.
+1. What exact generic guidance artifact should become Condition B?
+2. Which pinned browser-capture and accessibility toolchain should the local benchmark harness use?
+3. What time, iteration, and tool budgets should each run receive?
+4. Which prohibited-shortcut violations make a run invalid rather than merely penalized?
+5. How will evaluators be recruited, blinded, and assigned to comparisons?
+6. Will source maintainability receive a separate expert review?
+7. Will the project publish any aggregate score, or only metric-specific and preference results?
 
-3. **Statistical significance** — What is the minimum paired-run count per brief before
-   claiming a significant result? The methodology proposes N=10 per condition, but
-   this should be validated against expected effect size.
+## Open adapter questions
 
-4. **Model version pinning** — Should each benchmark run pin the model to a specific
-   version (e.g., `claude-sonnet-4-20260701`) or allow latest-at-time-of-run and record
-   the actual version? Pinning improves reproducibility; latest-at-run improves
-   real-world relevance.
+1. What final CLI names and flags should `init` and `uninstall` expose?
+2. Should adapter-generated policy live directly in existing instruction files or in `.design-canon/` files imported by those instructions?
+3. What managed-block conflict policy should apply when users edit generated sections?
+4. Which Cursor and Windsurf activation modes should ship in the first stable adapter release?
+5. What source supplies concrete tokens for a future Google DESIGN.md adapter?
 
-## Track B — Agent Compatibility
+## Open fixture and analysis questions
 
-5. **Windsurf documentation gaps** — Windsurf documentation is significantly less
-   detailed than Cursor or Claude Code regarding instruction-file precedence. Is
-   the assumption that Windsurf follows Cursor-like conventions acceptable, or
-   should we defer Windsurf support until documentation improves?
+1. Which semantic rule should receive the first browser-backed analyzer?
+2. How should detector-count changes be reviewed when broader matching is intentional?
+3. Should intentionally bad fixtures remain plain HTML only, or should framework-specific fixtures be added later?
 
-6. **AGENTS.md vs CLAUDE.md conflict** — When both exist in the same repo for
-   Claude Code, which wins? Official docs imply AGENTS.md is preferred but
-   CLAUDE.md may also be read. Need clarification from Anthropic.
+## Open QA questions
 
-7. **Design Canon adapter output format** — Should adapter outputs be single files
-   (e.g., one AGENTS.md) or split by concern (DESIGN.md for direction + AGENTS.md
-   for rules)? Single file is simpler; split files allow independent refresh.
+1. Which macOS environments are available for real execution evidence?
+2. Should the manual matrix become a scriptable conformance harness?
+3. What platform set is required before the first npm prerelease?
+4. How should interrupted JSON-output behavior be documented or improved?
 
-## Track C — Fixture Foundry
-
-8. **Fixture scope creep** — Some fixtures necessarily trigger rules from categories
-   beyond their primary anti-pattern. Should fixtures be scoped to demonstrate
-   exactly one anti-pattern, or is multi-rule triggering acceptable as "realistic bad
-   code"? The current approach allows realistic overlap but documents all expected
-   findings.
-
-9. **New rule proposals** — When a fixture anti-pattern has no matching rule (e.g.,
-   decorative animation overload without a `motion.decorative-overload` rule), should
-   the fixture still be created and marked, or deferred until the rule exists?
-   Created and marked as `[proposed]`.
-
-## Track D — Platform QA
-
-10. **macOS availability** — The project has intermittent macOS CI access. Should
-    macOS-specific test cases be marked as "deferred" or "requires manual testing"?
-    Marked as requiring manual testing with note.
-
-11. **SIGINT handling** — The current CLI uses `process.exitCode`. Does Ctrl+C during
-    a long lint produce a clean partial report or an unceremonious dump? Test needed.
-
-12. **Read-only directory behavior** — The linter writes only to stdout/stderr and
-    exit code. Does it attempt any writes (cache, temp files, config updates)? Current
-    code appears clean, but a write-only test case is needed to confirm.
-
-## Cross-Cutting
-
-13. **Provenance record maintenance** — As the project evolves, how should provenance
-    records for research artifacts be kept current? Option A: git-tracked in each
-    research directory. Option B: separate PROVENANCE.md in the root. Option A is
-    recommended for branch isolation but creates duplication.
+Each open question that changes a public API, schema, scoring policy, release boundary, or security posture requires an explicit maintainer decision before implementation.

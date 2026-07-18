@@ -1,99 +1,77 @@
-# Provenance Record
+# Research Provenance
 
-> Generated for Design Canon research tracks. See also individual provenance notes
-> within each track's output files.
+## Origin
 
-## Meta
+The initial four-track research package was generated on 2026-07-18 by Hermes Agent using `deepseek-v4-flash` on isolated feature branches:
 
-| Field | Value |
-|-------|-------|
-| Agent | Hermes (Hermes Agent by Nous Research) |
-| Model | deepseek-v4-flash |
-| Date | 2026-07-18 |
-| Repository | github.com/asimons81/design-canon |
-| Base commit | `ae8484d` (HEAD of `main` at start) |
+- `research/benchmark-factory`
+- `research/agent-compatibility`
+- `fixtures/anti-slop-suite`
+- `qa/platform-matrix`
 
-## Tracks
+The requested boundaries prohibited runtime API changes, schema changes, package publication, release tags, branch-protection changes, and unsupported superiority claims.
 
-### Track A — Benchmark Factory
+## Maintainer review
 
-| Field | Value |
-|-------|-------|
-| Branch | `research/benchmark-factory` |
-| Output path | `research/benchmarks/`, `research/methodology/` |
-| Content type | proposal |
-| Research method | Clean-room benchmark briefs based on common frontend surface types |
-| Assumptions | Briefs are brand-neutral and framework-neutral by construction |
-| Validation | All 15 briefs follow the same template; methodology separates objective from subjective metrics |
-| Unresolved | Scoring weights; human-preference rubric; statistical significance threshold |
+The material was subsequently reviewed and edited before merge. Review included:
 
-### Track B — Agent Compatibility
+- checking benchmark structure and executable profile assignments,
+- separating deterministic fixture output from future semantic expectations,
+- running every fixture against the current linter,
+- adding regression tests for benchmark structure and fixture findings,
+- verifying agent compatibility claims against primary documentation,
+- removing speculative or unsupported adapter behavior,
+- distinguishing Design Canon's current policy document from Google DESIGN.md conformance,
+- replacing hard-coded and nondeterministic QA commands,
+- running repository verification and the complete test suite on each branch.
 
-| Field | Value |
-|-------|-------|
-| Branch | `research/agent-compatibility` |
-| Output path | `research/compatibility/` |
-| Content type | research finding / verified fact / assumption (per claim) |
-| Research method | Official documentation where available; primary-source web research |
-| Assumptions | Tool documentation accessed on 2026-07-18 is current |
-| Validation | Each claim tagged with confidence level; conflicting/undocumented behavior flagged |
-| Unresolved | Some tools (e.g. Windsurf) have limited public documentation; claims marked accordingly |
+The merged files therefore represent a combination of generated research and maintainer-reviewed corrections. They should not be treated as untouched model output.
 
-### Track C — Fixture Foundry
+## Source classes
 
-| Field | Value |
-|-------|-------|
-| Branch | `fixtures/anti-slop-suite` |
-| Output path | `fixtures/patterns/` |
-| Content type | generated fixture |
-| Research method | Deliberate anti-pattern construction targeting existing Design Canon rule IDs |
-| Assumptions | Fixtures target the existing `rules/core.json` rule set only |
-| Validation | Expected findings documented in MANIFEST.md per fixture |
-| Unresolved | No new rule IDs proposed without explicit `[proposed]` marking |
+### Repository sources
 
-### Track D — Platform QA
+- the Design Canon rule catalog,
+- profile definitions,
+- schemas,
+- CLI implementation,
+- tests,
+- configuration and release documentation.
 
-| Field | Value |
-|-------|-------|
-| Branch | `qa/platform-matrix` |
-| Output path | `qa/` |
-| Content type | proposal |
-| Research method | Systematic enumeration of platform, installation, and runtime scenarios |
-| Assumptions | Test cases assume standard Node.js/npm/git tooling on each platform |
-| Validation | Each test case has discrete expected result and cleanup procedure |
-| Unresolved | macOS testing requires hardware not consistently available |
+### Primary external documentation
 
-## Non-Goals
+Compatibility claims were checked against the official documentation or source repositories for:
 
-The following are explicitly out of scope for this work package:
+- Hermes Agent,
+- OpenAI Codex,
+- Claude Code,
+- Cursor,
+- Windsurf,
+- AGENTS.md,
+- Google DESIGN.md,
+- Agent Skills.
 
-- Modifying `main` branch
-- Publishing npm packages
-- Creating GitHub releases
-- Tagging versions
-- Modifying branch protection or security settings
-- Changing public schemas
-- Changing suppression semantics
-- Changing CLI commands or package exports
-- Adding runtime dependencies
-- Finalizing benchmark scoring policy
-- Implementing agent adapters
-- Adding fixtures to the core catalog
-- Copying proprietary prompt files or unlicensed rule sets
-- Claiming superiority without evidence
+Primary-source links are preserved beside the reviewed claims in `research/compatibility/MATRIX.md`.
 
-## Source References
+## Content classification
 
-| Reference | URL | Accessed |
-|-----------|-----|----------|
-| Design Canon repo | https://github.com/asimons81/design-canon | 2026-07-18 |
-| Design Canon README | README.md at commit `ae8484d` | 2026-07-18 |
-| Design Canon rules | rules/core.json at commit `ae8484d` | 2026-07-18 |
-| Design Canon profiles | profiles/*.json at commit `ae8484d` | 2026-07-18 |
-| Design Canon schemas | schema/*.json at commit `ae8484d` | 2026-07-18 |
-| Hermes Agent docs | https://hermes-agent.nousresearch.com/docs | 2026-07-18 |
-| OpenAI Codex docs | https://codex.docs.openai.com | 2026-07-18 |
-| Claude Code docs | https://docs.anthropic.com/en/docs/claude-code | 2026-07-18 |
-| Cursor docs | https://docs.cursor.com | 2026-07-18 |
-| Windsurf docs | https://docs.windsurf.com | 2026-07-18 |
-| AGENTS.md convention | https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-agents-md | 2026-07-18 |
+- Benchmark briefs: **proposal**
+- Benchmark methodology: **maintainer-reviewed proposal**
+- Compatibility matrix: **maintainer-reviewed research**
+- Adapter plan: **proposal**
+- HTML anti-pattern files: **generated fixtures**
+- Fixture counts: **verified against the current linter and enforced by tests**
+- QA matrix: **maintainer-reviewed test specification, not execution evidence**
+
+## Limitations
+
+- No official benchmark runs have been completed.
+- No blind preference dataset exists yet.
+- No agent adapter from the research plan has been implemented yet.
+- The QA matrix does not certify platforms until execution evidence is attached.
+- Tool behavior may change. Compatibility claims require revalidation before stable adapter releases.
+- Google DESIGN.md compatibility requires a dedicated validated adapter and concrete project token input.
+
+## Clean-room statement
+
+The research and fixtures were created from public documentation, the existing Design Canon implementation, and original synthetic examples. Proprietary prompt files and unlicensed rule catalogs were not intentionally copied.

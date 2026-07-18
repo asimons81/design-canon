@@ -37,7 +37,7 @@ Technical decision-makers evaluating a developer-tool SaaS product. Assumed read
 2. Render a features/comparison section presenting three capabilities
 3. Render a social-proof or testimonial section with the supplied quote
 4. Render a final CTA section repeating the trial offer
-5. Link the primary hero CTA and the final-section CTA to `https://pragma.dev/signup`
+5. Link the primary hero CTA and the final-section CTA to `#signup`
 6. Render a top-level navigation bar with links: Product, Docs, Pricing, and the CTA button
 7. Render a footer with links: Documentation, Privacy, Terms, Contact
 
@@ -110,8 +110,8 @@ The benchmark run must produce:
 
 1. **Source output** — the full generated source tree (HTML, CSS, any JS)
 2. **Design policy** — the policy document (DESIGN.md or equivalent) that guided the agent, or a marker stating none was used
-3. **Desktop screenshot** — rendered view at 1280×800 with all sections visible
-4. **Mobile screenshot** — rendered view at 375×667 with the hero section visible
+3. **Desktop screenshots** — viewport crop at 1280×800 plus a full-page capture
+4. **Mobile screenshots** — viewport crop at 375×667 plus a full-page capture
 5. **Lint report** — output of `design-canon lint --profile marketing` against the source
 6. **Accessibility report** — structured findings from an automated a11y scan (e.g., axe-core, pa11y)
 
@@ -127,7 +127,7 @@ The benchmark run must produce:
 | `prompt` | `string` | Full prompt text or hash of prompt file |
 | `prompt_strategy` | `enum` | One of: `none`, `generic`, `design-canon` |
 | `instruction_file_paths` | `[string]` | Paths to any instruction or policy files used |
-| `token_usage` | `{input, output, total, input_cost, output_cost}` | Token counts from the model provider |
+| `usage` | `object or null` | Provider-reported usage; unavailable fields remain null |
 | `runtime_ms` | `number` | Wall-clock time from prompt to final output |
 | `environment_info` | `{os, node_version, agent_version}` | Environment metadata |
 | `commit_hash` | `string` | Git commit of Design Canon used |
@@ -136,7 +136,7 @@ The benchmark run must produce:
 | `screenshot_paths` | `{desktop, mobile}` | Relative paths to captured screenshots |
 | `lint_report_path` | `string` | Path to `design-canon lint` JSON output |
 | `a11y_report_path` | `string` | Path to accessibility scan output |
-| `human_preference_votes` | `[{voter_id, preferred_run_id, rationale}]` | Blind comparison votes |
+| `evaluation_dataset_path` | `string or null` | Separate blinded-evaluation data, never embedded in the generation manifest |
 
 ## Known Ambiguity Risks
 

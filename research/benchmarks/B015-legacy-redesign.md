@@ -7,7 +7,8 @@
 | **ID** | `B015` |
 | **Status** | proposal |
 | **Category** | mixed (redesign) |
-| **Applicable Design Canon profiles** | `product-app` (primary), `marketing` (considerations) |
+| **Applicable Design Canon profile** | `product-app` |
+| **Qualitative considerations** | Marketing clarity may be discussed during review but is not a second compiler profile |
 
 ## Title
 
