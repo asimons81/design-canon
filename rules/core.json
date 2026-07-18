@@ -308,10 +308,10 @@
         "Controls labeled by placeholder text alone are not compliant."
       ],
       "detect": {
-        "message": "Form control with no accessible name detected. Use a <label>, aria-label, or aria-labelledby.",
+        "message": "No supported static accessible-name source was found for this form control.",
         "patterns": [
           {
-            "source": "forms\\.input-labels-required",
+            "source": "f016-strct",
             "flags": "gi",
             "multiple": false
           }

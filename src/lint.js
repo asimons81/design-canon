@@ -129,10 +129,23 @@ export async function lintPath({
         }
       }
 
-      // Structural analyzer for rules that require HTML-level understanding
+      // Structural analyzer for rules that require HTML-level understanding.
+      // This runs INSTEAD of regex pattern matching for these rules.
       if (
         rule.id === 'forms.input-labels-required' &&
-        (file.endsWith('.html') || file.endsWith('.htm'))
+        file.endsWith('.html')
+      ) {
+        // Skip the generic regex pattern matching for structural rules
+        // to avoid false positives from literal sentinel text.
+        continue;
+      }
+    }
+
+    // Structural analyzer (second pass for structural-only rules)
+    for (const rule of rules) {
+      if (
+        rule.id === 'forms.input-labels-required' &&
+        file.endsWith('.html')
       ) {
         const structuralFindings = detectUnlabeledControls(
           normalizePath(relative(process.cwd(), file)),

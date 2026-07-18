@@ -115,7 +115,7 @@ test('scanner: labeled checkbox has name source', () => {
 });
 
 test('scanner: labeled radio has name source', () => {
-  const results = scanFormControls('<label for="r">Option<label><input type="radio" id="r">');
+  const results = scanFormControls('<label for="r">Option</label><input type="radio" id="r">');
   assert.equal(results.length, 1);
   assert.equal(results[0].hasNameSource, true);
   assert.equal(results[0].type, 'radio');
@@ -179,7 +179,7 @@ test('scanner: missing closing tags do not crash', () => {
 test('scanner: whitespace-only label text is empty', () => {
   const results = scanFormControls('<label for="x">   </label><input id="x" type="text">');
   assert.equal(results.length, 1);
-  assert.equal(results[0].hasNameSource, true); // label for/id match works regardless of content
+  assert.equal(results[0].hasNameSource, false); // whitespace-only label text is no label text
 });
 
 test('scanner: duplicate IDs handled without crash', () => {
@@ -401,4 +401,132 @@ test('boundary: only F016 was added (no other candidates)', () => {
   // Verify the catalog has exactly 14 rules (was 13, now +1 for F016)
   // This test serves as a regression guard against scope creep
   // It must be updated when other candidates are legitimately added
+});
+
+// ── Regression Tests for Review Issues ────────────────────────────────
+
+test('regression: data-aria-label does not match aria-label attribute', () => {
+  const results = scanFormControls('<input data-aria-label="Name">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasNameSource, false);
+  assert.equal(results[0].hasAriaLabel, false);
+});
+
+test('regression: data-type does not match type attribute', () => {
+  const results = scanFormControls('<input data-type="hidden">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].type, 'text'); // default, not hidden
+  assert.equal(results[0].exempt, false);
+});
+
+test('regression: data-id does not match id attribute', () => {
+  const results = scanFormControls('<input data-id="x" placeholder="n">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].id, null);
+});
+
+test('regression: data-placeholder does not match placeholder attribute', () => {
+  const results = scanFormControls('<input data-placeholder="Name">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasPlaceholder, false);
+});
+
+test('regression: data-for does not match for attribute', () => {
+  const results = scanFormControls('<label data-for="x">Name</label><input id="x">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasNameSource, false);
+});
+
+test('regression: uppercase exempt input types are recognized', () => {
+  const results = scanFormControls('<INPUT TYPE="HIDDEN">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].exempt, true);
+});
+
+test('regression: uppercase wrapping label detected', () => {
+  const results = scanFormControls('<LABEL>Name <INPUT></LABEL>');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasNameSource, true);
+  assert.equal(results[0].nameSourceType, 'wrapping-label');
+});
+
+test('regression: empty explicit label is insufficient', () => {
+  const results = scanFormControls('<label for="x"></label><input id="x">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasNameSource, false);
+});
+
+test('regression: whitespace-only explicit label is insufficient', () => {
+  const results = scanFormControls('<label for="x">   </label><input id="x">');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasNameSource, false);
+});
+
+test('regression: empty wrapping label is insufficient', () => {
+  const results = scanFormControls('<label><input id="x"></label>');
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasNameSource, false);
+});
+
+test('regression: unquoted for attribute resolves correctly', () => {
+  const results = scanFormControls('<label for=x>Email</label><input id=x>');
+  const labeled = results.find(r => r.element === 'input');
+  assert.ok(labeled);
+  assert.equal(labeled.hasNameSource, true);
+  assert.equal(labeled.nameSourceType, 'label-for');
+});
+
+test('regression: literal F016 sentinel text does not cause false finding', async () => {
+  const { mkdtemp, rm, writeFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const dir = await mkdtemp(join(tmpdir(), 'f016-sentinel-'));
+  const html = '<html><body><p>forms.input-labels-required found an issue</p><input type="hidden"></body></html>';
+  const htmlPath = join(dir, 'test.html');
+  await writeFile(htmlPath, html, 'utf8');
+  const result = await lintPath({ path: htmlPath, profile: 'marketing' });
+  const f016 = result.findings.filter(f => f.rule === 'forms.input-labels-required');
+  assert.equal(f016.length, 0, 'Sentinel text must not trigger F016');
+  await rm(dir, { recursive: true, force: true });
+});
+
+test('regression: .htm file is not scanned by F016', async () => {
+  const { mkdtemp, rm, writeFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const dir = await mkdtemp(join(tmpdir(), 'f016-htm-'));
+  const html = '<html><body><input placeholder="test"></body></html>';
+  const htmPath = join(dir, 'test.htm');
+  await writeFile(htmPath, html, 'utf8');
+  const result = await lintPath({ path: htmPath, profile: 'marketing' });
+  const f016 = result.findings.filter(f => f.rule === 'forms.input-labels-required');
+  assert.equal(f016.length, 0, '.htm must not trigger F016');
+  await rm(dir, { recursive: true, force: true });
+});
+
+test('regression: finding uses bounded confidence wording', async () => {
+  const result = await lintPath({ path: `${EXAMPLES}violation.html`, profile: 'marketing' });
+  const f016 = result.findings.filter(f => f.rule === 'forms.input-labels-required');
+  assert.ok(f016.length > 0);
+  for (const f of f016) {
+    assert.ok(
+      f.message.startsWith('No supported static accessible-name source'),
+      `Finding should use bounded wording: "${f.message}"`
+    );
+    assert.ok(
+      !f.message.includes('definitely inaccessible'),
+      'Finding must not claim runtime inaccessibility'
+    );
+  }
+});
+
+test('regression: catalog uses bounded wording in detect message', async () => {
+  const { loadCatalog } = await import('../src/io.js');
+  const catalog = await loadCatalog();
+  const rule = catalog.rules.find(r => r.id === 'forms.input-labels-required');
+  assert.ok(rule);
+  assert.ok(
+    rule.detect.message.startsWith('No supported static accessible-name source'),
+    'Catalog message should use bounded wording'
+  );
 });
