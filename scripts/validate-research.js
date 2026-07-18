@@ -414,18 +414,23 @@ async function verifyFixtureFiles(fixtures, manifestPaths) {
   }
 }
 
-export async function validateResearchTree(root, { includeExamples = false } = {}) {
-  const sourcePaths = await findJsonFiles(join(root, 'research', 'candidates', 'sources'));
-  const proposalPaths = await findJsonFiles(join(root, 'research', 'candidates', 'proposals'));
-  const fixturePaths = await findJsonFiles(
-    join(root, 'fixtures', 'candidates'),
-    (path) => path.endsWith(`${sep}manifest.json`) || path.endsWith('/manifest.json')
-  );
+export async function validateResearchTree(root, { includeExamples = false, includeCandidates = true } = {}) {
+  const sourcePaths = [];
+  const proposalPaths = [];
+  const fixturePaths = [];
 
   if (includeExamples) {
     sourcePaths.push(join(root, 'research', 'templates', 'source.original-observation.example.json'));
     proposalPaths.push(join(root, 'research', 'templates', 'proposal.copy.decorative-live-badge.example.json'));
     fixturePaths.push(join(root, 'research', 'templates', 'fixture.decorative-live-badge.example.json'));
+  }
+  if (includeCandidates) {
+    sourcePaths.push(...await findJsonFiles(join(root, 'research', 'candidates', 'sources')));
+    proposalPaths.push(...await findJsonFiles(join(root, 'research', 'candidates', 'proposals')));
+    fixturePaths.push(...await findJsonFiles(
+      join(root, 'fixtures', 'candidates'),
+      (path) => path.endsWith(`${sep}manifest.json`) || path.endsWith('/manifest.json')
+    ));
   }
 
   const [sourceDocs, proposalDocs, fixtureDocs] = await Promise.all([
@@ -447,7 +452,7 @@ async function main() {
   const includeExamples = args.delete('--examples');
   if (args.size > 1) fail('usage: node scripts/validate-research.js [--examples] [root]');
   const root = resolve([...args][0] ?? process.cwd());
-  const result = await validateResearchTree(root, { includeExamples });
+  const result = await validateResearchTree(root, { includeExamples, includeCandidates: !includeExamples });
   console.log(`Research validation passed: ${result.sources} source(s), ${result.proposals} proposal(s), ${result.fixtures} fixture(s).`);
 }
 

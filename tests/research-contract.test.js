@@ -138,7 +138,7 @@ test('dependency-free validators enforce the example contract', async () => {
     validateResearchGraph({ sources: [source], proposals: [proposal], fixtures: [fixture] }),
     { sources: 1, proposals: 1, fixtures: 1 }
   );
-  assert.deepEqual(await validateResearchTree(ROOT_PATH, { includeExamples: true }), {
+  assert.deepEqual(await validateResearchTree(ROOT_PATH, { includeExamples: true, includeCandidates: false }), {
     sources: 1,
     proposals: 1,
     fixtures: 1
