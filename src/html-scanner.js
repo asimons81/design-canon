@@ -133,8 +133,12 @@ function stripNonContent(text) {
       i += 1;
 
     } else if (state === STATE.IN_COMMENT) {
-      // Check for --> comment end
-      if (text[i] === '-' && text.slice(i, i + 3) === '-->') {
+      // Check for --!> and --> comment end (HTML allows both)
+      if (text[i] === '-' && text.slice(i, i + 4) === '--!>') {
+        out.push('--!>');
+        i += 4;
+        state = STATE.NORMAL;
+      } else if (text[i] === '-' && text.slice(i, i + 3) === '-->') {
         out.push('-->');
         i += 3;
         state = STATE.NORMAL;

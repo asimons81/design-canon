@@ -592,6 +592,37 @@ test('codeql: comment with dashes inside', () => {
   assert.equal(results[0].hasPlaceholder, true);
 });
 
+test('codeql: comment terminated by --!>', () => {
+  const html = '<!-- hidden --!><input placeholder="real">';
+  const results = scanFormControls(html);
+  assert.equal(results.length, 1);
+  assert.equal(results[0].hasPlaceholder, true);
+});
+
+test('codeql: multiline comment terminated by --!> preserves line numbers', async () => {
+  const { mkdtemp, rm, writeFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const dir = await mkdtemp(join(tmpdir(), 'f016-commentbang-'));
+  const html = `<!DOCTYPE html>
+<html>
+<body>
+<form>
+<!--
+  hidden --!>
+<input placeholder="real">
+</form>
+</body>
+</html>`;
+  const htmlPath = join(dir, 'test.html');
+  await writeFile(htmlPath, html, 'utf8');
+  const result = await lintPath({ path: htmlPath, profile: 'marketing' });
+  const f016 = result.findings.filter(f => f.rule === 'forms.input-labels-required');
+  assert.equal(f016.length, 1, 'Should find exactly one unlabeled control');
+  assert.equal(f016[0].line, 7, 'Line number should be stable after --!> stripping');
+  await rm(dir, { recursive: true, force: true });
+});
+
 test('codeql: line numbers stable after stripping', async () => {
   const { mkdtemp, rm, writeFile } = await import('node:fs/promises');
   const { join } = await import('node:path');
