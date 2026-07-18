@@ -3,3 +3,5 @@
 *.png binary
 *.jpg binary
 *.jpeg binary
+fixtures/candidates/**/*.html text eol=lf
+fixtures/candidates/**/*.json text eol=lf
