@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.layout.auto-play-carousel",
+  "proposedRuleId": "layout.auto-play-carousel",
+  "title": "Do not auto-advance carousels without user control",
+  "status": "researched",
+  "category": "layout",
+  "surfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated marketing pages frequently use auto-advancing hero carousels where slides rotate before users finish reading, reducing content comprehension and user control.",
+  "instruction": "If using a carousel, do not auto-advance slides. Let users navigate via explicit arrows, dots, or swipe gestures. If auto-advance is required, provide a visible pause button and respect prefers-reduced-motion.",
+  "rationale": "NN Group research shows auto-advancing carousels are largely ignored \u2014 fewer than 1% of users interact with hero carousel content. Auto-advance creates accessibility barriers, motion issues, and often advances before users finish reading the current slide.",
+  "claimType": "research-backed",
+  "sourceIds": [
+    "source.original-observation.carousel-auto-advance"
+  ],
+  "examples": {
+    "violations": [
+      "A hero section with a 3-slide carousel auto-rotating every 4 seconds with no pause control.",
+      "A testimonial carousel auto-advancing every 3 seconds before users can finish reading."
+    ],
+    "controls": [
+      "A hero section with manual arrows and dots only, no auto-advance.",
+      "A testimonial section showing all testimonials in a scrollable grid rather than a carousel."
+    ],
+    "borderline": [
+      "A rotating banner for urgent system alerts where auto-advance is justified by critical information volume, provided a pause button exists."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Kiosk or digital signage displays with no user input, video content that is inherently temporal, and photo gallery viewers where auto-advance with pause is standard.",
+      "examples": [
+        "Digital signage in public spaces",
+        "User-initiated slideshow with controls"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Detect carousel implementations with auto-advance configuration (setInterval on slide transition, autoPlay/autoplay options in carousel libraries). Check for associated pause control elements.",
+    "matcherProposal": {
+      "kind": "heuristic",
+      "patterns": [
+        "setInterval",
+        "autoPlay",
+        "autoplayInterval"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "CSS-only animation carousels may auto-advance without JavaScript signals.",
+      "Cannot determine if a pause button is added dynamically at runtime.",
+      "Some carousel libraries use different configuration keys for auto-advance."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Kiosk displays with no user input where auto-advance is appropriate.",
+      "User-initiated slideshows where the user presses play."
+    ],
+    "mitigations": [
+      "Check for pause button or hover-pause behavior alongside auto-advance detection."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.layout.carousel.violation.auto-no-pause",
+      "caseType": "violation",
+      "description": "Hero section with 3 slides and setInterval(4000) advancing slides, no pause button."
+    },
+    {
+      "fixtureId": "fixture.layout.carousel.control.manual-nav",
+      "caseType": "control",
+      "description": "Same hero section with manual arrows and dots only, no auto-advance."
+    },
+    {
+      "fixtureId": "fixture.layout.carousel.borderline.auto-with-pause",
+      "caseType": "borderline",
+      "description": "Carousel with auto-advance at 6-second intervals with visible pause button and hover-pause."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.mobile.safe-area-viewport",
+  "proposedRuleId": "mobile.safe-area-viewport",
+  "title": "Account for viewport safe areas on mobile devices",
+  "status": "researched",
+  "category": "mobile",
+  "surfaces": [
+    "mobile"
+  ],
+  "summary": "AI-generated mobile interfaces fail to use CSS env(safe-area-inset-*) variables, placing interactive elements behind notches, rounded corners, and home indicators.",
+  "instruction": "On mobile viewports, use CSS env(safe-area-inset-*) variables to ensure interactive content is not placed behind device notches, rounded corners, or the home indicator. Apply safe-area padding to fixed-position elements and full-bleed backgrounds.",
+  "rationale": "Modern mobile devices have non-rectangular viewports with notches, Dynamic Island, rounded corners, and software home indicators. Without safe-area handling, interactive elements can be obscured or unreachable. The CSS environment variables (safe-area-inset-top, safe-area-inset-right, safe-area-inset-bottom, safe-area-inset-left) provide the device's actual insets.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.mobile-safe-areas"
+  ],
+  "examples": {
+    "violations": [
+      "A mobile navigation bar with position: fixed at the bottom, placed behind the iOS home indicator with no safe-area-inset-bottom padding.",
+      "A full-width hero image using background-size: cover that places critical text behind the device notch on iOS."
+    ],
+    "controls": [
+      "A fixed bottom navigation with padding-bottom: env(safe-area-inset-bottom, 16px) providing fallback-safe spacing.",
+      "A page layout applying padding-top: env(safe-area-inset-top, 0px) to the main content to clear the status bar area."
+    ],
+    "borderline": [
+      "A landscape game or video player that intentionally uses the full screen including notch area for immersive content -- this should be an explicit opt-in."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Immersive full-screen experiences (games, video playback) that intentionally use the entire display including safe areas, with explicit user opt-in.",
+      "examples": [
+        "Full-screen video player",
+        "Immersive game with edge-to-edge rendering"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Search for CSS env(safe-area-inset-*) usage. Flag if fixed/sticky positioned elements exist at viewport edges without corresponding safe-area padding.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "safe-area-inset-top",
+        "safe-area-inset-bottom",
+        "env(",
+        "position: fixed",
+        "position: sticky"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "The actual safe-area values are device-specific and cannot be determined from static CSS analysis.",
+      "Some CSS frameworks handle safe areas implicitly through viewport meta tag settings.",
+      "Desktop browsers ignore env(safe-area-inset-*) so the absence may not be visible during development."
+    ]
+  },
+  "impact": "degraded",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Desktop-only interfaces where safe areas do not apply.",
+      "Frameworks that handle safe areas through a base stylesheet not visible to the linter.",
+      "Older mobile browsers that do not support env() variables."
+    ],
+    "mitigations": [
+      "Only flag at mobile viewport breakpoints. Accept CSS with env() fallback values as good practice."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.mobile.safe-area.violation.fixed-without",
+      "caseType": "violation",
+      "description": "A mobile page with fixed bottom navigation and no safe-area-inset-bottom padding."
+    },
+    {
+      "fixtureId": "fixture.mobile.safe-area.control.fixed-with-padding",
+      "caseType": "control",
+      "description": "Same page with padding-bottom: env(safe-area-inset-bottom, 16px) on the fixed navigation."
+    },
+    {
+      "fixtureId": "fixture.mobile.safe-area.borderline.immersive",
+      "caseType": "borderline",
+      "description": "A full-screen video player that intentionally ignores safe areas for immersion."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

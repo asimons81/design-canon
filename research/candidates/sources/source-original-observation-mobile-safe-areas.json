@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.mobile-safe-areas",
+  "sourceType": "original-observation",
+  "title": "Mobile viewport safe-area neglect in AI-generated interfaces",
+  "sourceLocation": "Review of AI-generated mobile-responsive code",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI-generated mobile interfaces fail to account for viewport safe areas (notch, Dynamic Island, home indicator, rounded corners), placing interactive elements in obscured regions.",
+  "supportingClaims": [
+    "Mobile UIs require env(safe-area-inset-*) to avoid placing content behind notches and hardware features.",
+    "Fixed-position elements at the bottom of the viewport are particularly susceptible to home-indicator occlusion."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

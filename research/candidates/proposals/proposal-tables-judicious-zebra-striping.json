@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.tables.judicious-zebra-striping",
+  "proposedRuleId": "tables.judicious-zebra-striping",
+  "title": "Use zebra striping only when it improves scanability",
+  "status": "researched",
+  "category": "tables",
+  "surfaces": [
+    "product-app",
+    "documentation"
+  ],
+  "summary": "AI-generated tables apply alternating row colors to every table by default, even when the table has few rows or clear column separation.",
+  "instruction": "Use zebra striping (alternating row background colors) only when a table has enough rows and columns that tracking across rows is difficult without it. Tables with fewer than 10 rows or strong column separators do not need zebra striping.",
+  "rationale": "Zebra striping adds visual noise that can counteract its intended benefit in small tables. A 4-row table with clear column headers and adequate row spacing is more readable without alternating backgrounds. Zebra striping is most effective in wide tables (6+ columns) with 15+ rows where the eye needs help tracking horizontally.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.table-zebra-defaults"
+  ],
+  "examples": {
+    "violations": [
+      "A 4-row settings table with alternating row colors where columns are clearly separated.",
+      "A 6-row data table with 3 columns using zebra striping when row hover would suffice."
+    ],
+    "controls": [
+      "A 50-row data table with 8 columns where zebra striping helps track across wide content.",
+      "A 4-row table with no zebra striping but 12px row padding and clear column headers."
+    ],
+    "borderline": [
+      "A calendar grid where alternating row colors help distinguish weeks \u2014 the entire row is a temporal unit."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Design systems that apply zebra striping consistently for brand style. Accessibility overrides where users prefer high-contrast row separation.",
+      "examples": [
+        "Enterprise design system table component",
+        "User accessibility stylesheet preference"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Detect nth-child background color CSS rules on table rows. Count rows in HTML. Flag if fewer than 10 rows AND zebra striping is detected. Exclude tables with 8+ columns (where striping is more justified).",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "nth-child",
+        "background-color"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Row count may be dynamically generated and not present in static HTML.",
+      "CSS class-based striping (odd/even classes) is harder to detect than nth-child rules.",
+      "Responsive tables may hide columns, changing the width justification."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "Design systems that apply zebra striping to all tables intentionally.",
+      "Accessibility settings that add high-contrast row differentiation."
+    ],
+    "mitigations": [
+      "Auto-detect row count from HTML when available. Allow suppression for design-system-level defaults."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.tables.zebra.violation.small-striped",
+      "caseType": "violation",
+      "description": "A 5-row table with nth-child(even) { background: #f9f9f9 }."
+    },
+    {
+      "fixtureId": "fixture.tables.zebra.control.no-stripe",
+      "caseType": "control",
+      "description": "Same 5-row table with no zebra striping, just row hover highlight."
+    },
+    {
+      "fixtureId": "fixture.tables.zebra.borderline.wide-table",
+      "caseType": "borderline",
+      "description": "A 12-row, 9-column table with zebra striping justified by table dimensions."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}

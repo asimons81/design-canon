@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schema/research-source.schema.json",
+  "schemaVersion": 1,
+  "sourceId": "source.original-observation.carousel-auto-advance",
+  "sourceType": "original-observation",
+  "title": "Auto-advancing hero carousels in AI-generated marketing pages",
+  "sourceLocation": "Review of AI-generated landing pages and marketing site code",
+  "accessedAt": "2026-07-18T12:00:00Z",
+  "licenseStatus": "not-applicable",
+  "summary": "AI-generated marketing pages frequently include auto-advancing hero carousels without pause controls, reducing content visibility and user control.",
+  "supportingClaims": [
+    "Auto-advancing carousels advance before users finish reading, reducing content comprehension.",
+    "NN Group research shows that fewer than 1% of users interact with hero carousels, making auto-advance an ineffective content delivery mechanism."
+  ],
+  "independence": {
+    "publiclyAccessible": true,
+    "noPaywallBypass": true,
+    "noLeakedMaterial": true,
+    "notDerivedFromPrivateEpsteinMd": true,
+    "independentSynthesis": true
+  }
+}

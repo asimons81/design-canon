@@ -1,0 +1,95 @@
+{
+  "$schema": "../../schema/rule-proposal.schema.json",
+  "schemaVersion": 1,
+  "proposalId": "proposal.radius.reserved-softening",
+  "proposedRuleId": "radius.reserved-softening",
+  "title": "Do not default to zero radius on all surfaces",
+  "status": "researched",
+  "category": "radius",
+  "surfaces": [
+    "product-app",
+    "universal"
+  ],
+  "summary": "AI agents generating business/professional interfaces default to 0px border-radius on all elements, overcorrecting from the pill-radius reflex and creating harsh interfaces.",
+  "instruction": "Use border-radius as part of the product's shape language. Interactive elements (buttons, inputs, cards) benefit from slight rounding (2-6px) for visual approachability. Reserve zero-radius for data containers where precision communicates functionality.",
+  "rationale": "Sharp corners on every surface is the opposite reflex of pill-radius on everything -- both are defaults that should be replaced with intentional choice. Interactive elements with slight rounding are more approachable and communicate clickability. Data containers (tables, code blocks) appropriately use sharp corners to signal precision.",
+  "claimType": "original-observation",
+  "sourceIds": [
+    "source.original-observation.product-dashboard-sharp-corners"
+  ],
+  "examples": {
+    "violations": [
+      "An enterprise dashboard where cards, inputs, buttons, modals, and badges all have border-radius: 0px.",
+      "A medical app interface with zero-radius on every interactive element."
+    ],
+    "controls": [
+      "A dashboard with 4px on cards, 6px on buttons, 0px on data tables -- functional role separation.",
+      "A professional tool with 2px radius on interactive elements and 0px on data containers."
+    ],
+    "borderline": [
+      "A terminal-inspired interface where zero-radius is part of the aesthetic (design direction documented)."
+    ]
+  },
+  "exceptions": [
+    {
+      "description": "Terminal/CLI-inspired interfaces, architecture/CAD tools where precision aesthetics demand sharp corners, and print-style editorial where zero-radius is intentional.",
+      "examples": [
+        "Terminal emulator interface",
+        "CAD tool UI",
+        "Command-line tool dashboard"
+      ]
+    }
+  ],
+  "universalBan": false,
+  "detector": {
+    "feasibility": "semantic",
+    "signalDescription": "Count all border-radius declarations. If 90%+ are 0px AND the design is not a documented terminal-style interface, flag for review. Focus specifically on interactive elements (buttons, inputs) where softening is expected.",
+    "matcherProposal": {
+      "kind": "css-property",
+      "patterns": [
+        "border-radius",
+        "rounded"
+      ],
+      "caseSensitive": false
+    },
+    "limitations": [
+      "Elements without border-radius declaration inherit from parent -- they are not intentionally 0px.",
+      "Tailwind 'rounded-none' is explicit; absence of 'rounded-*' is implicit and should not count."
+    ]
+  },
+  "impact": "nuisance",
+  "falsePositiveRisk": {
+    "level": "low",
+    "scenarios": [
+      "A data-dense admin interface where zero-radius on ALL surfaces is the product's documented design direction.",
+      "A mobile OS-level interface that follows platform conventions (0px)."
+    ],
+    "mitigations": [
+      "Flag only when radius: 0 appears on interactive elements, not on structural containers. Check for a design-direction rule that justifies sharpness."
+    ]
+  },
+  "fixturePlan": [
+    {
+      "fixtureId": "fixture.radius.sharp.violation.all-zero",
+      "caseType": "violation",
+      "description": "A form where all inputs, buttons, selects have border-radius: 0."
+    },
+    {
+      "fixtureId": "fixture.radius.sharp.control.role-based",
+      "caseType": "control",
+      "description": "A form with inputs at 4px, buttons at 6px, data table at 0px."
+    },
+    {
+      "fixtureId": "fixture.radius.sharp.borderline.terminal-themed",
+      "caseType": "borderline",
+      "description": "A terminal-themed admin panel with 0px everywhere and documented design direction."
+    }
+  ],
+  "provenanceAttestation": {
+    "cleanRoom": true,
+    "notCopiedFromPrivateCorpus": true,
+    "notReverseEngineeredFromEpsteinMd": true,
+    "sourcesRecorded": true,
+    "originalSynthesis": true
+  }
+}
