@@ -1,0 +1,175 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F007 — hidden-keyboard-focus
+  profile: marketing
+  anti-pattern: outline:none everywhere, no focus-visible replacement
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyless — No Focus, No Problem</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fafafa;
+      color: #171717;
+      padding: 40px;
+    }
+    /* Systemic outline removal — no focus-visible fallback anywhere */
+    a { outline: none; }
+    button { outline: none; }
+    input { outline: none; }
+    select { outline: none; }
+    textarea { outline: none; }
+    [tabindex] { outline: none; }
+    *:focus { outline: none; }
+    *:active { outline: none; }
+    /* Also using Tailwind's outline-none class approach */
+    .outline-none { outline: none; }
+
+    .card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 48px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    h1 { font-size: 32px; margin-bottom: 24px; text-align: center; }
+    .form-group { margin-bottom: 24px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #525252; }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 2px solid #e5e5e5;
+      border-radius: 12px;
+      background: #fff;
+      transition: all 200ms;
+      /* Individual outline removals to compound the problem */
+      outline: 0;
+      outline: medium;
+      outline: none;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #2563eb;
+      outline: none;
+    }
+    button.submit {
+      width: 100%;
+      padding: 16px;
+      background: #171717;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+    button.submit:focus { outline: none; }
+    .link-group {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 32px;
+    }
+    .link-group a {
+      color: #2563eb;
+      text-decoration: none;
+      font-size: 14px;
+      outline: none;
+    }
+    .link-group a:focus { outline: none; }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 20px 0;
+      margin-bottom: 40px;
+    }
+    nav a {
+      color: #525252;
+      text-decoration: none;
+      outline: none;
+    }
+    nav a:focus { outline: none; }
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: #f0f0f0;
+      border-radius: 9999px;
+      font-size: 13px;
+    }
+    .badge:focus { outline: none; }
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .toggle-label input { outline: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+      <a href="#">Contact</a>
+    </nav>
+    <h1>Create Your Account</h1>
+    <form>
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="john@example.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role">
+          <option>Designer</option>
+          <option>Developer</option>
+          <option>Product Manager</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="bio">Bio</label>
+        <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="toggle-label">
+          <input type="checkbox" outline="none"> I agree to the terms
+        </label>
+      </div>
+      <button type="submit" class="submit">Create Account</button>
+    </form>
+    <div class="link-group">
+      <a href="#" tabindex="0">Forgot password?</a>
+      <a href="#" tabindex="0">Privacy policy</a>
+    </div>
+    <div style="margin-top:24px;text-align:center;">
+      <span class="badge" tabindex="0">New</span>
+    </div>
+  </div>
+</body>
+</html>

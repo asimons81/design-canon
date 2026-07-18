@@ -1,0 +1,222 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F013 — inconsistent-spacing
+  profile: marketing
+  anti-pattern: Random margins/padding with no token system, inconsistent rhythm
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChaosGrid — Every Spacing Value Different</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #fafafa;
+      color: #171717;
+    }
+    /*
+     * INTENTIONAL: Every spacing value is different — no tokens, no system, no rhythm.
+     * Margins and padding range erratically: 11px, 19px, 27px, 35px, 42px, 51px, etc.
+     */
+    .page { max-width: 900px; margin: 0 auto; }
+    header {
+      padding: 27px 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      margin: 11px 19px 27px;
+    }
+    .logo { font-size: 22px; font-weight: 700; }
+    nav { display: flex; gap: 19px; }
+    nav a {
+      text-decoration: none;
+      color: #525252;
+      font-size: 15px;
+      padding: 7px 13px;
+      background: #f5f5f5;
+      border-radius: 6px;
+    }
+    .hero {
+      padding: 51px 27px;
+      margin: 0 11px 35px;
+      background: #fff;
+      border-radius: 14px;
+    }
+    .hero h1 {
+      font-size: 44px;
+      font-weight: 800;
+      margin-bottom: 19px;
+    }
+    .hero p {
+      font-size: 18px;
+      color: #737373;
+      line-height: 1.7;
+      margin-bottom: 42px;
+      max-width: 600px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 11px;
+    }
+    .btn {
+      padding: 15px 37px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary { background: #171717; color: #fff; }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 19px;
+      padding: 27px;
+      margin: 0 11px 42px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 31px 27px;
+    }
+    .feature-card h3 { font-size: 20px; margin-bottom: 11px; }
+    .feature-card p { font-size: 15px; color: #737373; line-height: 1.6; }
+    .section-title {
+      font-size: 30px;
+      font-weight: 700;
+      padding: 0 19px;
+      margin: 51px 11px 19px;
+    }
+    .testimonials {
+      display: flex;
+      gap: 27px;
+      padding: 19px 35px;
+      margin: 0 11px 51px;
+    }
+    .testimonial {
+      background: #fff;
+      border-radius: 14px;
+      padding: 35px 27px;
+      flex: 1;
+    }
+    .testimonial blockquote {
+      font-size: 16px;
+      font-style: italic;
+      color: #525252;
+      margin-bottom: 19px;
+      line-height: 1.6;
+    }
+    .testimonial cite {
+      font-size: 14px;
+      font-weight: 600;
+      color: #171717;
+    }
+    .cta-banner {
+      background: #171717;
+      color: #fff;
+      padding: 42px 27px;
+      margin: 0 19px 35px;
+      border-radius: 16px;
+      text-align: center;
+    }
+    .cta-banner h2 {
+      font-size: 28px;
+      margin-bottom: 11px;
+    }
+    .cta-banner p {
+      font-size: 16px;
+      color: #a3a3a3;
+      margin-bottom: 27px;
+    }
+    .cta-banner .btn {
+      background: #fff;
+      color: #171717;
+      padding: 17px 42px;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 51px;
+      padding: 35px 19px;
+      margin: 0 27px 42px;
+    }
+    .stat { text-align: center; }
+    .stat .num { font-size: 30px; font-weight: 800; }
+    .stat .lbl { font-size: 13px; color: #737373; margin-top: 7px; }
+    footer {
+      text-align: center;
+      padding: 27px 19px;
+      margin: 35px 11px 0;
+      color: #a3a3a3;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo">ChaosGrid</div>
+      <nav>
+        <a href="#">Product</a>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <h1>Spacing? We Don't Know Her</h1>
+      <p>Every margin and padding value on this page is unique. No two adjacent elements share the same spacing. We deliberately avoided any pattern, token, or system.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary">Get Started</button>
+        <button class="btn" style="background:#f0f0f0;color:#171717;">Learn More</button>
+      </div>
+    </section>
+    <h2 class="section-title">Our Chaotic Features</h2>
+    <div class="features">
+      <div class="feature-card">
+        <h3>Random Padding</h3>
+        <p>Each card has a different internal spacing. The 31px top padding was chosen for no reason.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Arbitrary Gaps</h3>
+        <p>Grid gaps vary per section. 19px here, 27px there, 51px for the stats. Consistency is boring.</p>
+      </div>
+      <div class="feature-card">
+        <h3>No Token System</h3>
+        <p>Every value is a hardcoded one-off. 7px, 11px, 13px, 15px, 17px, 19px — we use them all.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Margins from Mars</h3>
+        <p>Margins are applied in unpredictable ways. Some elements have margin on one side only.</p>
+      </div>
+    </div>
+    <h2 class="section-title">What People Say</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <blockquote>"The spacing is truly unique. I've never seen 27px used so consistently... wait, no. 35px here. 19px there."</blockquote>
+        <cite>— Confused Designer</cite>
+      </div>
+      <div class="testimonial">
+        <blockquote>"Every time I resize my browser, the layout does something unexpected. I love the chaos."</blockquote>
+        <cite>— QA Engineer</cite>
+      </div>
+    </div>
+    <div class="cta-banner">
+      <h2>Join the Chaos</h2>
+      <p>Sign up now. Or don't. The spacing will be different either way.</p>
+      <button class="btn">Get Started for Free</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">11px</div><div class="lbl">Min Spacing</div></div>
+      <div class="stat"><div class="num">51px</div><div class="lbl">Max Spacing</div></div>
+      <div class="stat"><div class="num">27</div><div class="lbl">Unique Values</div></div>
+    </div>
+    <footer>&copy; 2026 ChaosGrid. Inconsistent by design.</footer>
+  </div>
+</body>
+</html>

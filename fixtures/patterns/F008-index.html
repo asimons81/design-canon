@@ -1,0 +1,185 @@
+<!doctype html>
+<!--
+  DESIGN CANON FIXTURE — generated fixture
+  provenance: generated fixture, anti-slop suite
+  fixture: F008 — transition-all
+  profile: marketing
+  anti-pattern: Every element has transition:all, no property-specific animation
+-->
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmoothOps — Everything Animates</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 40px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    /* Every single element uses transition:all — the universal anti-pattern */
+    * { transition: all 200ms ease; }
+    html { transition: all 300ms; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 32px;
+      background: #fff;
+      border-radius: 16px;
+      margin-bottom: 32px;
+      transition: all 300ms;
+    }
+    header:hover { transition: all 150ms; }
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      transition: all 200ms;
+    }
+    .logo:hover { transition: all 100ms; }
+    nav a {
+      margin-left: 24px;
+      text-decoration: none;
+      color: #475569;
+      transition: all 200ms;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+    nav a:hover { transition: all 300ms; }
+    h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      transition: all 200ms;
+    }
+    h1:hover { transition: all 400ms; }
+    p {
+      font-size: 18px;
+      color: #64748b;
+      line-height: 1.7;
+      margin-bottom: 24px;
+      transition: all 250ms;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 24px;
+      transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      transition: all 200ms;
+    }
+    .card h3 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      transition: all 200ms;
+    }
+    .card p { font-size: 16px; transition: all 200ms; }
+    button {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 36px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    button:hover {
+      background: #1e293b;
+      transition: all 150ms;
+    }
+    .badge {
+      display: inline-block;
+      background: #dbeafe;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 200ms;
+    }
+    .badge:hover { transition: all 200ms; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 32px 0;
+      transition: all 300ms;
+    }
+    .grid-item {
+      background: #fff;
+      padding: 32px;
+      border-radius: 16px;
+      text-align: center;
+      transition: all 250ms;
+    }
+    .grid-item:hover { transition: all 250ms; }
+    .progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      margin: 24px 0;
+      transition: all 300ms;
+    }
+    .progress-fill {
+      width: 70%;
+      height: 100%;
+      background: #3b82f6;
+      border-radius: 9999px;
+      transition: all 500ms;
+    }
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: #94a3b8;
+      transition: all 200ms;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SmoothOps</div>
+      <nav>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">About</a>
+      </nav>
+    </header>
+    <h1>Smooth Transitions for Everything</h1>
+    <p>Every element on this page animates. Hover over anything and watch the universal transition:all spring to life. No property is too small to animate.</p>
+    <div class="card">
+      <h3>Card With All Animations</h3>
+      <p>This card, its heading, its paragraph, and every nested element all have transition:all. Hovering triggers cascading transitions on unrelated properties.</p>
+      <button>Learn More</button>
+    </div>
+    <div class="grid">
+      <div class="grid-item">
+        <span class="badge">Popular</span>
+        <h3 style="margin:16px 0;">Starter</h3>
+        <p style="font-size:36px;font-weight:800;">$19</p>
+        <button>Get Started</button>
+      </div>
+      <div class="grid-item">
+        <span class="badge">Best Value</span>
+        <h3 style="margin:16px 0;">Pro</h3>
+        <p style="font-size:36px;font-weight:800;">$49</p>
+        <button>Get Started</button>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    <footer>&copy; 2026 SmoothOps. All transitions reserved.</footer>
+  </div>
+</body>
+</html>
