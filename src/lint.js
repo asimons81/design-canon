@@ -409,9 +409,15 @@ export async function lintPath({
                 },
                 pageAdapters: {
                   evaluate: (fn, arg) => {
+                    // fn can be a function (serialized by Playwright) or a string expression
                     if (typeof fn === 'function') {
-                      return page.evaluate(arg !== undefined ? fn : fn.toString(), arg);
+                      // Playwright serializes functions to the browser
+                      if (arg !== undefined) {
+                        return page.evaluate(fn, arg);
+                      }
+                      return page.evaluate(fn);
                     }
+                    // String expression evaluated directly
                     return page.evaluate(fn);
                   },
                   getComputedStyle: (sel, prop) =>

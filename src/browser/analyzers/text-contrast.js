@@ -17,7 +17,6 @@
  * color spaces, unresolved colors, ambiguous overlap).
  */
 
-import { VALID_SAMPLE_STATUSES, VALID_SAMPLE_OUTCOMES, INDETERMINATE_REASONS } from '../schema.js';
 import {
   parseComputedColor,
   isUnsupportedColorSpace,
@@ -34,16 +33,187 @@ import {
 const CANVAS_FALLBACK = { r: 255, g: 255, b: 255, a: 1 };
 
 /**
+ * Self-contained function that runs in the browser page context.
+ * Collects all eligible text elements with computed styles,
+ * selectors, ancestor backgrounds, and unsupported-effect detection.
+ *
+ * Must be entirely self-contained — no references to module-level
+ * variables, since it is serialized and evaluated remotely.
+ *
+ * @returns {Array<{selector:string, text:string, style:object, effect:string|null}>}
+ */
+const COLLECT_TEXT_ELEMENTS_FN = (() => {
+  // string content comes from the toString() of a self-contained function
+  function collectTextElements() {
+    var results = [];
+
+    function generateSelector(el) {
+      if (el.id) {
+        return '#' + CSS.escape(el.id);
+      }
+      var parts = [];
+      var current = el;
+      while (current && current !== document.body && current !== document.documentElement) {
+        var parent = current.parentElement;
+        if (!parent) break;
+        var tag = current.tagName.toLowerCase();
+        var nth = 1;
+        var siblings = parent.children;
+        for (var i = 0; i < siblings.length; i++) {
+          if (siblings[i] === current) break;
+          if (siblings[i].tagName === current.tagName) nth++;
+        }
+        parts.unshift(tag + ':nth-of-type(' + nth + ')');
+        current = parent;
+      }
+      return parts.join(' > ');
+    }
+
+    function collectAncestorBackgrounds(el) {
+      var backgrounds = [];
+      var current = el.parentElement;
+      while (current) {
+        var cs = getComputedStyle(current);
+        backgrounds.push({
+          tag: current.tagName.toLowerCase(),
+          backgroundColor: cs.backgroundColor,
+          backgroundImage: cs.backgroundImage,
+          opacity: cs.opacity,
+          mixBlendMode: cs.mixBlendMode,
+          backgroundBlendMode: cs.backgroundBlendMode,
+          filter: cs.filter,
+          backdropFilter: cs.backdropFilter
+        });
+        current = current.parentElement;
+      }
+      return backgrounds;
+    }
+
+    function hasUnsupportedVisualEffect(el) {
+      var cs = getComputedStyle(el);
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+        if (cs.backgroundImage.toLowerCase().indexOf('gradient') !== -1) return 'gradient';
+        return 'background-image';
+      }
+      var op = parseFloat(cs.opacity);
+      if (!isNaN(op) && op < 1) return 'opacity';
+      if (cs.mixBlendMode && cs.mixBlendMode !== 'normal') return 'mix-blend-mode';
+      if (cs.backgroundBlendMode && cs.backgroundBlendMode !== 'normal') return 'background-blend-mode';
+      if (cs.filter && cs.filter !== 'none') return 'filter';
+      if (cs.backdropFilter && cs.backdropFilter !== 'none') return 'backdrop-filter';
+      if (cs.maskImage && cs.maskImage !== 'none') return 'mask';
+      if (cs.webkitMaskImage && cs.webkitMaskImage !== 'none') return 'mask';
+      if (cs.backgroundClip === 'text') return 'background-clip-text';
+      if (cs.textShadow && cs.textShadow !== 'none' && cs.textShadow !== '0px 0px 0px transparent') return 'text-shadow';
+      var strokeVal = cs.webkitTextStroke || '0';
+      if (strokeVal !== '0px' && strokeVal !== '0') return 'text-stroke';
+
+      var parent = el.parentElement;
+      while (parent) {
+        var pcs = getComputedStyle(parent);
+        var pop = parseFloat(pcs.opacity);
+        if (!isNaN(pop) && pop < 1) return 'opacity';
+        if (pcs.mixBlendMode && pcs.mixBlendMode !== 'normal') return 'mix-blend-mode';
+        if (pcs.filter && pcs.filter !== 'none') return 'filter';
+        parent = parent.parentElement;
+      }
+      return null;
+    }
+
+    var walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: function(node) {
+          var parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+          var tag = parent.tagName.toLowerCase();
+          if (tag === 'script' || tag === 'style' || tag === 'noscript' || tag === 'template') {
+            return NodeFilter.FILTER_REJECT;
+          }
+          var svgCheck = parent;
+          while (svgCheck) {
+            if (svgCheck.tagName.toLowerCase() === 'svg') return NodeFilter.FILTER_REJECT;
+            svgCheck = svgCheck.parentElement;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    var processedElements = new Set();
+    var node;
+    while ((node = walker.nextNode()) !== null) {
+      var parent = node.parentElement;
+      if (!parent) continue;
+      if (processedElements.has(parent)) continue;
+
+      var cs = getComputedStyle(parent);
+      if (cs.display === 'none') continue;
+      if (cs.visibility !== 'visible') continue;
+      if (parent.disabled === true) continue;
+      if (parent.getAttribute('aria-disabled') === 'true') continue;
+
+      var range = document.createRange();
+      range.selectNodeContents(parent);
+      var rects = range.getClientRects();
+      var hasPositiveArea = false;
+      for (var ri = 0; ri < rects.length; ri++) {
+        if (rects[ri].width > 0 && rects[ri].height > 0) {
+          hasPositiveArea = true;
+          break;
+        }
+      }
+      if (!hasPositiveArea) continue;
+
+      var text = parent.textContent || '';
+      var collapsed = text.replace(/\s+/g, ' ').trim();
+      if (!collapsed) continue;
+
+      var effect = hasUnsupportedVisualEffect(parent);
+      var ancestorBackgrounds = collectAncestorBackgrounds(parent);
+      var selector = generateSelector(parent);
+
+      processedElements.add(parent);
+      results.push({
+        selector: selector,
+        text: collapsed,
+        style: {
+          color: cs.color,
+          backgroundColor: cs.backgroundColor,
+          fontSize: cs.fontSize,
+          fontWeight: cs.fontWeight,
+          backgroundImage: cs.backgroundImage,
+          opacity: cs.opacity,
+          mixBlendMode: cs.mixBlendMode,
+          backgroundBlendMode: cs.backgroundBlendMode,
+          filter: cs.filter,
+          backdropFilter: cs.backdropFilter,
+          maskImage: cs.maskImage || cs.webkitMaskImage || 'none',
+          backgroundClip: cs.backgroundClip,
+          textShadow: cs.textShadow,
+          webkitTextStroke: cs.webkitTextStroke || '0',
+          ancestorBackgrounds: ancestorBackgrounds
+        },
+        effect: effect
+      });
+    }
+    return results;
+  }
+  return collectTextElements.toString();
+})();
+
+/**
  * The main analyzer function called by the browser analysis runner.
  *
  * @param {import('../analyzer.js').AnalyzerContext} context
  * @returns {Promise<object>} Analyzer result with status, measurements, samples, message, confidence
  */
 export async function analyzeTextContrast(context) {
-  const { evaluate, getComputedStyle } = context.pageAdapters || context;
+  const { evaluate } = context.pageAdapters || context;
 
   // Step 1: Gather all eligible text elements and their computed styles in one page pass
-  const textElements = await evaluate(collectTextElements);
+  const textElements = await evaluate(COLLECT_TEXT_ELEMENTS_FN);
 
   if (!textElements || textElements.length === 0) {
     return {
@@ -60,12 +230,9 @@ export async function analyzeTextContrast(context) {
     };
   }
 
-  // Step 2: Build a deterministic tree-walker to generate stable selectors
+  // Step 2: Process each element's computed styles into samples
   const samples = [];
   const viewport = context.viewport || 'desktop';
-  const colorScheme = context.colorScheme || 'light';
-  const browserVersion = context.browserVersion || 'unknown';
-  const scanRoot = context.scanRoot || process.cwd();
 
   for (const el of textElements) {
     // Check deadline
@@ -87,9 +254,10 @@ export async function analyzeTextContrast(context) {
     const selector = el.selector;
     const text = collapseWhitespace(el.text);
     const style = el.style;
+    const effect = el.effect;
 
-    // Determine indeterminate conditions
-    const indeterminate = checkIndeterminate(style);
+    // Check indeterminate conditions
+    const indeterminate = checkIndeterminate(style, effect);
     if (indeterminate) {
       samples.push({
         status: 'indeterminate',
@@ -103,36 +271,13 @@ export async function analyzeTextContrast(context) {
     // Parse computed foreground
     const fgParsed = parseComputedColor(style.color);
     if (!fgParsed) {
-      if (isUnsupportedColorSpace(style.color)) {
-        samples.push({
-          status: 'indeterminate',
-          selector,
-          text: text.slice(0, 120),
-          reason: 'unsupported-color-space'
-        });
-        continue;
-      }
       samples.push({
         status: 'indeterminate',
         selector,
         text: text.slice(0, 120),
-        reason: 'unresolved-color'
+        reason: isUnsupportedColorSpace(style.color) ? 'unsupported-color-space' : 'unresolved-color'
       });
       continue;
-    }
-
-    // Parse computed background
-    const bgParsed = parseComputedColor(style.backgroundColor);
-    if (!bgParsed) {
-      if (isUnsupportedColorSpace(style.backgroundColor)) {
-        samples.push({
-          status: 'indeterminate',
-          selector,
-          text: text.slice(0, 120),
-          reason: 'unsupported-color-space'
-        });
-        continue;
-      }
     }
 
     // Resolve background stack: start with canvas fallback, composite each ancestor
@@ -213,212 +358,6 @@ export async function analyzeTextContrast(context) {
 }
 
 /**
- * Collect all eligible rendered text elements in the page.
- * This function runs inside the browser page context (evaluate).
- *
- * @returns {Array<{selector:string, text:string, style:object}>}
- */
-function collectTextElements() {
-  const results = [];
-
-  /**
-   * Generate a stable CSS selector for an element.
-   * @param {Element} el
-   * @returns {string}
-   */
-  function generateSelector(el) {
-    if (el.id) {
-      // Escape special characters in IDs
-      return '#' + CSS.escape(el.id);
-    }
-
-    const parts = [];
-    let current = el;
-
-    while (current && current !== document.body && current !== document.documentElement) {
-      const parent = current.parentElement;
-      if (!parent) break;
-
-      const tag = current.tagName.toLowerCase();
-
-      // Find nth-of-type among siblings
-      let nth = 1;
-      const siblings = parent.children;
-      for (let i = 0; i < siblings.length; i++) {
-        if (siblings[i] === current) break;
-        if (siblings[i].tagName === current.tagName) nth++;
-      }
-
-      parts.unshift(`${tag}:nth-of-type(${nth})`);
-      current = parent;
-    }
-
-    return parts.join(' > ');
-  }
-
-  /**
-   * Collect ancestor styles for background resolution.
-   */
-  function collectAncestorBackgrounds(el) {
-    const backgrounds = [];
-    let current = el.parentElement;
-
-    while (current) {
-      const cs = getComputedStyle(current);
-      backgrounds.push({
-        tag: current.tagName.toLowerCase(),
-        backgroundColor: cs.backgroundColor,
-        backgroundImage: cs.backgroundImage,
-        opacity: cs.opacity,
-        mixBlendMode: cs.mixBlendMode,
-        backgroundBlendMode: cs.backgroundBlendMode,
-        filter: cs.filter,
-        backdropFilter: cs.backdropFilter
-      });
-      current = current.parentElement;
-    }
-
-    return backgrounds;
-  }
-
-  /**
-   * Check if an element or any of its ancestors has unsupported visual effects.
-   */
-  function hasUnsupportedVisualEffect(el) {
-    const cs = getComputedStyle(el);
-
-    // Element-level checks
-    if (cs.backgroundImage && cs.backgroundImage !== 'none') return 'background-image';
-    if (parseFloat(cs.opacity) < 1) return 'opacity';
-    if (cs.mixBlendMode && cs.mixBlendMode !== 'normal') return 'mix-blend-mode';
-    if (cs.backgroundBlendMode && cs.backgroundBlendMode !== 'normal') return 'background-blend-mode';
-    if (cs.filter && cs.filter !== 'none') return 'filter';
-    if (cs.backdropFilter && cs.backdropFilter !== 'none') return 'backdrop-filter';
-    if (cs.maskImage && cs.maskImage !== 'none') return 'mask';
-    if (cs.webkitMaskImage && cs.webkitMaskImage !== 'none') return 'mask';
-    if (cs.backgroundClip === 'text') return 'background-clip-text';
-    if (cs.textShadow && cs.textShadow !== 'none' && cs.textShadow !== '0px 0px 0px transparent') return 'text-shadow';
-    if (cs.webkitTextStroke && cs.webkitTextStroke !== '0px' && cs.webkitTextStroke !== '0') return 'text-stroke';
-    if (cs.textDecorationColor && cs.textDecorationColor !== cs.color) {
-      // Underline color different from text — could affect, but conservative
-    }
-
-    // Check ancestors for opacity
-    let parent = el.parentElement;
-    while (parent) {
-      const pcs = getComputedStyle(parent);
-      if (parseFloat(pcs.opacity) < 1) return 'opacity';
-      if (pcs.mixBlendMode && pcs.mixBlendMode !== 'normal') return 'mix-blend-mode';
-      if (pcs.filter && pcs.filter !== 'none') return 'filter';
-      parent = parent.parentElement;
-    }
-
-    return null;
-  }
-
-  // TreeWalker to walk all text nodes
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT,
-    {
-      acceptNode(node) {
-        // Exclude script, style, noscript, template
-        const parent = node.parentElement;
-        if (!parent) return NodeFilter.FILTER_REJECT;
-
-        const tag = parent.tagName.toLowerCase();
-        if (tag === 'script' || tag === 'style' || tag === 'noscript' || tag === 'template') {
-          return NodeFilter.FILTER_REJECT;
-        }
-
-        // Exclude SVG text
-        let svgCheck = parent;
-        while (svgCheck) {
-          if (svgCheck.tagName.toLowerCase() === 'svg') return NodeFilter.FILTER_REJECT;
-          svgCheck = svgCheck.parentElement;
-        }
-
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    }
-  );
-
-  // Track elements we've already processed (for aggregation)
-  const processedElements = new Set();
-
-  let node;
-  while ((node = walker.nextNode()) !== null) {
-    const parent = node.parentElement;
-    if (!parent) continue;
-
-    // Aggregate: only process the nearest element container once
-    if (processedElements.has(parent)) continue;
-
-    // Check visibility and layout
-    const cs = getComputedStyle(parent);
-    if (cs.display === 'none') continue;
-    if (cs.visibility !== 'visible') continue;
-
-    // Check for disabled state
-    if (parent.disabled && typeof parent.disabled === 'boolean') continue;
-    if (parent.getAttribute('aria-disabled') === 'true') continue;
-
-    // Check zero-area (use text range or element rect)
-    const range = document.createRange();
-    range.selectNodeContents(parent);
-    const rects = range.getClientRects();
-    let hasPositiveArea = false;
-    for (let i = 0; i < rects.length; i++) {
-      if (rects[i].width > 0 && rects[i].height > 0) {
-        hasPositiveArea = true;
-        break;
-      }
-    }
-    if (!hasPositiveArea) continue;
-
-    // Collect text content (collapsed)
-    const text = parent.textContent || '';
-    const collapsed = text.replace(/\s+/g, ' ').trim();
-    if (!collapsed) continue;
-
-    // Check for unsupported visual effects (only on the element itself and ancestors)
-    const effect = hasUnsupportedVisualEffect(parent);
-
-    // Collect ancestor backgrounds
-    const ancestorBackgrounds = collectAncestorBackgrounds(parent);
-
-    const selector = generateSelector(parent);
-
-    processedElements.add(parent);
-
-    results.push({
-      selector,
-      text: collapsed,
-      style: {
-        color: cs.color,
-        backgroundColor: cs.backgroundColor,
-        fontSize: cs.fontSize,
-        fontWeight: cs.fontWeight,
-        backgroundImage: cs.backgroundImage,
-        opacity: cs.opacity,
-        mixBlendMode: cs.mixBlendMode,
-        backgroundBlendMode: cs.backgroundBlendMode,
-        filter: cs.filter,
-        backdropFilter: cs.backdropFilter,
-        maskImage: cs.maskImage || cs.webkitMaskImage,
-        backgroundClip: cs.backgroundClip,
-        textShadow: cs.textShadow,
-        webkitTextStroke: cs.webkitTextStroke || '0',
-        ancestorBackgrounds
-      },
-      effect
-    });
-  }
-
-  return results;
-}
-
-/**
  * Collapse whitespace in a string.
  * @param {string} s
  * @returns {string}
@@ -432,7 +371,12 @@ function collapseWhitespace(s) {
  * Check indeterminate conditions from computed style.
  * Returns null if the element is determinate, or {reason: string} if indeterminate.
  */
-function checkIndeterminate(style) {
+function checkIndeterminate(style, effect) {
+  // Use the effect detected in the browser context first
+  if (effect) {
+    return { reason: effect };
+  }
+
   // Background image/gradient
   if (style.backgroundImage && style.backgroundImage !== 'none') {
     const bi = style.backgroundImage.toLowerCase();
@@ -486,27 +430,22 @@ function checkIndeterminate(style) {
     return { reason: 'text-stroke' };
   }
 
-  // Check ancestor conditions (opacity, mix-blend-mode, filter)
+  // Check ancestor conditions
   if (style.ancestorBackgrounds) {
     for (const ancestor of style.ancestorBackgrounds) {
-      // Opacity on ancestor
       if (ancestor.opacity !== undefined && ancestor.opacity !== null) {
         const op = parseFloat(ancestor.opacity);
         if (!Number.isNaN(op) && op < 1) return { reason: 'opacity' };
       }
-      // Mix blend mode on ancestor
       if (ancestor.mixBlendMode && ancestor.mixBlendMode !== 'normal' && ancestor.mixBlendMode !== '') {
         return { reason: 'mix-blend-mode' };
       }
-      // Background blend mode on ancestor
       if (ancestor.backgroundBlendMode && ancestor.backgroundBlendMode !== 'normal' && ancestor.backgroundBlendMode !== '') {
         return { reason: 'background-blend-mode' };
       }
-      // Filter on ancestor
       if (ancestor.filter && ancestor.filter !== 'none') {
         return { reason: 'filter' };
       }
-      // Backdrop filter on ancestor
       if (ancestor.backdropFilter && ancestor.backdropFilter !== 'none') {
         return { reason: 'backdrop-filter' };
       }
@@ -525,18 +464,14 @@ function resolveBackground(ancestorBackgrounds, ownBackgroundColor) {
 
   // First composite all ancestors in order (from root to element)
   if (ancestorBackgrounds && ancestorBackgrounds.length > 0) {
-    // Reverse: ancestors are collected from parent to root
     for (let i = ancestorBackgrounds.length - 1; i >= 0; i--) {
       const ancestor = ancestorBackgrounds[i];
       if (ancestor.backgroundImage && ancestor.backgroundImage !== 'none') {
-        // Background image makes this indeterminate, but we're already past that check
         continue;
       }
       const bg = parseComputedColor(ancestor.backgroundColor);
-      if (bg) {
-        if (bg.a > 0) {
-          resolved = alphaComposite(bg, resolved);
-        }
+      if (bg && bg.a > 0) {
+        resolved = alphaComposite(bg, resolved);
       }
     }
   }
@@ -554,13 +489,11 @@ function resolveBackground(ancestorBackgrounds, ownBackgroundColor) {
 
 /**
  * Parse a numeric font weight from a computed weight string.
- * Handles numeric values ('400', '700') and keyword mapping.
  */
 function parseNumericWeight(weight) {
   if (!weight) return 400;
   const num = Number(weight);
   if (!Number.isNaN(num)) return Math.round(num);
-  // Keyword mapping (unlikely from computed styles, but defensive)
   const map = {
     normal: 400,
     bold: 700,
@@ -572,8 +505,6 @@ function parseNumericWeight(weight) {
 
 /**
  * Format a {r,g,b,a} color object to a CSS rgb() string.
- * @param {{r:number,g:number,b:number,a:number}} color
- * @returns {string}
  */
 function formatColor(color) {
   return `rgb(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)})`;
