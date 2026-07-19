@@ -10,6 +10,13 @@ import {
 import { selectRules } from './select.js';
 import { detectUnlabeledControls, detectSkipLink } from './html-scanner.js';
 import { detectUnprotectedMotion, detectUnprotectedMotionInHtml, extractStyleBlocks } from './css-reduced-motion.js';
+import {
+  detectBrowserCapability,
+  resolveMode,
+  effectiveMode,
+  parseBrowserConfig,
+  DEFAULT_BROWSER_CONFIG
+} from './browser/index.js';
 
 const MAX_FINDINGS = 10000;
 
@@ -66,11 +73,14 @@ export async function lintPath({
   path,
   profile: requestedProfile = null,
   configPath = null,
-  referenceDate = new Date()
+  referenceDate = new Date(),
+  mode: requestedMode = null
 }) {
   const catalog = await loadCatalog();
   const loadedConfig = await loadConfig(configPath, { catalog, referenceDate });
   const profileName = requestedProfile ?? loadedConfig.config.profile ?? 'product-app';
+  const browserConfig = loadedConfig.browserConfig ?? DEFAULT_BROWSER_CONFIG;
+  const effectiveLintMode = effectiveMode({ cliMode: requestedMode, browserConfig });
   const [profile, files] = await Promise.all([
     loadProfile(profileName),
     collectSourceFiles(path)
@@ -81,6 +91,7 @@ export async function lintPath({
   const findings = [];
   const suppressedFindings = [];
   const skipped = [];
+  const analysisRecords = [];
   const usedSuppressionIndexes = new Set();
   let observedFindings = 0;
 
@@ -270,6 +281,116 @@ export async function lintPath({
     }
   }
 
+  // Browser-assisted analysis when mode is auto or browser
+  if (effectiveLintMode === 'auto' || effectiveLintMode === 'browser') {
+    const capability = await detectBrowserCapability();
+    const resolved = resolveMode(effectiveLintMode, capability);
+
+    if (resolved.skipped) {
+      // In auto mode without browser, record skipped records for each HTML file
+      for (const file of files) {
+        if (file.endsWith('.html')) {
+          const { createAnalysisRecord } = await import('./browser/schema.js');
+          analysisRecords.push(
+            createAnalysisRecord({
+              status: 'skipped',
+              file: normalizePath(relative(process.cwd(), file)),
+              analyzerId: '__runtime__',
+              message: 'Analysis skipped: browser runtime not available in auto mode.'
+            })
+          );
+        }
+      }
+    } else if (resolved.available) {
+      const { launchBrowser, closeBrowser, createAnalysisPage, closeAnalysisPage } =
+        await import('./browser/launcher.js');
+      const { loadLocalPage } = await import('./browser/page.js');
+      const { createAnalysisRecord, confirmedRecord, failedRecord } =
+        await import('./browser/schema.js');
+      const { runAnalyzer } = await import('./browser/analyzer.js');
+
+      let browserInstance;
+      try {
+        browserInstance = await launchBrowser({
+          concurrency: browserConfig.concurrency,
+          pageTimeout: browserConfig.pageTimeout,
+          operationTimeout: browserConfig.operationTimeout,
+          scanRoot: process.cwd()
+        });
+
+        const htmlFiles = files.filter(
+          (file) => file.endsWith('.html')
+        );
+
+        const deadline = Date.now() + browserConfig.operationTimeout;
+
+        for (const file of htmlFiles) {
+          let page;
+          try {
+            page = await createAnalysisPage(browserInstance);
+
+            await loadLocalPage(
+              page,
+              file,
+              browserConfig.viewport,
+              browserConfig.pageTimeout
+            );
+
+            // Get browser version for metadata
+            const browserVersion = browserInstance.browserVersion;
+
+            // Record browser version metadata as a runtime info record
+            analysisRecords.push(
+              createAnalysisRecord({
+                status: 'indeterminate',
+                file: normalizePath(relative(process.cwd(), file)),
+                analyzerId: '__runtime__',
+                viewport: browserConfig.viewport,
+                browserEngine: 'chromium',
+                browserVersion,
+                message: 'Page loaded successfully in browser context.'
+              })
+            );
+          } catch (err) {
+            analysisRecords.push(
+              failedRecord({
+                file: normalizePath(relative(process.cwd(), file)),
+                analyzerId: '__runtime__',
+                message: `Page analysis failed: ${err.message}`,
+                errorType: 'page_load_failed'
+              })
+            );
+          } finally {
+            if (page) {
+              await closeAnalysisPage(page);
+            }
+          }
+        }
+      } catch (err) {
+        analysisRecords.push(
+          createAnalysisRecord({
+            status: 'failed',
+            file: normalizePath(relative(process.cwd(), path)),
+            analyzerId: '__runtime__',
+            error: { type: 'browser_launch_failed', message: err.message }
+          })
+        );
+      } finally {
+        if (browserInstance) {
+          await closeBrowser(browserInstance);
+        }
+      }
+    } else if (resolved.error) {
+      // In browser mode without availability, produce operation error
+      if (effectiveLintMode === 'browser') {
+        const err = new Error(resolved.error);
+        err.browserError = true;
+        err.exitCode = 3;
+        throw err;
+      }
+    }
+  }
+
   const sortFindings = (a, b) =>
     a.file.localeCompare(b.file) ||
     a.line - b.line ||
@@ -284,6 +405,7 @@ export async function lintPath({
   return {
     profile: profile.id,
     config: loadedConfig.path,
+    mode: effectiveLintMode,
     filesDiscovered: files.length,
     filesScanned:
       files.length - skipped.filter((entry) => entry.file !== '*').length,
@@ -295,14 +417,15 @@ export async function lintPath({
       used: usedSuppressionIndexes.size,
       unused: unusedSuppressions
     },
+    analysisRecords,
     errors: findings.filter((finding) => finding.severity === 'error').length,
     warnings: findings.filter((finding) => finding.severity === 'warning').length,
     info: findings.filter((finding) => finding.severity === 'info').length
   };
 }
 
-export async function lintCommand({ path, profile, format, configPath = null }) {
-  const result = await lintPath({ path, profile, configPath });
+export async function lintCommand({ path, profile, format, configPath = null, mode = null }) {
+  const result = await lintPath({ path, profile, configPath, mode });
   if (format === 'json') {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     return result;
@@ -333,6 +456,15 @@ export async function lintCommand({ path, profile, format, configPath = null }) 
   if (result.suppressedFindings.length) {
     console.log(
       `${result.suppressedFindings.length} finding(s) suppressed by ${result.suppressions.used} justified exception(s).`
+    );
+  }
+  if (result.analysisRecords && result.analysisRecords.length > 0) {
+    const confirmed = result.analysisRecords.filter((r) => r.status === 'confirmed').length;
+    const skippedCount = result.analysisRecords.filter((r) => r.status === 'skipped').length;
+    const failed = result.analysisRecords.filter((r) => r.status === 'failed').length;
+    const indeterminate = result.analysisRecords.filter((r) => r.status === 'indeterminate').length;
+    console.log(
+      `Browser analysis: ${confirmed} confirmed, ${indeterminate} indeterminate, ${skippedCount} skipped, ${failed} failed.`
     );
   }
   console.log(

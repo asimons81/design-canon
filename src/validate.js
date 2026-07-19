@@ -2,7 +2,7 @@ export const PROFILE_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const RULE_ID_PATTERN = /^[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
 const ALLOWED_SEVERITIES = new Set(['error', 'warning', 'info']);
 const ALLOWED_REGEX_FLAGS = new Set(['g', 'i', 'm', 's', 'u', 'y']);
-const CONFIG_KEYS = new Set(['$schema', 'version', 'profile', 'suppressions']);
+const CONFIG_KEYS = new Set(['$schema', 'version', 'profile', 'browser', 'suppressions']);
 const SUPPRESSION_KEYS = new Set([
   'rule',
   'files',

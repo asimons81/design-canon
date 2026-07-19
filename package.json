@@ -23,6 +23,7 @@
     "schema/",
     "skills/",
     "docs/CONFIGURATION.md",
+    "docs/decisions/",
     "README.md",
     "LICENSE",
     "SECURITY.md",
@@ -65,6 +66,9 @@
     "hermes-agent"
   ],
   "license": "MIT",
+  "optionalDependencies": {
+    "playwright": ">=1.48"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true

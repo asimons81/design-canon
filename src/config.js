@@ -1,6 +1,7 @@
 import { relative, resolve } from 'node:path';
 import { loadCatalog, readJson } from './io.js';
 import { validateConfig } from './validate.js';
+import { parseBrowserConfig } from './browser/config.js';
 
 export const DEFAULT_CONFIG_FILE = 'design-canon.config.json';
 
@@ -72,11 +73,13 @@ export async function loadConfig(configPath = null, options = {}) {
     index,
     matchers: suppression.files.map(globToRegExp)
   }));
+  const browserConfig = config.browser ? parseBrowserConfig(config.browser) : undefined;
 
   return {
     path: normalizePath(relative(cwd, absolutePath) || requestedPath),
     config,
-    suppressions
+    suppressions,
+    browserConfig
   };
 }
 
