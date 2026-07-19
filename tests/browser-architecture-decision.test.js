@@ -67,12 +67,12 @@ test('ADR-002 keeps browser operational records separate from findings', async (
   assert.match(text, /never become confirmed accessibility findings/);
 });
 
-test('ADR-002 preserves the production-rule sequence without shipping F019 or touch targets', async () => {
+test('ADR-002 preserves the production-rule sequence without shipping touch targets', async () => {
   const text = await readAdr();
   const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
   const serialized = JSON.stringify(catalog);
   assert.match(text, /rendered text contrast/);
   assert.match(text, /rendered touch targets/);
-  assert.doesNotMatch(serialized, /accessibility\.text-contrast-minimum/);
+  assert.match(serialized, /accessibility\.text-contrast-minimum/);
   assert.doesNotMatch(serialized, /mobile\.touch-target-size/);
 });

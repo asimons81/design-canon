@@ -99,9 +99,9 @@ test('candidate decision is upgraded from partial static to browser-rendered imp
   assert.equal(candidate.implementationReadiness, 'ready-for-implementation');
 });
 
-test('decision does not add F019 to the production catalog', async () => {
+test('decision adds F019 to the production catalog', async () => {
   const { catalog } = await load();
   const ids = catalog.rules.map((rule) => rule.id);
-  assert.ok(!ids.includes('accessibility.text-contrast-minimum'));
-  assert.equal(ids.length, 16);
+  assert.ok(ids.includes('accessibility.text-contrast-minimum'));
+  assert.equal(ids.length, 17);
 });
