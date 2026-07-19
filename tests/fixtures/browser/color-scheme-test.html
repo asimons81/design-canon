@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Scheme Test</title>
+<style>
+  .indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    font-size: 20px;
+  }
+  .light-bg {
+    background: white;
+    color: black;
+  }
+  .dark-bg {
+    background: black;
+    color: white;
+  }
+  @media (prefers-color-scheme: light) {
+    body { background: white; color: black; }
+    .indicator { content: 'light'; }
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: black; color: white; }
+    .indicator { content: 'dark'; }
+  }
+</style>
+</head>
+<body>
+  <h1>Color Scheme Test</h1>
+  <div class="indicator" id="scheme-indicator">unknown</div>
+  <script>
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    document.getElementById('scheme-indicator').textContent =
+      mq.matches ? 'dark' : 'light';
+  </script>
+</body>
+</html>

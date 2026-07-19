@@ -15,3 +15,6 @@ export {
   validateProfile,
   validateRule
 } from './validate.js';
+
+// Browser-assisted analysis (optional, requires Playwright)
+export * from './browser/index.js';

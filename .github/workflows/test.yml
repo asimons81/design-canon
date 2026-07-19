@@ -52,3 +52,36 @@ jobs:
           node ./bin/design-canon.js --version
           node ./bin/design-canon.js profiles
           node ./bin/design-canon.js compile --profile marketing --target design > /tmp/DESIGN.md
+
+  browser-test:
+    name: Browser (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install with Playwright
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install chromium
+
+      - name: Run browser tests
+        run: node --test --test-reporter=spec tests/browser-lifecycle.test.js tests/browser-security-integration.test.js
+
+      - name: Verify static output stability
+        run: |
+          node --test --test-reporter=spec tests/browser-regression.test.js
+          node --test --test-reporter=spec tests/browser-schema.test.js
+          node --test --test-reporter=spec tests/browser-capability.test.js
+          node --test --test-reporter=spec tests/browser-security.test.js
