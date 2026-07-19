@@ -1,8 +1,10 @@
 # ADR-002: Browser-Assisted Analysis Architecture
 
-**Status:** Proposed  
-**Date:** 2026-07-18  
+**Status:** Accepted
+**Date:** 2026-07-19
 **Branch:** `architecture/browser-assisted-analysis`  
+**PR:** #18
+**Implemented by:** PR #19, merged as `b856b00`
 **Extends:** ADR-001
 
 ## Context
@@ -13,9 +15,9 @@ A broad static approximation would create deterministic output without trustwort
 
 ## Decision
 
-Design Canon will remain static-first and add an **optional browser-assisted capability** using Playwright with pinned Chromium.
+Design Canon remains static-first and adds an **optional browser-assisted capability** using Playwright `1.61.1` with Chromium.
 
-This ADR authorizes infrastructure only. The browser-foundation PR must not implement contrast, touch targets, frameworks, arbitrary server startup, or public-site crawling.
+This ADR authorizes shared infrastructure only. Production rules must not launch their own browser, bypass lifecycle or security controls, or reinterpret operational failures as accessibility violations. The foundation shipped in PR #19 without adding contrast, touch targets, framework builds, arbitrary server startup, or public-site crawling.
 
 ## Execution Modes
 
@@ -23,7 +25,9 @@ This ADR authorizes infrastructure only. The browser-foundation PR must not impl
 - `auto`: runs static rules and browser analyzers when available; otherwise reports machine-readable `skipped` analysis.
 - `browser`: requires browser capability; unavailable runtime is an explicit operation error.
 
-Exact CLI and configuration names are reserved for the foundation PR.
+The accepted CLI option is `--mode static|auto|browser`. The configuration equivalent is `browser.mode`.
+
+`browser` mode uses exit code `3` when required browser capability is unavailable. Browser availability does not alter existing static findings, ordering, suppression behavior, or static exit semantics.
 
 ## Supported Inputs
 
@@ -46,14 +50,14 @@ Path traversal outside the scan root is rejected.
 
 ## Runtime and Lifecycle
 
-Playwright with Chromium is selected because it provides isolated contexts, deterministic viewports, computed styles, geometry, request interception, timeouts, and mature CI support.
+Playwright `1.61.1` with Chromium is selected because it provides isolated contexts, deterministic viewports, computed styles, geometry, request interception, timeouts, and mature CI support.
 
 A lint operation must:
 
 1. detect capability once
 2. launch at most one browser process
 3. create an isolated context per page
-4. apply security and viewport policy
+4. apply security, viewport, color-scheme, JavaScript, and timeout policy
 5. navigate to the local document
 6. wait for `DOMContentLoaded` plus one bounded layout flush
 7. run registered browser analyzers
@@ -108,17 +112,17 @@ Initial defaults:
 - one browser process per lint operation
 - maximum two concurrent pages
 - 10-second page timeout
-- bounded total-operation timeout
+- 60-second total-operation timeout with a hard operation deadline
 - existing linter file-size caps
 - no screenshots, video, trace, HAR, or downloads by default
 
-Cleanup must be tested after success, timeout, malformed pages, analyzer exceptions, and crashes where practical.
+Cleanup must be tested after success, timeout, malformed pages, analyzer exceptions, and crashes where practical. Navigation, readiness, concurrency waits, and analyzer execution must respect the shorter of their local timeout and the remaining operation time. Late or never-resolving analyzers return failed analysis records rather than hanging the process.
 
 ## Analyzer Boundary
 
 Lifecycle and rule logic must be separate.
 
-A browser analyzer receives a bounded internal context containing normalized file path, scan root, selected viewport, operation deadline, rule metadata, evidence helpers, and page access through an internal adapter.
+A browser analyzer registers through `registerAnalyzer(capabilityId, analyzerFunction)` and receives a bounded internal context containing normalized file path, scan root, selected viewport, operation deadline, rule metadata, and controlled evidence helpers. Registered analyzers are enumerated and executed through `lintPath` after page readiness.
 
 An analyzer must not launch browsers, change global configuration, access files outside the scan root, perform network requests, mutate the repository, or write arbitrary artifacts.
 
@@ -152,7 +156,7 @@ Browser metadata must include:
 - relevant computed measurements
 - bounded confidence text
 
-The foundation PR must define a backward-compatible JSON schema before browser rules ship.
+The shipped foundation defines a backward-compatible JSON schema. Browser analysis records carry status, analyzer ID, viewport, browser engine and version, measurements, message, confidence, and operational error details when applicable.
 
 ## Static and Browser Coexistence
 
@@ -173,7 +177,7 @@ Existing supression syntax, rationale, scope, expiry, and unused-suppression rep
 
 ## Packaging and CI
 
-Playwright must not become mandatory for static users. Chromium binaries must not be bundled in the npm tarball. The foundation PR must choose and validate an optional delivery mechanism and document explicit setup, such as:
+Playwright is pinned as the exact optional dependency `1.61.1`; it is not mandatory for static users. Chromium binaries are not bundled in the npm tarball. Browser setup is explicit:
 
 ```bash
 npx playwright install chromium
@@ -242,25 +246,29 @@ Costs and risks:
 
 These risks are accepted only with the gates and sequence above.
 
-## Reserved Decisions for the Foundation PR
+## Resolved Foundation Decisions
 
-The next PR must explicitly decide and test:
+PR #19 resolved and tested the previously reserved decisions:
 
-- CLI and config names
-- optional dependency mechanism
-- failed-analysis exit codes
-- final structured result schema
-- browser-version metadata location
-- scan-root local-origin mechanism
-- per-operation JavaScript control
-- color-scheme defaults
-- browser CI Node matrix
-- concurrency override limits
+- CLI: `--mode static|auto|browser`
+- config: `browser.mode`, `viewport`, `javaScriptEnabled`, `colorScheme`, `concurrency`, `pageTimeout`, and `operationTimeout`
+- optional dependency: exact `playwright` version `1.61.1`
+- Chromium setup: `npx playwright install chromium`
+- browser-unavailable exit code: `3` in required browser mode
+- analysis statuses: `confirmed`, `indeterminate`, `skipped`, and `failed`
+- local origin: normalized `file://` URLs restricted to the scan root
+- JavaScript default: enabled, configurable per operation
+- color scheme: `light` or `dark`, applied to isolated contexts
+- viewports: `desktop` 1440 x 900 and `mobile` 390 x 844
+- concurrency default: `2`, validated within configured bounds
+- page timeout default: 10 seconds
+- operation timeout default: 60 seconds with hard analyzer deadlines
+- CI: static Node 20/22/24 plus a separate Chromium job on Node 20
 
-None may be decided implicitly inside a production rule.
+These decisions are infrastructure contracts. Production rules may consume them but must not redefine them.
 
 ## Outcome
 
-The browser layer is infrastructure, not proof of conformance. It may confirm bounded rendered measurements, report indeterminate cases, or state that analysis was skipped or failed.
+The browser layer is infrastructure, not proof of conformance. It confirms bounded rendered measurements, reports indeterminate cases, and records when analysis was skipped or failed.
 
 This architecture is required before production implementation of `accessibility.text-contrast-minimum` and `mobile.touch-target-size`.
