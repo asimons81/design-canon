@@ -1,0 +1,2 @@
+.card { animation: fade 300ms ease; }
+.title { animation-name: slideIn; }

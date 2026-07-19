@@ -16,6 +16,7 @@
     "typography"
   ],
   "includeRules": [
-    "forms.input-labels-required"
+    "forms.input-labels-required",
+    "motion.respect-reduced-motion"
   ]
 }
