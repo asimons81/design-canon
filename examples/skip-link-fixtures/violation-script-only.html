@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Violation: fake skip link in script</title></head>
+<body>
+  <script>
+    document.write('<a href="#main-content">Skip to main content</a>');
+  </script>
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+    </ul>
+  </nav>
+  <div>
+    <h1>Script-generated link only</h1>
+  </div>
+</body>
+</html>
