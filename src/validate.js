@@ -142,12 +142,44 @@ export function validateRule(rule, index) {
   if (rule.detect !== undefined) {
     requireObject(rule.detect, `rule '${rule.id}'.detect`);
     requireString(rule.detect.message, `rule '${rule.id}'.detect.message`);
-    if (!Array.isArray(rule.detect.patterns) || rule.detect.patterns.length === 0) {
-      fail(`rule '${rule.id}'.detect.patterns must be a non-empty array.`);
+    const hasPatterns = Array.isArray(rule.detect.patterns) && rule.detect.patterns.length > 0;
+    const hasBrowser = rule.detect.browserAnalyzer !== undefined;
+
+    if (!hasPatterns && !hasBrowser) {
+      fail(`rule '${rule.id}'.detect must contain either patterns or browserAnalyzer.`);
     }
-    rule.detect.patterns.forEach((pattern, patternIndex) => {
-      validatePattern(pattern, rule.id, patternIndex);
-    });
+    if (hasPatterns && hasBrowser) {
+      fail(`rule '${rule.id}'.detect must not contain both patterns and browserAnalyzer.`);
+    }
+
+    if (hasPatterns) {
+      for (const [index, pattern] of rule.detect.patterns.entries()) {
+        validatePattern(pattern, rule.id, index);
+      }
+    }
+
+    if (hasBrowser) {
+      const ba = rule.detect.browserAnalyzer;
+      requireString(ba.id, `rule '${rule.id}'.detect.browserAnalyzer.id`);
+      if (ba.id.trim().length === 0) {
+        fail(`rule '${rule.id}'.detect.browserAnalyzer.id must be a non-empty string.`);
+      }
+      if (!Array.isArray(ba.extensions) || ba.extensions.length === 0) {
+        fail(`rule '${rule.id}'.detect.browserAnalyzer.extensions must be a non-empty array.`);
+      }
+      for (const [extIndex, ext] of ba.extensions.entries()) {
+        requireString(ext, `rule '${rule.id}'.detect.browserAnalyzer.extensions[${extIndex}]`);
+        if (!/^\.[a-z0-9]+$/.test(ext)) {
+          fail(`rule '${rule.id}'.detect.browserAnalyzer.extensions[${extIndex}] must start with a dot followed by lowercase alphanumeric characters.`);
+        }
+      }
+      const allowedKeys = new Set(['id', 'extensions']);
+      for (const key of Object.keys(ba)) {
+        if (!allowedKeys.has(key)) {
+          fail(`rule '${rule.id}'.detect.browserAnalyzer contains unknown property '${key}'.`);
+        }
+      }
+    }
   }
   return rule;
 }

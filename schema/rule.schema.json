@@ -15,7 +15,7 @@
     "verify": { "type": "array", "items": { "type": "string" } },
     "detect": {
       "type": "object",
-      "required": ["message", "patterns"],
+      "required": ["message"],
       "properties": {
         "message": { "type": "string" },
         "patterns": {
@@ -29,8 +29,31 @@
               "multiple": { "type": "boolean" }
             }
           }
+        },
+        "browserAnalyzer": {
+          "type": "object",
+          "required": ["id", "extensions"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "extensions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\.[a-z0-9]+$"
+              },
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false
         }
-      }
+      },
+      "oneOf": [
+        { "required": ["patterns"] },
+        { "required": ["browserAnalyzer"] }
+      ]
     }
   },
   "additionalProperties": false
