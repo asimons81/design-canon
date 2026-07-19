@@ -344,6 +344,34 @@
           }
         ]
       }
+    },
+    {
+      "id": "accessibility.skip-link",
+      "category": "accessibility",
+      "title": "Provide a static skip link to main content",
+      "severity": "warning",
+      "appliesTo": [
+        "marketing",
+        "editorial",
+        "product-app"
+      ],
+      "instruction": "Include a same-document anchor as one of the first focusable elements that targets the main-content region. The link must have a supported accessible name (visible text, aria-label, or aria-labelledby) and resolve to a <main> element or an element with role=\"main\" in the same file. Static analysis cannot verify runtime focus behavior or CSS visibility.",
+      "rationale": "Keyboard users need a mechanism to bypass repeated navigation blocks. A skip link targeting the main-content region is the most widely supported technique. Static analysis can confirm the presence of a supported skip-link structure but cannot prove runtime keyboard behavior or complete WCAG 2.4.1 (Bypass Blocks) conformance.",
+      "verify": [
+        "The page contains an <a href=\"#...\"> element before the first <nav> element, with visible link text or aria-label.",
+        "The fragment target exists in the same file and is a <main> element or an element with role=\"main\".",
+        "Note: Static analysis does not verify CSS visibility on focus, client-side routing, JavaScript focus management, or alternative bypass mechanisms such as ARIA landmarks."
+      ],
+      "detect": {
+        "message": "No supported static skip link targeting a main-content region was found.",
+        "patterns": [
+          {
+            "source": "f018strct",
+            "flags": "gi",
+            "multiple": false
+          }
+        ]
+      }
     }
   ]
 }

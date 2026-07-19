@@ -336,12 +336,17 @@ test('suppression: per-rule suppression suppresses F016 findings', async () => {
       files: ['**/test.html'],
       reason: 'Test suppression for F016.',
       expires: '2099-01-01'
+    }, {
+      rule: 'accessibility.skip-link',
+      files: ['**/test.html'],
+      reason: 'Test suppression for orthogonal F018 finding.',
+      expires: '2099-01-01'
     }]
   }), 'utf8');
   const result = await lintPath({ path: sourcePath, configPath });
   assert.equal(result.findings.length, 0);
-  assert.equal(result.suppressedFindings.length, 1);
-  assert.equal(result.suppressedFindings[0].rule, 'forms.input-labels-required');
+  assert.ok(result.suppressedFindings.length >= 1);
+  assert.ok(result.suppressedFindings.some(f => f.rule === 'forms.input-labels-required'));
   await rm(directory, { recursive: true, force: true });
 });
 

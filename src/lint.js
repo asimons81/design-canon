@@ -8,7 +8,7 @@ import {
   MAX_SOURCE_FILE_BYTES
 } from './io.js';
 import { selectRules } from './select.js';
-import { detectUnlabeledControls } from './html-scanner.js';
+import { detectUnlabeledControls, detectSkipLink } from './html-scanner.js';
 import { detectUnprotectedMotion, detectUnprotectedMotionInHtml, extractStyleBlocks } from './css-reduced-motion.js';
 
 const MAX_FINDINGS = 10000;
@@ -146,6 +146,12 @@ export async function lintPath({
       ) {
         continue;
       }
+      if (
+        rule.id === 'accessibility.skip-link' &&
+        file.endsWith('.html')
+      ) {
+        continue;
+      }
     }
 
     // Structural analyzer (second pass for structural-only rules)
@@ -225,6 +231,39 @@ export async function lintPath({
               });
               break outer;
             }
+          }
+        }
+      }
+
+      if (
+        rule.id === 'accessibility.skip-link' &&
+        file.endsWith('.html')
+      ) {
+        const structuralFindings = detectSkipLink(
+          normalizePath(relative(process.cwd(), file)),
+          text,
+          rule.id,
+          rule.severity
+        );
+        for (const finding of structuralFindings) {
+          const suppression = findSuppression(loadedConfig.suppressions, finding);
+          if (suppression) {
+            usedSuppressionIndexes.add(suppression.index);
+            suppressedFindings.push({
+              ...finding,
+              suppression: publicSuppression(suppression)
+            });
+          } else {
+            findings.push(finding);
+          }
+
+          observedFindings += 1;
+          if (observedFindings >= MAX_FINDINGS) {
+            skipped.push({
+              file: '*',
+              reason: `Finding limit of ${MAX_FINDINGS} reached.`
+            });
+            break outer;
           }
         }
       }

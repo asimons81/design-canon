@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Borderline: SPA with programmatic focus</title></head>
+<body>
+  <div id="app">
+    <nav>
+      <a href="#/dashboard">Dashboard</a>
+      <a href="#/reports">Reports</a>
+    </nav>
+    <main id="main-content" tabindex="-1">
+      <h1>Dashboard</h1>
+      <p>This SPA uses programmatic focus management. No skip link present.</p>
+    </main>
+  </div>
+  <script>
+    window.addEventListener('hashchange', () => {
+      document.getElementById('main-content').focus();
+    });
+  </script>
+</body>
+</html>
