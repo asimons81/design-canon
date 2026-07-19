@@ -92,8 +92,19 @@ test('isWithinScanRoot rejects paths outside root', () => {
   assert.equal(isWithinScanRoot('/home/user/other/secret.txt', '/home/user/project'), false);
 });
 
+test('isWithinScanRoot rejects prefix-collision paths', () => {
+  // /work/site-evil must NOT be considered inside /work/site
+  assert.equal(isWithinScanRoot('/work/site-evil/asset.css', '/work/site'), false);
+  assert.equal(isWithinScanRoot('/work/site-extra/file.js', '/work/site'), false);
+});
+
 test('isWithinScanRoot accepts paths inside root', () => {
   assert.equal(isWithinScanRoot('/home/user/project/subdir/style.css', '/home/user/project'), true);
+  assert.equal(isWithinScanRoot('/home/user/project/style.css', '/home/user/project'), true);
+});
+
+test('isWithinScanRoot handles exact root match', () => {
+  assert.equal(isWithinScanRoot('/home/user/project', '/home/user/project'), true);
 });
 
 test('hasPathTraversal detects directory escape', () => {

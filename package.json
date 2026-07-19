@@ -23,7 +23,6 @@
     "schema/",
     "skills/",
     "docs/CONFIGURATION.md",
-    "docs/decisions/",
     "README.md",
     "LICENSE",
     "SECURITY.md",
@@ -67,7 +66,7 @@
   ],
   "license": "MIT",
   "optionalDependencies": {
-    "playwright": ">=1.48"
+    "playwright": "1.61.1"
   },
   "publishConfig": {
     "access": "public",

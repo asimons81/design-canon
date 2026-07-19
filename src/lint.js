@@ -307,7 +307,7 @@ export async function lintPath({
       const { loadLocalPage } = await import('./browser/page.js');
       const { createAnalysisRecord, confirmedRecord, failedRecord } =
         await import('./browser/schema.js');
-      const { runAnalyzer } = await import('./browser/analyzer.js');
+      const { runAnalyzer, listAnalyzers } = await import('./browser/analyzer.js');
 
       let browserInstance;
       try {
@@ -315,14 +315,13 @@ export async function lintPath({
           concurrency: browserConfig.concurrency,
           pageTimeout: browserConfig.pageTimeout,
           operationTimeout: browserConfig.operationTimeout,
+          javaScriptEnabled: browserConfig.javaScriptEnabled,
           scanRoot: process.cwd()
         });
 
         const htmlFiles = files.filter(
           (file) => file.endsWith('.html')
         );
-
-        const deadline = Date.now() + browserConfig.operationTimeout;
 
         for (const file of htmlFiles) {
           let page;
@@ -351,6 +350,54 @@ export async function lintPath({
                 message: 'Page loaded successfully in browser context.'
               })
             );
+            // Execute every registered analyzer against this page
+            const analyzerIds = listAnalyzers();
+            for (const analyzerId of analyzerIds) {
+              if (Date.now() > browserInstance.deadline) break;
+
+              const result = await runAnalyzer(analyzerId, {
+                filePath: file,
+                scanRoot: process.cwd(),
+                viewport: browserConfig.viewport,
+                deadline: browserInstance.deadline,
+                rule: {},
+                getComputedStyle: (sel, prop) =>
+                  import('./browser/page.js').then((m) =>
+                    m.getComputedStyle(page, sel, prop)
+                  ),
+                getBoundingBox: (sel) =>
+                  import('./browser/page.js').then((m) =>
+                    m.getBoundingBox(page, sel)
+                  ),
+                getTextContent: (sel) =>
+                  import('./browser/page.js').then((m) =>
+                    m.getTextContent(page, sel)
+                  ),
+                elementExists: (sel) =>
+                  import('./browser/page.js').then((m) =>
+                    m.elementExists(page, sel)
+                  ),
+                captureScreenshot: () =>
+                  import('./browser/page.js').then((m) =>
+                    m.captureScreenshot(page)
+                  ),
+                page: null
+              });
+
+              analysisRecords.push(
+                createAnalysisRecord({
+                  status: result.status,
+                  file: normalizePath(relative(process.cwd(), file)),
+                  analyzerId,
+                  viewport: browserConfig.viewport,
+                  browserEngine: 'chromium',
+                  browserVersion: browserInstance.browserVersion,
+                  measurements: result.measurements,
+                  message: result.message,
+                  confidence: result.confidence
+                })
+              );
+            }
           } catch (err) {
             analysisRecords.push(
               failedRecord({

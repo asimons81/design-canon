@@ -65,9 +65,14 @@ export function routeRequest(requestUrl, policy) {
 
     // Always allow file:// requests within the scan root
     if (url.protocol === 'file:') {
-      const isAllowed = policy.allowedOrigins.some((origin) =>
-        requestUrl.startsWith(origin)
-      );
+      const normalizedUrl = url.pathname.replace(/\\/g, '/');
+      const isAllowed = policy.allowedOrigins.some((origin) => {
+        const originPath = origin.replace('file://', '').replace(/\/$/, '');
+        // Exact match or path-separator boundary
+        if (normalizedUrl === originPath) return true;
+        if (normalizedUrl.startsWith(originPath + '/')) return true;
+        return false;
+      });
       if (!isAllowed) return 'abort';
       return 'allow';
     }
@@ -115,7 +120,9 @@ export function isNavigationAllowed(targetUrl, policy) {
 }
 
 /**
- * Check if a file path is within the scan root (no path traversal).
+ * Check if a file path is within the scan root.
+ * Uses path-separator boundary to prevent prefix collisions
+ * (e.g., /work/site-evil is not inside /work/site).
  *
  * @param {string} resolvedPath - absolute resolved file path
  * @param {string} scanRoot - absolute scan root path
@@ -123,8 +130,11 @@ export function isNavigationAllowed(targetUrl, policy) {
  */
 export function isWithinScanRoot(resolvedPath, scanRoot) {
   const normalizedPath = resolvedPath.replace(/\\/g, '/');
-  const normalizedRoot = scanRoot.replace(/\\/g, '/');
-  return normalizedPath.startsWith(normalizedRoot);
+  const normalizedRoot = scanRoot.replace(/\\/g, '/').replace(/\/$/, '');
+  // Exact match or path-separator boundary
+  if (normalizedPath === normalizedRoot) return true;
+  if (normalizedPath.startsWith(normalizedRoot + '/')) return true;
+  return false;
 }
 
 /**

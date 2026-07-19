@@ -3,8 +3,7 @@
  *
  * Browser lifecycle management.
  * One Chromium process per lint operation.
- * Isolated browser context per page.
- * Maximum two concurrent pages by default.
+ * Fresh browser context per page (no state leakage).
  */
 
 import { createSecurityPolicy, routeRequest, isNavigationAllowed } from './security.js';
@@ -16,11 +15,14 @@ const DEFAULT_OPERATION_TIMEOUT = 60_000;
 /**
  * @typedef {object} BrowserInstance
  * @property {import('playwright').Browser} browser
- * @property {import('playwright').BrowserContext} context
  * @property {string} browserVersion
  * @property {number} concurrency
- * @property {Set<import('playwright').Page>} activePages
+ * @property {number} pageTimeout
+ * @property {boolean} javaScriptEnabled
  * @property {AbortController} operationController
+ * @property {number} deadline
+ * @property {Set<import('playwright').Page>} activePages
+ * @property {object} securityPolicy
  */
 
 /**
@@ -30,7 +32,7 @@ const DEFAULT_OPERATION_TIMEOUT = 60_000;
  * @param {number} [options.concurrency=2] - max concurrent pages
  * @param {number} [options.pageTimeout=10000] - per-page timeout in ms
  * @param {number} [options.operationTimeout=60000] - total operation timeout in ms
- * @param {object} [options.securityPolicy] - security policy overrides
+ * @param {boolean} [options.javaScriptEnabled=true] - enable JS execution
  * @param {string} [options.scanRoot] - normalized scan root
  * @returns {Promise<BrowserInstance>}
  */
@@ -39,6 +41,7 @@ export async function launchBrowser(options = {}) {
     concurrency = DEFAULT_CONCURRENCY,
     pageTimeout = DEFAULT_PAGE_TIMEOUT,
     operationTimeout = DEFAULT_OPERATION_TIMEOUT,
+    javaScriptEnabled = true,
     scanRoot = process.cwd()
   } = options;
 
@@ -52,118 +55,118 @@ export async function launchBrowser(options = {}) {
     );
   }
 
+  const deadline = Date.now() + operationTimeout;
   const operationController = new AbortController();
-  const totalTimeout = setTimeout(() => {
-    operationController.abort(new Error(`Operation timed out after ${operationTimeout}ms`));
-  }, operationTimeout);
-
-  const securityPolicy = createSecurityPolicy({ scanRoot: toFileUrl(scanRoot) });
 
   let browser;
   try {
     browser = await playwright.chromium.launch({
       headless: true,
-      timeout: 30_000
+      timeout: Math.min(30_000, operationTimeout)
     });
   } catch (err) {
-    clearTimeout(totalTimeout);
     throw new Error(`Failed to launch Chromium: ${err.message}`);
   }
 
   const browserVersion = browser.version();
+  const securityPolicy = createSecurityPolicy({ scanRoot: toFileUrl(scanRoot) });
 
-  const context = await browser.newContext({
+  // Register a single context-level service-worker blocker.
+  // Per-page contexts get their own isolation.
+  browser.on('disconnected', () => {
+    operationController.abort(new Error('Browser disconnected.'));
+  });
+
+  return {
+    browser,
+    browserVersion,
+    concurrency,
+    pageTimeout,
+    javaScriptEnabled,
+    operationController,
+    deadline,
+    activePages: new Set(),
+    securityPolicy
+  };
+}
+
+/**
+ * Create an isolated browser context and page for a single analysis.
+ * Fresh context per call — no cookies, storage, or permissions leak.
+ *
+ * @param {BrowserInstance} instance
+ * @returns {Promise<import('playwright').Page>}
+ */
+export async function createAnalysisPage(instance) {
+  if (instance.operationController.signal.aborted) {
+    throw new Error('Operation was cancelled before page could be created.');
+  }
+
+  // Check deadline
+  if (Date.now() > instance.deadline) {
+    throw new Error('Operation deadline exceeded before page could be created.');
+  }
+
+  await waitForConcurrencySlot(instance);
+
+  // Fresh isolated context per page
+  const context = await instance.browser.newContext({
     ignoreHTTPSErrors: false,
     bypassCSP: false,
-    javaScriptEnabled: true,
+    javaScriptEnabled: instance.javaScriptEnabled,
     userAgent: 'DesignCanon/1.0'
   });
 
-  // Block background service worker registration
+  // Apply security policy at the context level (not per-page event)
+  await context.route('**/*', async (route) => {
+    const requestUrl = route.request().url();
+    const isNavigation = route.request().isNavigationRequest();
+
+    // Block external navigations
+    if (isNavigation && !isNavigationAllowed(requestUrl, instance.securityPolicy)) {
+      await route.abort('blockedbyclient');
+      return;
+    }
+
+    const action = routeRequest(requestUrl, instance.securityPolicy);
+    if (action === 'abort') {
+      await route.abort('blockedbyclient');
+    } else {
+      await route.continue();
+    }
+  });
+
+  // Block popups at the context level
+  context.on('page', async (popupPage) => {
+    await popupPage.close().catch(() => {});
+  });
+
+  // Deny all permission requests
+  await context.grantPermissions([]);
+
+  // Block service worker registration
   await context.addInitScript(() => {
-    // Override service worker registration to no-op
     if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
       navigator.serviceWorker.register = () =>
         Promise.reject(new Error('Service workers are disabled by Design Canon security policy.'));
     }
   });
 
-  // Apply security policy to all new pages
-  context.on('page', async (page) => {
-    // Route requests through security policy
-    await page.route('**/*', async (route) => {
-      const action = routeRequest(route.request().url(), securityPolicy);
-      if (action === 'abort') {
-        await route.abort('blockedbyclient');
-      } else {
-        await route.continue();
-      }
-    });
-
-    // Block popups
-    context.on('page', async (popupPage) => {
-      if (securityPolicy.blockPopups) {
-        await popupPage.close().catch(() => {});
-      }
-    });
-
-    // Block downloads
-    page.on('download', async (download) => {
-      if (securityPolicy.blockDownloads) {
-        await download.cancel().catch(() => {});
-      }
-    });
-
-    // Block dialogs
-    page.on('dialog', async (dialog) => {
-      if (securityPolicy.dismissDialogs) {
-        await dialog.dismiss().catch(() => {});
-      }
-    });
-
-    // Block external navigation
-    page.on('framenavigated', async (frame) => {
-      if (frame === page.mainFrame()) {
-        const url = frame.url();
-        if (!isNavigationAllowed(url, securityPolicy)) {
-          // Navigation was blocked — the page stays on the current URL
-          // We don't navigate back as that could create a loop
-        }
-      }
-    });
-  });
-
-  // Deny all permission requests at the context level
-  await context.grantPermissions([]);
-
-  clearTimeout(totalTimeout);
-
-  return {
-    browser,
-    context,
-    browserVersion,
-    concurrency,
-    activePages: new Set(),
-    operationController
-  };
-}
-
-/**
- * Create an isolated browser context for a single page analysis.
- *
- * @param {BrowserInstance} instance
- * @returns {Promise<import('playwright').Page>}
- */
-export async function createAnalysisPage(instance) {
-  await waitForConcurrencySlot(instance);
-
-  const page = await instance.context.newPage();
+  const page = await context.newPage();
+  page.setDefaultTimeout(instance.pageTimeout);
   instance.activePages.add(page);
 
-  // Set default timeout
-  page.setDefaultTimeout(DEFAULT_PAGE_TIMEOUT);
+  // Block downloads
+  page.on('download', async (download) => {
+    await download.cancel().catch(() => {});
+  });
 
-  // Clean up on close
+  // Auto-dismiss dialogs
+  page.on('dialog', async (dialog) => {
+    await dialog.dismiss().catch(() => {});
+  });
+
+  // Clean up tracking on close
   page.on('close', () => {
     instance.activePages.delete(page);
   });
@@ -173,23 +176,32 @@ export async function createAnalysisPage(instance) {
 
 /**
  * Wait until concurrency is available.
+ * Checks both page count and operation deadline.
  *
  * @param {BrowserInstance} instance
  */
 async function waitForConcurrencySlot(instance) {
   while (instance.activePages.size >= instance.concurrency) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (instance.operationController.signal.aborted) {
+      throw new Error('Operation was cancelled while waiting for a concurrency slot.');
+    }
+    if (Date.now() > instance.deadline) {
+      throw new Error('Operation deadline exceeded while waiting for a concurrency slot.');
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
 }
 
 /**
- * Close a single analysis page.
+ * Close a single analysis page and its context.
  *
  * @param {import('playwright').Page} page
  */
 export async function closeAnalysisPage(page) {
   try {
-    await page.close();
+    const context = page.context();
+    // Close the context which closes the page and all its children
+    await context.close();
   } catch {
     // Best-effort cleanup
   }
@@ -201,22 +213,17 @@ export async function closeAnalysisPage(page) {
  * @param {BrowserInstance} instance
  */
 export async function closeBrowser(instance) {
+  instance.operationController.abort(new Error('Browser closing.'));
+
   // Close all active pages
   for (const page of instance.activePages) {
     try {
-      await page.close();
+      await page.context().close();
     } catch {
       // Best-effort cleanup
     }
   }
   instance.activePages.clear();
-
-  // Close context
-  try {
-    await instance.context.close();
-  } catch {
-    // Best-effort cleanup
-  }
 
   // Close browser
   try {

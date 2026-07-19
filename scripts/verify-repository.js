@@ -12,7 +12,6 @@ const REQUIRED_PACKAGE_FILES = [
   'schema/',
   'skills/',
   'docs/CONFIGURATION.md',
-  'docs/decisions/',
   'README.md',
   'LICENSE',
   'SECURITY.md',
