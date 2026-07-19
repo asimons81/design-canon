@@ -139,69 +139,92 @@
     {
       "proposalId": "proposal.accessibility.text-contrast-minimum",
       "proposedRuleId": "accessibility.text-contrast-minimum",
-      "disposition": "accept-for-partial-static-implementation",
+      "disposition": "accept-for-browser-assisted-implementation",
       "architecture": [
-        "static-css-analysis",
-        "browser-rendered-fallback"
+        "browser-rendered-analysis"
       ],
       "confidenceBoundary": {
-        "canProve": "A statically resolvable CSS color/background-color pair in the same rule falls below the WCAG AA threshold when computed against the standard WCAG relative-luminance formula.",
-        "cannotProve": "The rendered text actually has that contrast ratio. Cascade, inheritance, opacity, images, gradients, pseudo-elements, and runtime values may produce different rendered contrast. A static finding is not a WCAG conformance failure."
+        "canProve": "In the configured initial Chromium state, eligible rendered text with a supported computed sRGB foreground and resolvable solid-color background stack has an unrounded contrast ratio below the applicable 4.5:1 or 3:1 threshold.",
+        "cannotProve": "Complete WCAG conformance, semantic logo or decorative-text exemptions, unsupported effects or compositing, images of text, SVG or canvas text, other browser and font environments, other viewport or theme states, or later interaction states."
       },
       "requiredInputs": [
-        "CSS color declarations",
-        "CSS background-color declarations",
-        "WCAG relative luminance computation (same-rule pairs only)"
+        "Rendered HTML text nodes",
+        "Computed foreground color",
+        "Computed ancestor background-color stack",
+        "Computed font size and weight",
+        "Configured Chromium viewport and color scheme",
+        "WCAG 2.2 sRGB relative luminance calculation"
       ],
       "exclusions": [
-        "CSS custom properties (unresolvable statically)",
-        "Background images",
-        "Gradient backgrounds",
-        "Opacity composition",
-        "currentColor references",
-        "Disabled/readonly form controls",
-        "Decorative text",
-        "Pseudo-element text"
+        "Gradients and background images",
+        "Opacity below 1",
+        "Blend modes, filters, masks, and backdrop filters",
+        "Text shadows and text strokes",
+        "Unsupported color spaces",
+        "Canvas, SVG, pseudo-element, and image-of-text content",
+        "Native disabled and aria-disabled user interface components",
+        "Semantic logo, decorative, and incidental-text classification"
       ],
       "profileRecommendations": [
-        "universal"
+        "marketing",
+        "editorial",
+        "product-app"
       ],
       "severityRecommendation": "warning",
-      "implementationReadiness": "ready-after-architecture-support",
+      "implementationReadiness": "ready-for-implementation",
       "fixtureAssessment": {
         "violation": {
           "fixtureId": "fixture.accessibility.text-contrast.violation.light-gray-text",
           "usable": true,
-          "gap": "Additional opacity-cascade and custom-property tests needed"
+          "gap": "Promote to browser fixture and add large-text, alpha, runtime-style, and unrounded-boundary cases."
         },
         "control": {
           "fixtureId": "fixture.accessibility.text-contrast.control.dark-text-white-bg",
           "usable": true,
-          "gap": null
+          "gap": "Add exact-threshold, inherited-style, light-theme, and dark-theme controls."
         },
         "borderline": {
           "fixtureId": "fixture.accessibility.text-contrast.borderline.gradient-overlay",
           "usable": true,
-          "gap": "Gradient case is explicitly out of static scope \u2014 good documentation fixture"
+          "gap": "Use as an indeterminate browser fixture; add image, opacity, blend, shadow, stroke, and unsupported-color cases."
         }
       },
       "acceptanceCriteria": {
         "requiredTests": [
-          "Same-rule solid-color pair below threshold triggers finding",
-          "Same-rule solid-color pair above threshold produces no finding",
-          "Custom-property declaration produces no finding (unresolvable)",
-          "Gradient declaration produces no finding"
+          "Normal text below 4.5:1 produces a confirmed warning",
+          "Large text below 3:1 produces a confirmed warning",
+          "Exact-threshold controls pass using unrounded ratios",
+          "Computed inherited colors and solid alpha composition are measured",
+          "Complex visual effects produce indeterminate samples",
+          "Only confirmed violation samples become findings",
+          "One finding is emitted per violating element",
+          "Static mode and all existing rules remain unchanged"
         ],
         "requiredFixtures": [
-          "Opacity cascade test",
-          "Custom property resolution test",
-          "Multiple selector specificity test"
+          "Normal, large, and bold threshold fixtures",
+          "Alpha foreground and ancestor background fixtures",
+          "Runtime-applied style fixture",
+          "Light and dark color-scheme fixtures",
+          "Gradient, image, opacity, blend, filter, shadow, stroke, and background-clip indeterminate fixtures",
+          "Hidden, zero-area, disabled, and template-content exclusions"
         ],
-        "cliBehavior": "Lint triggers warning with evidence showing the color pair and computed ratio. Message must state scope limitation.",
-        "suppressionBehavior": "Per-rule, per-file-pattern, with rationale requirement",
-        "performanceConstraints": "Single-file scan; contrast computation is O(n) over CSS declarations",
-        "failureBoundaries": "Does not resolve CSS cascade, custom properties, or inheritance chains beyond direct parent.",
-        "documentation": "Every finding message must include: 'This check covers only statically resolvable solid-color foreground/background pairs in the same CSS rule.'"
+        "cliBehavior": "F019 runs only in auto or browser mode. Auto without Chromium records skipped analysis; browser mode without Chromium exits 3. Confirmed violations are warning findings with selector and computed measurement evidence.",
+        "documentation": [
+          "Document the 4.5:1 and 3:1 thresholds and large-text classification.",
+          "Document supported solid-color composition and every indeterminate condition.",
+          "State that findings are bounded rendered measurements, not complete WCAG conformance failures."
+        ],
+        "suppressionBehavior": "Confirmed F019 warning findings use the existing rationale-required, file-scoped suppression system. Passing and indeterminate analysis samples are not suppressible findings.",
+        "performanceConstraints": [
+          "Reuse one Chromium process per lint operation and one isolated context per page.",
+          "Analyze each eligible rendered text sample once per selected viewport and color scheme.",
+          "Respect existing page and operation deadlines and finding caps."
+        ],
+        "failureBoundaries": [
+          "Browser unavailability, navigation failure, timeout, and analyzer failure never become contrast violations.",
+          "Unsupported visual composition produces indeterminate samples, not passes or findings.",
+          "Static mode emits no F019 findings."
+        ]
       }
     },
     {
