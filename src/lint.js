@@ -69,6 +69,29 @@ async function readBoundedFile(file) {
   }
 }
 
+/**
+ * Separate selected rules into static pattern rules, structural static rules,
+ * and browser rules (those with detect.browserAnalyzer).
+ */
+function classifyRules(rules) {
+  const staticPatternRules = [];
+  const structuralStaticRules = [];
+  const browserRules = [];
+
+  for (const rule of rules) {
+    if (rule.detect?.browserAnalyzer) {
+      browserRules.push(rule);
+    } else if (rule.detect?.patterns) {
+      staticPatternRules.push(rule);
+    } else {
+      // Rules without detect (editorial.reading-measure, marketing.single-primary-action, etc.)
+      staticPatternRules.push(rule);
+    }
+  }
+
+  return { staticPatternRules, structuralStaticRules, browserRules };
+}
+
 export async function lintPath({
   path,
   profile: requestedProfile = null,
@@ -85,15 +108,22 @@ export async function lintPath({
     loadProfile(profileName),
     collectSourceFiles(path)
   ]);
-  const rules = selectRules(catalog, profile).filter(
-    (rule) => rule.detect?.patterns?.length
-  );
+  const rules = selectRules(catalog, profile);
+
+  // Classify selected rules
+  const { browserRules } = classifyRules(rules);
+
   const findings = [];
   const suppressedFindings = [];
   const skipped = [];
   const analysisRecords = [];
   const usedSuppressionIndexes = new Set();
   let observedFindings = 0;
+
+  // Filter for static-only rules (rules that have patterns or no detect at all)
+  const allStaticRules = rules.filter(
+    (rule) => !(rule.detect?.browserAnalyzer)
+  );
 
   outer: for (const file of files) {
     const { info, text, reason } = await readBoundedFile(file);
@@ -106,7 +136,10 @@ export async function lintPath({
       continue;
     }
 
+    // Static pattern matching (rules with detect.patterns)
     for (const rule of rules) {
+      if (rule.detect?.browserAnalyzer) continue; // Skip browser-only rules
+      if (!rule.detect?.patterns) continue;
       for (const pattern of rule.detect.patterns) {
         const regex = compilePattern(pattern);
         for (const match of text.matchAll(regex)) {
@@ -140,33 +173,10 @@ export async function lintPath({
           if (!pattern.multiple) break;
         }
       }
-
-      // Structural analyzer for rules that require HTML-level understanding.
-      // This runs INSTEAD of regex pattern matching for these rules.
-      if (
-        rule.id === 'forms.input-labels-required' &&
-        file.endsWith('.html')
-      ) {
-        // Skip the generic regex pattern matching for structural rules
-        // to avoid false positives from literal sentinel text.
-        continue;
-      }
-      if (
-        rule.id === 'motion.respect-reduced-motion' &&
-        (file.endsWith('.css') || file.endsWith('.html'))
-      ) {
-        continue;
-      }
-      if (
-        rule.id === 'accessibility.skip-link' &&
-        file.endsWith('.html')
-      ) {
-        continue;
-      }
     }
 
     // Structural analyzer (second pass for structural-only rules)
-    for (const rule of rules) {
+    for (const rule of allStaticRules) {
       if (
         rule.id === 'forms.input-labels-required' &&
         file.endsWith('.html')
@@ -287,27 +297,37 @@ export async function lintPath({
     const resolved = resolveMode(effectiveLintMode, capability);
 
     if (resolved.skipped) {
-      // In auto mode without browser, record skipped records for each HTML file
+      // In auto mode without browser, record skipped records for each
+      // eligible file × selected F019 rule
       for (const file of files) {
         if (file.endsWith('.html')) {
-          const { createAnalysisRecord } = await import('./browser/schema.js');
-          analysisRecords.push(
-            createAnalysisRecord({
-              status: 'skipped',
-              file: normalizePath(relative(process.cwd(), file)),
-              analyzerId: '__runtime__',
-              message: 'Analysis skipped: browser runtime not available in auto mode.'
-            })
-          );
+          for (const rule of browserRules) {
+            const ba = rule.detect.browserAnalyzer;
+            if (!ba.extensions.some(ext => file.endsWith(ext))) continue;
+            const { createAnalysisRecord } = await import('./browser/schema.js');
+            analysisRecords.push(
+              createAnalysisRecord({
+                status: 'skipped',
+                file: normalizePath(relative(process.cwd(), file)),
+                analyzerId: ba.id,
+                ruleId: rule.id,
+                message: 'Analysis skipped: browser runtime not available in auto mode.'
+              })
+            );
+          }
         }
       }
     } else if (resolved.available) {
       const { launchBrowser, closeBrowser, createAnalysisPage, closeAnalysisPage } =
         await import('./browser/launcher.js');
       const { loadLocalPage } = await import('./browser/page.js');
-      const { createAnalysisRecord, confirmedRecord, failedRecord } =
+      const { createAnalysisRecord } =
         await import('./browser/schema.js');
       const { runAnalyzer, listAnalyzers } = await import('./browser/analyzer.js');
+
+      // Initialize production analyzers
+      const { setupAnalyzers } = await import('./browser/analyzers/index.js');
+      setupAnalyzers();
 
       let browserInstance;
       try {
@@ -325,6 +345,14 @@ export async function lintPath({
         );
 
         for (const file of htmlFiles) {
+          // Determine which browser rules apply to this file
+          const applicableRules = browserRules.filter(rule => {
+            const ba = rule.detect.browserAnalyzer;
+            return ba.extensions.some(ext => file.endsWith(ext));
+          });
+
+          if (applicableRules.length === 0) continue;
+
           let page;
           try {
             page = await createAnalysisPage(browserInstance);
@@ -339,7 +367,7 @@ export async function lintPath({
             // Get browser version for metadata
             const browserVersion = browserInstance.browserVersion;
 
-            // Record browser version metadata as a runtime info record
+            // Record page-loaded info record
             analysisRecords.push(
               createAnalysisRecord({
                 status: 'indeterminate',
@@ -351,63 +379,114 @@ export async function lintPath({
                 message: 'Page loaded successfully in browser context.'
               })
             );
-            // Execute every registered analyzer against this page
-            const analyzerIds = listAnalyzers();
-            for (const analyzerId of analyzerIds) {
+
+            // Execute only analyzers referenced by selected browser rules
+            const uniqueAnalyzerIds = new Set(
+              applicableRules.map(r => r.detect.browserAnalyzer.id)
+            );
+
+            for (const analyzerId of uniqueAnalyzerIds) {
               if (Date.now() > browserInstance.deadline) break;
+
+              // Get all rules that reference this analyzer
+              const rulesForAnalyzer = applicableRules.filter(
+                r => r.detect.browserAnalyzer.id === analyzerId
+              );
 
               const result = await runAnalyzer(analyzerId, {
                 filePath: file,
                 scanRoot: process.cwd(),
                 viewport: browserConfig.viewport,
+                colorScheme: browserConfig.colorScheme,
+                browserVersion,
                 deadline: browserInstance.deadline,
-                rule: {},
-                getComputedStyle: (sel, prop) =>
-                  import('./browser/page.js').then((m) =>
-                    m.getComputedStyle(page, sel, prop)
-                  ),
-                getBoundingBox: (sel) =>
-                  import('./browser/page.js').then((m) =>
-                    m.getBoundingBox(page, sel)
-                  ),
-                getTextContent: (sel) =>
-                  import('./browser/page.js').then((m) =>
-                    m.getTextContent(page, sel)
-                  ),
-                elementExists: (sel) =>
-                  import('./browser/page.js').then((m) =>
-                    m.elementExists(page, sel)
-                  ),
-                captureScreenshot: () =>
-                  import('./browser/page.js').then((m) =>
-                    m.captureScreenshot(page)
-                  ),
-                page: null
+                rule: {
+                  id: rulesForAnalyzer[0]?.id || '',
+                  title: rulesForAnalyzer[0]?.title || '',
+                  severity: rulesForAnalyzer[0]?.severity || 'warning',
+                  message: rulesForAnalyzer[0]?.detect?.message || '',
+                  browserAnalyzer: rulesForAnalyzer[0]?.detect?.browserAnalyzer || {}
+                },
+                pageAdapters: {
+                  evaluate: (fn, arg) => {
+                    if (typeof fn === 'function') {
+                      return page.evaluate(arg !== undefined ? fn : fn.toString(), arg);
+                    }
+                    return page.evaluate(fn);
+                  },
+                  getComputedStyle: (sel, prop) =>
+                    page.evaluate(({ s, p }) => {
+                      const el = document.querySelector(s);
+                      if (!el) return null;
+                      return getComputedStyle(el).getPropertyValue(p);
+                    }, { s: sel, p: prop })
+                }
               });
 
-              analysisRecords.push(
-                createAnalysisRecord({
-                  status: result.status,
-                  file: normalizePath(relative(process.cwd(), file)),
-                  analyzerId,
-                  viewport: browserConfig.viewport,
-                  browserEngine: 'chromium',
-                  browserVersion: browserInstance.browserVersion,
-                  measurements: result.measurements,
-                  message: result.message,
-                  confidence: result.confidence
-                })
-              );
+              // Create analysis records for each rule that references this analyzer
+              for (const rule of rulesForAnalyzer) {
+                analysisRecords.push(
+                  createAnalysisRecord({
+                    status: result.status,
+                    file: normalizePath(relative(process.cwd(), file)),
+                    analyzerId,
+                    ruleId: rule.id,
+                    viewport: browserConfig.viewport,
+                    browserEngine: 'chromium',
+                    browserVersion: browserInstance.browserVersion,
+                    measurements: result.measurements,
+                    message: result.message,
+                    confidence: result.confidence,
+                    samples: result.samples
+                  })
+                );
+
+                // Convert confirmed violation samples into findings
+                if (result.samples && result.status === 'confirmed') {
+                  for (const sample of result.samples) {
+                    if (sample.status === 'confirmed' && sample.outcome === 'violation') {
+                      const evidence = buildContrastEvidence(sample, browserConfig.viewport, browserConfig.colorScheme, browserVersion);
+                      const finding = {
+                        file: normalizePath(relative(process.cwd(), file)),
+                        line: 1,
+                        rule: rule.id,
+                        severity: rule.severity,
+                        message: rule.detect?.message || 'Rendered text contrast measured below the configured minimum in the analyzed Chromium state.',
+                        evidence
+                      };
+
+                      const suppression = findSuppression(loadedConfig.suppressions, finding);
+                      if (suppression) {
+                        usedSuppressionIndexes.add(suppression.index);
+                        suppressedFindings.push({
+                          ...finding,
+                          suppression: publicSuppression(suppression)
+                        });
+                      } else {
+                        findings.push(finding);
+                      }
+
+                      observedFindings += 1;
+                      if (observedFindings >= MAX_FINDINGS) {
+                        skipped.push({
+                          file: '*',
+                          reason: `Finding limit of ${MAX_FINDINGS} reached.`
+                        });
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
             }
           } catch (err) {
-            analysisRecords.push(
-              failedRecord({
-                file: normalizePath(relative(process.cwd(), file)),
-                analyzerId: '__runtime__',
-                message: `Page analysis failed: ${err.message}`,
-                errorType: 'page_load_failed'
-              })
-            );
+            analysisRecords.push({
+              status: 'failed',
+              file: normalizePath(relative(process.cwd(), file)),
+              analyzerId: '__runtime__',
+              message: `Page analysis failed: ${err.message}`,
+              error: { type: 'page_load_failed', message: err.message }
+            });
           } finally {
             if (page) {
               await closeAnalysisPage(page);
@@ -415,14 +494,12 @@ export async function lintPath({
           }
         }
       } catch (err) {
-        analysisRecords.push(
-          createAnalysisRecord({
-            status: 'failed',
-            file: normalizePath(relative(process.cwd(), path)),
-            analyzerId: '__runtime__',
-            error: { type: 'browser_launch_failed', message: err.message }
-          })
-        );
+        analysisRecords.push({
+          status: 'failed',
+          file: normalizePath(relative(process.cwd(), path)),
+          analyzerId: '__runtime__',
+          error: { type: 'browser_launch_failed', message: err.message }
+        });
       } finally {
         if (browserInstance) {
           await closeBrowser(browserInstance);
@@ -470,6 +547,16 @@ export async function lintPath({
     warnings: findings.filter((finding) => finding.severity === 'warning').length,
     info: findings.filter((finding) => finding.severity === 'info').length
   };
+}
+
+/**
+ * Build a concise deterministic evidence string for a contrast violation.
+ */
+function buildContrastEvidence(sample, viewport, colorScheme, browserVersion) {
+  const vp = typeof viewport === 'string' ? viewport : (viewport?.name || 'desktop');
+  const scheme = colorScheme || 'light';
+  const ver = browserVersion || 'unknown';
+  return `selector="${sample.selector}"; text="${sample.text}"; foreground=${sample.foreground}; background=${sample.background}; ratio=${sample.displayRatio}:1; required=${sample.requiredRatio}:1; font=${sample.fontSizePx}px/${sample.fontWeight}; viewport=${vp}(${sample.viewportWidth || ''}x${sample.viewportHeight || ''}); scheme=${scheme}; chromium=${ver}`;
 }
 
 export async function lintCommand({ path, profile, format, configPath = null, mode = null }) {

@@ -13,6 +13,7 @@
  * @param {'confirmed'|'indeterminate'|'skipped'|'failed'} options.status
  * @param {string} options.file - normalized file path
  * @param {string} options.analyzerId - analyzer or capability ID
+ * @param {string} [options.ruleId] - optional rule ID (for rule-scoped records)
  * @param {string} [options.viewport] - viewport preset name
  * @param {string} [options.browserEngine] - 'chromium'
  * @param {string|null} [options.browserVersion] - browser version string
@@ -20,6 +21,7 @@
  * @param {string} [options.message] - human-readable message
  * @param {'high'|'medium'|'low'} [options.confidence] - bounded confidence level
  * @param {object|null} [options.error] - operational failure details
+ * @param {Array} [options.samples] - individual sample results
  * @returns {object}
  */
 export function createAnalysisRecord(options) {
@@ -27,13 +29,15 @@ export function createAnalysisRecord(options) {
     status,
     file,
     analyzerId,
+    ruleId = null,
     viewport = null,
     browserEngine = null,
     browserVersion = null,
     measurements = {},
     message = '',
     confidence = 'medium',
-    error = null
+    error = null,
+    samples = null
   } = options;
 
   const record = {
@@ -42,6 +46,8 @@ export function createAnalysisRecord(options) {
     analyzerId
   };
 
+  // Add ruleId when provided
+  if (ruleId) record.ruleId = ruleId;
   // Only add metadata fields when they have meaningful values
   if (viewport) record.viewport = viewport;
   if (browserEngine) record.browserEngine = browserEngine;
@@ -61,6 +67,10 @@ export function createAnalysisRecord(options) {
       message: error.message ?? 'An unexpected error occurred.'
     };
   }
+  // Preserve samples when provided
+  if (samples !== null && samples !== undefined) {
+    record.samples = samples;
+  }
 
   return record;
 }
@@ -72,11 +82,13 @@ export function createAnalysisRecord(options) {
  * @param {object} options
  * @param {string} options.file
  * @param {string} options.analyzerId
+ * @param {string} [options.ruleId]
  * @param {string} [options.viewport]
  * @param {string|null} [options.browserVersion]
  * @param {object} [options.measurements]
  * @param {string} [options.message]
  * @param {'high'|'medium'|'low'} [options.confidence]
+ * @param {Array} [options.samples]
  * @returns {object}
  */
 export function confirmedRecord(options) {
@@ -90,6 +102,7 @@ export function confirmedRecord(options) {
  * @param {object} options
  * @param {string} options.file
  * @param {string} options.analyzerId
+ * @param {string} [options.ruleId]
  * @param {string} [options.message]
  * @returns {object}
  */
@@ -108,6 +121,7 @@ export function indeterminateRecord(options) {
  * @param {object} options
  * @param {string} options.file
  * @param {string} options.analyzerId
+ * @param {string} [options.ruleId]
  * @param {string} [options.message]
  * @returns {object}
  */
@@ -127,6 +141,7 @@ export function skippedRecord(options) {
  * @param {object} options
  * @param {string} options.file
  * @param {string} options.analyzerId
+ * @param {string} [options.ruleId]
  * @param {string} [options.message]
  * @param {string} [options.errorType]
  * @returns {object}
@@ -176,3 +191,34 @@ export const VALID_STATUSES = new Set([
  * Valid confidence levels.
  */
 export const VALID_CONFIDENCE = new Set(['high', 'medium', 'low']);
+
+/**
+ * Valid sample statuses.
+ */
+export const VALID_SAMPLE_STATUSES = new Set(['confirmed', 'indeterminate']);
+
+/**
+ * Valid sample outcomes.
+ */
+export const VALID_SAMPLE_OUTCOMES = new Set(['pass', 'violation']);
+
+/**
+ * Indeterminate reason codes.
+ */
+export const INDETERMINATE_REASONS = new Set([
+  'background-image',
+  'gradient',
+  'image-background',
+  'opacity',
+  'mix-blend-mode',
+  'background-blend-mode',
+  'filter',
+  'backdrop-filter',
+  'mask',
+  'background-clip-text',
+  'text-shadow',
+  'text-stroke',
+  'unsupported-color-space',
+  'unresolved-color',
+  'ambiguous-overlap'
+]);
