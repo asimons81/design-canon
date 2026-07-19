@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "status": "accepted",
+  "adr": "ADR-003",
+  "ruleNumber": "F019",
+  "ruleId": "accessibility.text-contrast-minimum",
+  "analyzerId": "rendered.text-contrast",
+  "architecture": "browser-rendered-analysis",
+  "severity": "warning",
+  "profiles": [
+    "marketing",
+    "editorial",
+    "product-app"
+  ],
+  "supportedExtensions": [
+    ".html"
+  ],
+  "catalogBinding": {
+    "field": "detect.browserAnalyzer",
+    "detectorFamiliesAreExclusive": true,
+    "binding": {
+      "id": "rendered.text-contrast",
+      "extensions": [
+        ".html"
+      ]
+    }
+  },
+  "execution": {
+    "viewports": "single configured viewport",
+    "colorSchemes": "single configured color scheme",
+    "static": "no finding and no browser launch",
+    "autoUnavailable": "skipped",
+    "browserUnavailableExitCode": 3,
+    "sourceLinePolicy": "line 1; deterministic DOM path is authoritative"
+  },
+  "thresholds": {
+    "normal": 4.5,
+    "large": 3.0,
+    "largeRegularMinPx": 24.0,
+    "largeBoldMinPx": 18.66,
+    "largeBoldMinWeight": 700,
+    "comparison": "unrounded"
+  },
+  "luminance": {
+    "colorSpace": "sRGB",
+    "channelThreshold": 0.04045,
+    "coefficients": {
+      "r": 0.2126,
+      "g": 0.7152,
+      "b": 0.0722
+    },
+    "contrastOffset": 0.05
+  },
+  "textSelection": {
+    "walker": "rendered text nodes grouped by nearest element",
+    "requiresPositiveRect": true,
+    "excludedContainers": [
+      "script",
+      "style",
+      "noscript",
+      "template"
+    ],
+    "excludedStates": [
+      "display:none",
+      "visibility:hidden",
+      "zero-area",
+      "native-disabled",
+      "aria-disabled=true"
+    ],
+    "ariaHiddenStillCheckedWhenVisible": true,
+    "readonlyStillChecked": true
+  },
+  "colorResolution": {
+    "computedStylesOnly": true,
+    "supported": [
+      "rgb",
+      "rgba",
+      "sRGB space-separated equivalents"
+    ],
+    "canvasFallback": "white",
+    "ancestorBackgroundAlphaComposition": true,
+    "foregroundAlphaComposition": true,
+    "screenshotPixelSampling": false
+  },
+  "indeterminateReasons": [
+    "background-image",
+    "gradient",
+    "image-background",
+    "opacity",
+    "mix-blend-mode",
+    "background-blend-mode",
+    "filter",
+    "backdrop-filter",
+    "mask",
+    "background-clip-text",
+    "text-shadow",
+    "text-stroke",
+    "unsupported-color-space",
+    "unresolved-color",
+    "ambiguous-overlap"
+  ],
+  "sampleContract": {
+    "statuses": [
+      "confirmed",
+      "indeterminate"
+    ],
+    "outcomes": [
+      "pass",
+      "violation"
+    ],
+    "findingCondition": {
+      "status": "confirmed",
+      "outcome": "violation"
+    },
+    "aggregation": "one finding per element, viewport, and color scheme"
+  },
+  "evidenceFields": [
+    "selector",
+    "text",
+    "foreground",
+    "background",
+    "ratio",
+    "displayRatio",
+    "requiredRatio",
+    "fontSizePx",
+    "fontWeight",
+    "largeText",
+    "viewport",
+    "colorScheme",
+    "browserVersion"
+  ],
+  "confidenceBoundary": {
+    "canProve": "In the configured initial Chromium state, eligible text with supported computed sRGB foreground and a resolvable solid-color background stack has an unrounded contrast ratio below the applicable 4.5:1 or 3:1 threshold.",
+    "cannotProve": "Complete WCAG conformance, semantic exemptions, unsupported visual effects, non-HTML text, other browsers or environments, later interaction states, or contrast through images, gradients, filters, blending, strokes, shadows, masks, and ambiguous overlays."
+  },
+  "nonGoals": [
+    "touch-target analysis",
+    "APCA",
+    "WCAG 3",
+    "7:1 enhanced contrast",
+    "automatic viewport matrix",
+    "automatic color-scheme matrix",
+    "remote URL analysis",
+    "framework builds",
+    "autofix"
+  ]
+}
