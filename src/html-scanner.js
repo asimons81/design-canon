@@ -108,25 +108,33 @@ function stripNonContent(text) {
         state = STATE.IN_COMMENT;
         continue;
       }
-      // Check for <script start
+      // Check for <script start with word boundary
       if (text[i] === '<' && text.slice(i, i + 7).toLowerCase() === '<script') {
-        // Find the end of the opening tag
-        const tagEnd = text.indexOf('>', i);
-        if (tagEnd !== -1) {
-          out.push(text.slice(i, tagEnd + 1).replace(/[^\n]/g, ' '));
-          i = tagEnd + 1;
-          state = STATE.IN_SCRIPT;
-          continue;
+        const nextChar = text[i + 7];
+        // Word boundary: next char must not be a word character
+        if (!nextChar || !/[a-zA-Z0-9-]/.test(nextChar)) {
+          // Find the end of the opening tag
+          const tagEnd = text.indexOf('>', i);
+          if (tagEnd !== -1) {
+            out.push(text.slice(i, tagEnd + 1).replace(/[^\\n]/g, ' '));
+            i = tagEnd + 1;
+            state = STATE.IN_SCRIPT;
+            continue;
+          }
         }
       }
-      // Check for <style start
+      // Check for <style start with word boundary
       if (text[i] === '<' && text.slice(i, i + 6).toLowerCase() === '<style') {
-        const tagEnd = text.indexOf('>', i);
-        if (tagEnd !== -1) {
-          out.push(text.slice(i, tagEnd + 1).replace(/[^\n]/g, ' '));
-          i = tagEnd + 1;
-          state = STATE.IN_STYLE;
-          continue;
+        const nextChar = text[i + 6];
+        // Word boundary: next char must not be a word character
+        if (!nextChar || !/[a-zA-Z0-9-]/.test(nextChar)) {
+          const tagEnd = text.indexOf('>', i);
+          if (tagEnd !== -1) {
+            out.push(text.slice(i, tagEnd + 1).replace(/[^\\n]/g, ' '));
+            i = tagEnd + 1;
+            state = STATE.IN_STYLE;
+            continue;
+          }
         }
       }
       out.push(text[i]);
@@ -150,14 +158,20 @@ function stripNonContent(text) {
       }
 
     } else if (state === STATE.IN_SCRIPT) {
-      // Check for </script closing tag (case-insensitive)
+      // Check for </script closing tag (case-insensitive, with word boundary)
       if (text[i] === '<' && text.slice(i, i + 8).toLowerCase() === '</script') {
-        // Find the closing >
-        const closeBracket = text.indexOf('>', i);
-        if (closeBracket !== -1) {
-          out.push(text.slice(i, closeBracket + 1).replace(/[^\n]/g, ' '));
-          i = closeBracket + 1;
-          state = STATE.NORMAL;
+        const nextChar = text[i + 8];
+        if (!nextChar || !/[a-zA-Z0-9-]/.test(nextChar)) {
+          // Find the closing >
+          const closeBracket = text.indexOf('>', i);
+          if (closeBracket !== -1) {
+            out.push(text.slice(i, closeBracket + 1).replace(/[^\\n]/g, ' '));
+            i = closeBracket + 1;
+            state = STATE.NORMAL;
+          } else {
+            out.push(text[i]);
+            i += 1;
+          }
         } else {
           out.push(text[i]);
           i += 1;
@@ -168,13 +182,19 @@ function stripNonContent(text) {
       }
 
     } else if (state === STATE.IN_STYLE) {
-      // Check for </style closing tag (case-insensitive)
+      // Check for </style closing tag (case-insensitive, with word boundary)
       if (text[i] === '<' && text.slice(i, i + 7).toLowerCase() === '</style') {
-        const closeBracket = text.indexOf('>', i);
-        if (closeBracket !== -1) {
-          out.push(text.slice(i, closeBracket + 1).replace(/[^\n]/g, ' '));
-          i = closeBracket + 1;
-          state = STATE.NORMAL;
+        const nextChar = text[i + 7];
+        if (!nextChar || !/[a-zA-Z0-9-]/.test(nextChar)) {
+          const closeBracket = text.indexOf('>', i);
+          if (closeBracket !== -1) {
+            out.push(text.slice(i, closeBracket + 1).replace(/[^\\n]/g, ' '));
+            i = closeBracket + 1;
+            state = STATE.NORMAL;
+          } else {
+            out.push(text[i]);
+            i += 1;
+          }
         } else {
           out.push(text[i]);
           i += 1;
@@ -442,6 +462,289 @@ export function detectUnlabeledControls(filePath, fileText, ruleId, severity) {
       });
     }
   }
+
+  return findings;
+}
+
+// ── F018: Skip-Link Detector ─────────────────────────────────────────────
+
+/**
+ * Get the approximate visible text content inside an HTML container element.
+ * Strips inner HTML tags and returns the trimmed, collapsed text.
+ */
+function getInnerText(source, openTagEnd) {
+  const rest = source.slice(openTagEnd);
+  const closeMatch = rest.match(/<\/[a-zA-Z][a-zA-Z0-9]*\s*>/);
+  if (!closeMatch) return '';
+  const content = rest.slice(0, closeMatch.index);
+  return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Collect all same-document anchor candidates (<a href="#fragment">) with
+ * their position, fragment name, and accessible-name status.
+ *
+ * @param {string} text - Non-content-stripped HTML text.
+ * @returns {Array<{index: number, fragment: string|null, hasName: boolean, nameSource: string|null, tagText: string, line: number}>}
+ */
+function collectSkipLinkCandidates(text) {
+  const candidates = [];
+  const anchorPattern = /<(a)\b([^>]*?)>/gi;
+  let match;
+
+  while ((match = anchorPattern.exec(text)) !== null) {
+    const tagText = match[0];
+    const attrs = match[2];
+    const index = match.index;
+
+    // Extract href and check it's a same-document fragment
+    const href = extractAttributeValue(attrs, 'href');
+    if (!href || !href.startsWith('#')) continue;
+
+    const fragment = href.slice(1).trim();
+    const line = text.slice(0, index).split('\n').length;
+
+    // Determine accessible name
+    let hasName = false;
+    let nameSource = null;
+
+    // 1. aria-label
+    const ariaLabel = extractAttributeValue(attrs, 'aria-label');
+    if (ariaLabel && ariaLabel.trim().length > 0) {
+      hasName = true;
+      nameSource = 'aria-label';
+    }
+
+    // 2. Visible text content
+    if (!hasName) {
+      const anchorText = getInnerText(text, index + tagText.length);
+      if (anchorText && anchorText.length > 0) {
+        hasName = true;
+        nameSource = 'text';
+      }
+    }
+
+    // 3. aria-labelledby
+    if (!hasName) {
+      const ariaLabelledby = extractAttributeValue(attrs, 'aria-labelledby');
+      if (ariaLabelledby && ariaLabelledby.trim().length > 0) {
+        const refIds = ariaLabelledby.split(/\s+/).filter(Boolean);
+        for (const refId of refIds) {
+          const refMatch = text.match(
+            new RegExp(`<(\\w+)[^>]*?\\sid\\s*=\\s*["']?${escapeRegex(refId)}["'\\s>]`, 'i')
+          );
+          if (refMatch) {
+            const refLine = text.slice(0, refMatch.index).split('\n').length;
+            const refTag = refMatch[0];
+            const refText = getInnerText(text, refMatch.index + refTag.length);
+            if (refText && refText.trim().length > 0) {
+              hasName = true;
+              nameSource = 'aria-labelledby';
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    candidates.push({
+      index,
+      line,
+      fragment: fragment || null,
+      hasName,
+      nameSource,
+      tagText: tagText.slice(0, 120)
+    });
+  }
+
+  return candidates;
+}
+
+/**
+ * Collect all main-content regions in the document: <main id="x">,
+ * elements with role="main", and their IDs.
+ *
+ * @param {string} text - Non-content-stripped HTML text.
+ * @returns {Map<string, {index: number, line: number, tagName: string}>}
+ *   Map from id value to target info.
+ */
+function collectMainTargets(text) {
+  // First pass: count all ID occurrences to detect duplicates
+  const idCounts = new Map();
+  const countIdPattern = /\sid\s*=\s*("[^"]*"|'[^']*'|[^\s>"']+)/gi;
+  let countMatch;
+  while ((countMatch = countIdPattern.exec(text)) !== null) {
+    const idValue = trimQuotes(countMatch[1]);
+    if (idValue) {
+      idCounts.set(idValue, (idCounts.get(idValue) || 0) + 1);
+    }
+  }
+
+  // Second pass: collect main targets, but only if the target ID is unique
+  const targets = new Map();
+  const tagPattern = /<(?:([a-zA-Z0-9]+)\b([^>]*?)|([a-zA-Z0-9]+)\b([^>]*?))>/gi;
+  let match;
+
+  const addTarget = (tagName, attrs, index) => {
+    const idVal = extractAttributeValue(attrs || '', 'id');
+    const roleVal = extractAttributeValue(attrs || '', 'role');
+
+    // Check if this element is a main-content region
+    let isMain = false;
+    if (tagName && tagName.toLowerCase() === 'main') {
+      isMain = true;
+    }
+    if (roleVal && roleVal.trim().toLowerCase() === 'main') {
+      isMain = true;
+    }
+
+    if (isMain && idVal && !targets.has(idVal) && idCounts.get(idVal) === 1) {
+      const line = text.slice(0, index).split('\n').length;
+      targets.set(idVal, { index, line, tagName: tagName ? tagName.toLowerCase() : 'unknown' });
+    }
+  };
+
+  // Reset lastIndex
+  tagPattern.lastIndex = 0;
+  while ((match = tagPattern.exec(text)) !== null) {
+    // The pattern captures either [tag, attrs] or [, , tag, attrs]
+    // depending on which alternative matched
+    let tagName = match[1] || match[3];
+    let attrs = match[2] || match[4];
+    addTarget(tagName, attrs, match.index);
+  }
+
+  return targets;
+}
+
+/**
+ * Find the character index of the first <nav> element in the text.
+ * Returns null if no <nav> is found.
+ */
+function findFirstNavIndex(text) {
+  const navPattern = /<(nav)\b[^>]*?>/i;
+  const match = navPattern.exec(text);
+  return match ? match.index : null;
+}
+
+/**
+ * Detect whether a static HTML document contains a supported skip link
+ * targeting a main-content region.
+ *
+ * Returns at most one finding per file with bounded confidence language.
+ *
+ * @param {string} filePath - Path to the file being scanned.
+ * @param {string} fileText - The file content.
+ * @param {string} ruleId - The rule ID for findings.
+ * @param {string} severity - The rule severity.
+ * @returns {Array<{file: string, line: number, rule: string, severity: string, message: string, evidence: string}>}
+ */
+export function detectSkipLink(filePath, fileText, ruleId, severity) {
+  const text = stripNonContent(fileText);
+  const candidates = collectSkipLinkCandidates(text);
+  const targets = collectMainTargets(text);
+  const findings = [];
+
+  // Every file without a main-content target needs investigation,
+  // but we emit the bounded finding below with appropriate evidence.
+  // If no target exists, we still check for any candidate.
+
+  // Find ordering boundary
+  const firstNavIndex = findFirstNavIndex(text);
+
+  // Check each candidate in document order for a valid skip link
+  let failReason = null;
+  let lastFailTag = null;
+
+  for (const candidate of candidates) {
+    // Check accessible name
+    if (!candidate.hasName) {
+      failReason = 'unnamed';
+      lastFailTag = candidate;
+      continue;
+    }
+
+    // Check fragment
+    if (!candidate.fragment || candidate.fragment.length === 0) {
+      failReason = 'empty-fragment';
+      lastFailTag = candidate;
+      continue;
+    }
+
+    // Resolve fragment
+    const targetEntry = targets.get(candidate.fragment);
+    if (!targetEntry) {
+      failReason = 'unresolved-fragment';
+      lastFailTag = candidate;
+      continue;
+    }
+
+    // Check ordering: candidate must be before the first <nav>
+    // or, if no <nav>, before the resolved target
+    if (firstNavIndex !== null && candidate.index >= firstNavIndex) {
+      failReason = 'after-nav';
+      lastFailTag = candidate;
+      continue;
+    }
+    if (candidate.index >= targetEntry.index) {
+      failReason = 'after-target';
+      lastFailTag = candidate;
+      continue;
+    }
+
+    // All checks passed — valid skip link found
+    return [];
+  }
+
+  // No valid skip link found — emit one bounded finding
+  let message;
+  let evidence = '';
+
+  if (candidates.length === 0 || (candidates.length === 1 && !candidates[0].hasName && !candidates[0].fragment)) {
+    if (targets.size === 0) {
+      message = 'No supported static skip link or main-content region was found.';
+    } else {
+      message = 'No supported static skip link targeting a main-content region was found.';
+    }
+  } else if (failReason === 'unnamed') {
+    if (lastFailTag) {
+      evidence = `Candidate <a href="#${lastFailTag.fragment || ''}"...> has no supported accessible name.`;
+    } else {
+      message = 'A same-document anchor was found but no supported accessible name was detected.';
+    }
+  } else if (failReason === 'empty-fragment') {
+    message = 'An anchor was found with an empty fragment target. Skip links require a non-empty fragment reference.';
+  } else if (failReason === 'unresolved-fragment') {
+    if (lastFailTag) {
+      message = `A same-document bypass-link candidate was found, but its fragment target "#${lastFailTag.fragment}" did not resolve to a supported main-content region.`;
+      evidence = `The fragment "#${lastFailTag.fragment}" was not found on any main-content element.`;
+    } else {
+      message = 'A same-document bypass-link candidate was found, but its fragment target did not resolve to a supported main-content region.';
+    }
+  } else if (failReason === 'after-nav') {
+    message = 'A supported skip-link candidate was found, but it appears after the first navigation landmark.';
+  } else if (failReason === 'after-target') {
+    message = 'A supported skip-link candidate was found, but it appears after its target in document order.';
+  } else {
+    message = 'No supported static skip link targeting a main-content region was found.';
+  }
+
+  // Determine the finding line: use the first candidate's line if available
+  let line = 1;
+  if (lastFailTag) {
+    line = lastFailTag.line;
+  } else if (candidates.length > 0) {
+    line = candidates[0].line;
+  }
+
+  findings.push({
+    file: filePath,
+    line,
+    rule: ruleId,
+    severity,
+    message,
+    evidence: evidence.slice(0, 160)
+  });
 
   return findings;
 }
