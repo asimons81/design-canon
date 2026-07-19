@@ -285,3 +285,59 @@ test('boundary: finding uses bounded confidence wording', async () => {
     assert.ok(!f.message.includes('WCAG'), 'Must not claim WCAG conformance');
   }
 });
+
+// ── Shorthand Parsing Regressions ────────────────────────────────────
+
+test('shorthand: spin with zero duration', () => {
+  assert.equal(scanCssMotion('.x { animation: spin 0s; }').length, 0);
+  assert.equal(scanCssMotion('.x { animation: spin 0ms; }').length, 0);
+  assert.equal(scanCssMotion('.x { animation: spin 0.01ms; }').length, 0);
+});
+
+test('shorthand: ease 0s spin', () => {
+  assert.equal(scanCssMotion('.x { animation: ease 0s spin; }').length, 0);
+});
+
+test('shorthand: spin 0s 1s (0s duration, 1s delay)', () => {
+  assert.equal(scanCssMotion('.x { animation: spin 0s 1s; }').length, 0);
+});
+
+test('shorthand: spin with no duration defaults to 0s', () => {
+  assert.equal(scanCssMotion('.x { animation: spin; }').length, 0);
+});
+
+test('shorthand: transition opacity with no duration defaults to 0s', () => {
+  assert.equal(scanCssMotion('.x { transition: opacity; }').length, 0);
+});
+
+test('shorthand: transition with zero duration', () => {
+  assert.equal(scanCssMotion('.x { transition: opacity 0s; }').length, 0);
+  assert.equal(scanCssMotion('.x { transition: opacity 0ms; }').length, 0);
+});
+
+test('shorthand: comma-separated list with all disabled', () => {
+  assert.equal(scanCssMotion('.x { animation: none, spin 0s; }').length, 0);
+});
+
+test('shorthand: comma-separated list with active component warns', () => {
+  const r = scanCssMotion('.x { animation: none, spin 1s; }');
+  assert.equal(r.length, 1);
+  assert.equal(r[0].selector, '.x');
+});
+
+// ── Media-Query List Regressions ─────────────────────────────────────
+
+test('media: comma-separated list with reduce branch first', () => {
+  const css = '.x { animation: fade 1s; } @media (prefers-reduced-motion: reduce), (max-width: 1px) { .x { animation: none; } }';
+  assert.equal(scanCssMotion(css).length, 0);
+});
+
+test('media: comma-separated list with reduce branch second', () => {
+  const css = '.x { animation: fade 1s; } @media (max-width: 1px), (prefers-reduced-motion: reduce) { .x { animation: none; } }';
+  assert.equal(scanCssMotion(css).length, 0);
+});
+
+test('shorthand: spin 1s produces finding', () => {
+  const r = scanCssMotion('.x { animation: spin 1s; }');
+  assert.equal(r.length, 1);
+});
