@@ -65,3 +65,10 @@ export {
   isWithinScanRoot,
   hasPathTraversal
 } from './security.js';
+
+export {
+  setupAnalyzers,
+  resetAnalyzers,
+  hasProductionAnalyzer,
+  getProductionAnalyzerIds
+} from './analyzers/index.js';

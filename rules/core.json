@@ -372,6 +372,33 @@
           }
         ]
       }
+    },
+    {
+      "id": "accessibility.text-contrast-minimum",
+      "category": "accessibility",
+      "title": "Require minimum rendered text contrast",
+      "severity": "warning",
+      "appliesTo": [
+        "marketing",
+        "editorial",
+        "product-app"
+      ],
+      "instruction": "Ensure rendered text reaches the applicable minimum contrast ratio in the intended viewport and color scheme.",
+      "rationale": "Low-contrast text can be difficult to read for people with low vision, reduced contrast sensitivity, or color-vision differences.",
+      "verify": [
+        "Normal text measures at least 4.5:1 against its rendered background.",
+        "Large-scale text measures at least 3:1 against its rendered background.",
+        "Unsupported visual composition is reviewed manually rather than treated as a pass."
+      ],
+      "detect": {
+        "message": "Rendered text contrast measured below the configured minimum in the analyzed Chromium state.",
+        "browserAnalyzer": {
+          "id": "rendered.text-contrast",
+          "extensions": [
+            ".html"
+          ]
+        }
+      }
     }
   ]
 }

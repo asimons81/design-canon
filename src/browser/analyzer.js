@@ -129,7 +129,8 @@ export async function runAnalyzer(capabilityId, context) {
       status: result.status ?? 'indeterminate',
       measurements: result.measurements ?? {},
       message: result.message ?? '',
-      confidence: result.confidence ?? 'medium'
+      confidence: result.confidence ?? 'medium',
+      samples: result.samples ?? []
     };
   } catch (err) {
     const isTimeout = err.message && err.message.includes('deadline exceeded');

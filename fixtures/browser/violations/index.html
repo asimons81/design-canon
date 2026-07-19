@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8">
+<style>
+  body { background: #fff; color: #777; font-family: sans-serif; }
+  .control { color: #333; }
+  .exact-threshold { color: #777; } /* ~4.5:1 against white */
+</style>
+</head>
+<body>
+  <h1 style="color: #222;">Large heading</h1> <!-- ~13:1 pass -->
+  <p class="control">This text has good contrast against white.</p>
+  <p class="exact-threshold">This text is at approximately the 4.5:1 threshold.</p>
+  <p style="color: #767676;">Near-threshold text.</p>
+</body>
+</html>
