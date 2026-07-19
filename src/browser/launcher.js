@@ -19,6 +19,7 @@ const DEFAULT_OPERATION_TIMEOUT = 60_000;
  * @property {number} concurrency
  * @property {number} pageTimeout
  * @property {boolean} javaScriptEnabled
+ * @property {'light'|'dark'} colorScheme
  * @property {AbortController} operationController
  * @property {number} deadline
  * @property {Set<import('playwright').Page>} activePages
@@ -33,6 +34,7 @@ const DEFAULT_OPERATION_TIMEOUT = 60_000;
  * @param {number} [options.pageTimeout=10000] - per-page timeout in ms
  * @param {number} [options.operationTimeout=60000] - total operation timeout in ms
  * @param {boolean} [options.javaScriptEnabled=true] - enable JS execution
+ * @param {'light'|'dark'} [options.colorScheme='light'] - preferred color scheme
  * @param {string} [options.scanRoot] - normalized scan root
  * @returns {Promise<BrowserInstance>}
  */
@@ -42,6 +44,7 @@ export async function launchBrowser(options = {}) {
     pageTimeout = DEFAULT_PAGE_TIMEOUT,
     operationTimeout = DEFAULT_OPERATION_TIMEOUT,
     javaScriptEnabled = true,
+    colorScheme = 'light',
     scanRoot = process.cwd()
   } = options;
 
@@ -83,6 +86,7 @@ export async function launchBrowser(options = {}) {
     concurrency,
     pageTimeout,
     javaScriptEnabled,
+    colorScheme,
     operationController,
     deadline,
     activePages: new Set(),
@@ -114,6 +118,7 @@ export async function createAnalysisPage(instance) {
     ignoreHTTPSErrors: false,
     bypassCSP: false,
     javaScriptEnabled: instance.javaScriptEnabled,
+    colorScheme: instance.colorScheme,
     userAgent: 'DesignCanon/1.0'
   });
 

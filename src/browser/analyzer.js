@@ -90,6 +90,9 @@ export function clearAnalyzers() {
 
 /**
  * Run an analyzer against a loaded page.
+ * The analyzer promise is raced against the remaining deadline
+ * so a never-resolving analyzer cannot hang the operation.
+ * The deadline timer is always cancelled when the race ends.
  *
  * @param {string} capabilityId
  * @param {AnalyzerContext} context
@@ -107,8 +110,8 @@ export async function runAnalyzer(capabilityId, context) {
   }
 
   try {
-    // Check deadline
-    if (Date.now() > context.deadline) {
+    const remaining = context.deadline - Date.now();
+    if (remaining <= 0) {
       return {
         status: 'failed',
         measurements: {},
@@ -117,7 +120,11 @@ export async function runAnalyzer(capabilityId, context) {
       };
     }
 
-    const result = await analyzerFn(context);
+    // Race the analyzer against the remaining operation time.
+    // The deadline timeout is cleared when the race ends so it
+    // cannot keep the event loop alive.
+    const result = await raceWithDeadline(analyzerFn(context), remaining);
+
     return {
       status: result.status ?? 'indeterminate',
       measurements: result.measurements ?? {},
@@ -125,11 +132,40 @@ export async function runAnalyzer(capabilityId, context) {
       confidence: result.confidence ?? 'medium'
     };
   } catch (err) {
+    const isTimeout = err.message && err.message.includes('deadline exceeded');
     return {
       status: 'failed',
       measurements: {},
-      message: `Analyzer error: ${err.message}`,
+      message: isTimeout ? err.message : `Analyzer error: ${err.message}`,
       confidence: 'low'
     };
   }
+}
+
+/**
+ * Race a promise against a deadline timeout.
+ * The timer is always cleared so it cannot keep the event loop alive.
+ *
+ * @param {Promise<T>} promise
+ * @param {number} ms - milliseconds until deadline
+ * @returns {Promise<T>}
+ * @template T
+ */
+function raceWithDeadline(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error('Operation deadline exceeded during analysis.'));
+    }, Math.max(1, ms));
+
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (reason) => {
+        clearTimeout(timer);
+        reject(reason);
+      }
+    );
+  });
 }

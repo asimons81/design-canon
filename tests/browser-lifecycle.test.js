@@ -14,6 +14,11 @@ import {
   loadLocalPage,
   getComputedStyle
 } from '../src/browser/page.js';
+import {
+  registerAnalyzer,
+  clearAnalyzers,
+  runAnalyzer
+} from '../src/browser/analyzer.js';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 
@@ -27,7 +32,7 @@ test('setup: check browser availability', async () => {
   const cap = await detectBrowserCapability();
   chromiumAvailable = cap.chromiumAvailable;
   if (!chromiumAvailable) return;
-  browserInstance = await launchBrowser();
+  browserInstance = await launchBrowser({ colorScheme: 'light' });
 });
 
 test.after(async () => {
@@ -52,6 +57,41 @@ async function withPage(testFn) {
     browserInstance.activePages.delete(page);
   }
 }
+
+// Operation-deadline regression tests (validates runAnalyzer races analyzer
+// against remaining operation time). Placed here because the browser lifecycle
+// keeps the Node event loop alive, avoiding exit-contention with pending
+// analyzer promises.
+
+test('runAnalyzer races analyzer against remaining deadline - resolves after deadline', async () => {
+  if (!chromiumAvailable) return;
+  clearAnalyzers();
+  registerAnalyzer('test.afterdeadline', async () => {
+    await new Promise((r) => setTimeout(r, 100));
+    return { status: 'confirmed', measurements: {}, message: 'Done late.', confidence: 'high' };
+  });
+
+  const deadline = Date.now() + 30;
+  const context = { deadline };
+  const result = await runAnalyzer('test.afterdeadline', context);
+  assert.equal(result.status, 'failed');
+  assert.match(result.message, /deadline exceeded/);
+});
+
+test('runAnalyzer races analyzer against remaining deadline - never resolves', async () => {
+  if (!chromiumAvailable) return;
+  clearAnalyzers();
+  registerAnalyzer('test.never', async () => {
+    await new Promise(() => {}); // Never resolves
+    return { status: 'confirmed', measurements: {}, message: '', confidence: 'high' };
+  });
+
+  const deadline = Date.now() + 20;
+  const context = { deadline };
+  const result = await runAnalyzer('test.never', context);
+  assert.equal(result.status, 'failed');
+  assert.match(result.message, /deadline exceeded/);
+});
 
 test('browser launches once and closes cleanly', async () => {
   if (!chromiumAvailable || !browserInstance) return;
@@ -155,4 +195,46 @@ test('readiness does not wait for endless timers', async () => {
     const filePath = resolve(fixturesDir, 'basic-page.html');
     await loadLocalPage(page, filePath, 'desktop');
   });
+});
+
+test('colorScheme light applies prefers-color-scheme: light', async () => {
+  if (!chromiumAvailable || !browserInstance) return;
+  const context = await browserInstance.browser.newContext({ colorScheme: 'light' });
+  const page = await context.newPage();
+  browserInstance.activePages.add(page);
+  page.on('close', () => browserInstance.activePages.delete(page));
+  try {
+    const filePath = resolve(fixturesDir, 'color-scheme-test.html');
+    await loadLocalPage(page, filePath, 'desktop');
+
+    const scheme = await page.evaluate(() =>
+      document.getElementById('scheme-indicator').textContent
+    );
+    assert.equal(scheme, 'light');
+  } finally {
+    try { await page.close(); } catch {}
+    try { await context.close(); } catch {}
+    browserInstance.activePages.delete(page);
+  }
+});
+
+test('colorScheme dark applies prefers-color-scheme: dark', async () => {
+  if (!chromiumAvailable || !browserInstance) return;
+  const context = await browserInstance.browser.newContext({ colorScheme: 'dark' });
+  const page = await context.newPage();
+  browserInstance.activePages.add(page);
+  page.on('close', () => browserInstance.activePages.delete(page));
+  try {
+    const filePath = resolve(fixturesDir, 'color-scheme-test.html');
+    await loadLocalPage(page, filePath, 'desktop');
+
+    const scheme = await page.evaluate(() =>
+      document.getElementById('scheme-indicator').textContent
+    );
+    assert.equal(scheme, 'dark');
+  } finally {
+    try { await page.close(); } catch {}
+    try { await context.close(); } catch {}
+    browserInstance.activePages.delete(page);
+  }
 });

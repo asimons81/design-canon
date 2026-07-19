@@ -316,6 +316,7 @@ export async function lintPath({
           pageTimeout: browserConfig.pageTimeout,
           operationTimeout: browserConfig.operationTimeout,
           javaScriptEnabled: browserConfig.javaScriptEnabled,
+          colorScheme: browserConfig.colorScheme,
           scanRoot: process.cwd()
         });
 

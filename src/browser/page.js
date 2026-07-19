@@ -64,8 +64,14 @@ export async function navigateAndWait(page, fileUrl, timeout = DEFAULT_PAGE_TIME
     timeout
   });
 
-  // Wait for one animation frame to ensure style/layout has been computed
-  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+  // Wait for one animation frame to ensure style/layout has been computed.
+  // Race against a bounded timeout so a stuck rAF cannot hang the operation.
+  await Promise.race([
+    page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve))),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Readiness timeout: no animation frame within timeout.')), 5000)
+    )
+  ]);
 }
 
 /**
