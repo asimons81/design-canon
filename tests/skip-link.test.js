@@ -548,6 +548,55 @@ test('boundary: unsupported file extensions ignored', async () => {
   await rm(dir, { recursive: true, force: true });
 });
 
+// ── Regression: F018 field-test issues ────────────────────────────────
+
+test('regression: unnamed finding has non-empty message', () => {
+  // Bug 1: Whitespace-only name left message undefined
+  const html = '<a href="#main">   </a><nav>X</nav><main id="main"><h1>C</h1></main>';
+  const findings = detectSkipLink('t.html', html, 'accessibility.skip-link', 'warning');
+  assert.equal(findings.length, 1);
+  assert.ok(findings[0].message, 'message must be non-empty');
+  assert.ok(typeof findings[0].message === 'string' && findings[0].message.length > 0);
+});
+
+test('regression: empty nested link content has non-empty message', () => {
+  // Bug 1 variant: empty span inside anchor leaves message undefined
+  const html = '<a href="#main"><span></span></a><nav>X</nav><main id="main"><h1>C</h1></main>';
+  const findings = detectSkipLink('t.html', html, 'accessibility.skip-link', 'warning');
+  assert.equal(findings.length, 1);
+  assert.ok(findings[0].message, 'message must be non-empty');
+  assert.ok(typeof findings[0].message === 'string' && findings[0].message.length > 0);
+});
+
+test('regression: aria-hidden text is not counted as name', () => {
+  // Bug 2: <span aria-hidden="true">Icon</span> counted as name
+  const html = '<a href="#main"><span aria-hidden="true">Icon</span></a><nav>X</nav><main id="main"><h1>C</h1></main>';
+  const findings = detectSkipLink('t.html', html, 'accessibility.skip-link', 'warning');
+  assert.equal(findings.length, 1, 'aria-hidden text must not count as accessible name');
+  assert.ok(findings[0].message.includes('no supported accessible name'));
+});
+
+test('regression: aria-hidden labelledby element is not counted as name', () => {
+  // Bug 2: Referenced element with aria-hidden="true" should not count
+  const html = '<span id="l" aria-hidden="true">Label</span><a href="#main" aria-labelledby="l"></a><nav>X</nav><main id="main"><h1>C</h1></main>';
+  const findings = detectSkipLink('t.html', html, 'accessibility.skip-link', 'warning');
+  assert.equal(findings.length, 1, 'aria-hidden labelledby element must not count');
+});
+
+test('regression: text after empty span is recognized as name', () => {
+  // Bug 3: <span></span> before text caused getInnerText to stop early
+  const html = '<a href="#main"><span></span>Skip to content</a><nav>X</nav><main id="main"><h1>C</h1></main>';
+  const findings = detectSkipLink('t.html', html, 'accessibility.skip-link', 'warning');
+  assert.equal(findings.length, 0, 'text after empty nested element must be recognized');
+});
+
+test('regression: text after empty SVG is recognized as name', () => {
+  // Bug 3 variant: SVG before text
+  const html = '<a href="#main"><svg></svg>Skip to content</a><nav>X</nav><main id="main"><h1>C</h1></main>';
+  const findings = detectSkipLink('t.html', html, 'accessibility.skip-link', 'warning');
+  assert.equal(findings.length, 0, 'text after empty SVG must be recognized');
+});
+
 // ── Regression: F016 and F017 still work ──────────────────────────────
 
 test('regression: F016 and F017 still work', async () => {

@@ -470,13 +470,23 @@ export function detectUnlabeledControls(filePath, fileText, ruleId, severity) {
 
 /**
  * Get the approximate visible text content inside an HTML container element.
- * Strips inner HTML tags and returns the trimmed, collapsed text.
+ * Strips inner HTML tags, ignores aria-hidden subtrees, and returns the
+ * trimmed, collapsed text. Uses the correct closing tag for the container
+ * so nested inline elements do not truncate the result.
  */
-function getInnerText(source, openTagEnd) {
+function getInnerText(source, openTagEnd, containerTag) {
   const rest = source.slice(openTagEnd);
-  const closeMatch = rest.match(/<\/[a-zA-Z][a-zA-Z0-9]*\s*>/);
+  const closePattern = new RegExp(`</${containerTag}\\s*>`, 'i');
+  const closeMatch = rest.match(closePattern);
   if (!closeMatch) return '';
-  const content = rest.slice(0, closeMatch.index);
+  let content = rest.slice(0, closeMatch.index);
+  // Strip content of elements with aria-hidden="true" (bounded approximation).
+  // Handles simple non-nested cases; nested aria-hidden is not deterministically
+  // resolvable with static source scanning.
+  content = content.replace(
+    /<([a-zA-Z][a-zA-Z0-9]*)[^>]*?\b(aria-hidden)\s*=\s*["']true["'][^>]*>[\s\S]*?<\/\1\s*>/gi,
+    ' '
+  );
   return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
@@ -517,7 +527,7 @@ function collectSkipLinkCandidates(text) {
 
     // 2. Visible text content
     if (!hasName) {
-      const anchorText = getInnerText(text, index + tagText.length);
+      const anchorText = getInnerText(text, index + tagText.length, 'a');
       if (anchorText && anchorText.length > 0) {
         hasName = true;
         nameSource = 'text';
@@ -531,12 +541,17 @@ function collectSkipLinkCandidates(text) {
         const refIds = ariaLabelledby.split(/\s+/).filter(Boolean);
         for (const refId of refIds) {
           const refMatch = text.match(
-            new RegExp(`<(\\w+)[^>]*?\\sid\\s*=\\s*["']?${escapeRegex(refId)}["'\\s>]`, 'i')
+            new RegExp(`<(\\w+)([^>]*?)\\sid\\s*=\\s*["']?${escapeRegex(refId)}["'\\s>][^>]*>`, 'i')
           );
           if (refMatch) {
             const refLine = text.slice(0, refMatch.index).split('\n').length;
+            const refTagName = refMatch[1];
             const refTag = refMatch[0];
-            const refText = getInnerText(text, refMatch.index + refTag.length);
+            // Reject if the resolved element has aria-hidden="true"
+            if (extractAttributeValue(refTag, 'aria-hidden') === 'true') {
+              continue;
+            }
+            const refText = getInnerText(text, refMatch.index + refTag.length, refTagName);
             if (refText && refText.trim().length > 0) {
               hasName = true;
               nameSource = 'aria-labelledby';
@@ -708,6 +723,7 @@ export function detectSkipLink(filePath, fileText, ruleId, severity) {
     }
   } else if (failReason === 'unnamed') {
     if (lastFailTag) {
+      message = 'A same-document anchor was found but no supported accessible name was detected.';
       evidence = `Candidate <a href="#${lastFailTag.fragment || ''}"...> has no supported accessible name.`;
     } else {
       message = 'A same-document anchor was found but no supported accessible name was detected.';
