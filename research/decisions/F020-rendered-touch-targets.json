@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "status": "accepted",
+  "ruleNumber": "F020",
+  "proposalId": "proposal.mobile.touch-target-minimum",
+  "ruleId": "mobile.touch-target-minimum",
+  "analyzerId": "rendered.touch-target-size",
+  "severity": "warning",
+  "architecture": "browser-rendered-analysis",
+  "profiles": [
+    "marketing",
+    "editorial",
+    "product-app"
+  ],
+  "extensions": [
+    ".html"
+  ],
+  "normativeBasis": {
+    "criterion": "WCAG 2.2 SC 2.5.8 Target Size (Minimum)",
+    "minimumWidthCssPx": 24,
+    "minimumHeightCssPx": 24,
+    "spacingCircleDiameterCssPx": 24,
+    "comparison": "full-precision-no-rounding",
+    "enhancedExcluded": "WCAG 2.5.5 44 by 44"
+  },
+  "geometry": {
+    "primary": "getBoundingClientRect",
+    "fragments": "getClientRects",
+    "rectangularPass": {
+      "widthGte": 24,
+      "heightGte": 24
+    },
+    "offViewport": "exclude",
+    "partialViewport": "visible-intersection-if-deterministic",
+    "axisAlignedTransforms": "supported",
+    "nonAxisAlignedTransforms": "indeterminate",
+    "fragmentation": "indeterminate-unless-independently-supported"
+  },
+  "spacing": {
+    "radiusCssPx": 12,
+    "circleCircle": "center-distance < 24",
+    "circleTarget": "distance-to-target-area < 12",
+    "exactTangencyIntersects": false,
+    "neighbors": "all-rendered-targets",
+    "strategy": "spatial-bucketing-or-bounded-filter"
+  },
+  "eligible": {
+    "native": [
+      "a[href]",
+      "button",
+      "input:not([type=hidden])",
+      "select",
+      "textarea",
+      "summary"
+    ],
+    "roles": [
+      "button",
+      "link",
+      "checkbox",
+      "radio",
+      "switch",
+      "tab",
+      "menuitem",
+      "menuitemcheckbox",
+      "menuitemradio",
+      "option",
+      "slider",
+      "spinbutton",
+      "textbox",
+      "combobox",
+      "searchbox"
+    ],
+    "scripted": "non-negative-tabindex-plus-deterministic-activation",
+    "readonlyEligible": true
+  },
+  "excluded": [
+    "hidden",
+    "inert",
+    "native-disabled",
+    "aria-disabled",
+    "zero-area",
+    "collapsed",
+    "wholly-off-viewport",
+    "outside-initial-state"
+  ],
+  "exceptions": {
+    "inline": {
+      "automatic": "narrow",
+      "requirements": [
+        "inline-formatting-context",
+        "sentence-or-text-block",
+        "adjacent-non-target-text",
+        "line-height-constrained",
+        "not-standalone-control"
+      ]
+    },
+    "equivalent": {
+      "automatic": false,
+      "boundary": "justified-suppression"
+    },
+    "userAgentControl": {
+      "automatic": "unmodified-native-only"
+    },
+    "essential": {
+      "automatic": false,
+      "boundary": "justified-suppression"
+    }
+  },
+  "statuses": [
+    "confirmed",
+    "indeterminate",
+    "skipped",
+    "failed"
+  ],
+  "outcomes": [
+    "pass",
+    "spacing-exception",
+    "inline-exception",
+    "user-agent-exception",
+    "violation",
+    "excluded"
+  ],
+  "findingConversion": {
+    "status": "confirmed",
+    "outcome": "violation",
+    "onePer": "target-viewport-colorScheme"
+  },
+  "indeterminateReasons": [
+    "non-axis-aligned-transform",
+    "perspective-transform",
+    "ambiguous-fragmentation",
+    "ambiguous-overlap",
+    "partially-obscured",
+    "unsupported-hit-area",
+    "unsupported-native-control",
+    "unresolved-target-geometry",
+    "dynamic-target-state",
+    "nested-interactive-target",
+    "clipped-nonrectangular-target"
+  ],
+  "evidence": [
+    "selector",
+    "targetType",
+    "role",
+    "label",
+    "width",
+    "height",
+    "visibleWidth",
+    "visibleHeight",
+    "centerX",
+    "centerY",
+    "requiredWidth",
+    "requiredHeight",
+    "exception",
+    "spacingProof",
+    "viewport",
+    "colorScheme",
+    "browserVersion"
+  ],
+  "performance": {
+    "singleBrowser": true,
+    "isolatedContext": true,
+    "boundedEvaluations": true,
+    "avoidUnboundedAllPairs": true,
+    "newRuntimeDependency": false
+  },
+  "security": {
+    "inherits": "ADR-002",
+    "localHtmlOnly": true,
+    "externalNetworkBlocked": true,
+    "screenshots": false,
+    "rawBrowserLifecycle": false
+  },
+  "implementationReadiness": "ready-for-implementation",
+  "productionChangeInDecisionPr": false
+}

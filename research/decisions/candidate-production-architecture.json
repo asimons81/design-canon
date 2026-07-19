@@ -300,26 +300,29 @@
         "browser-rendered-analysis"
       ],
       "confidenceBoundary": {
-        "canProve": "At a defined mobile viewport width, an interactive element has a rendered bounding box smaller than 44x44 CSS pixels.",
-        "cannotProve": "Anything about rendered touch target size from static CSS analysis alone. CSS width/height/padding declarations may differ from rendered size due to cascade, content overflow, border-box, transforms, and responsive rules."
+        "canProve": "In the configured initial Chromium state, a supported target has deterministic rendered geometry below 24 by 24 CSS pixels and does not satisfy a confirmed spacing or inline exception.",
+        "cannotProve": "Complete WCAG conformance, functional equivalence, essential presentation, uncertain user-agent control, unsupported hit areas, later states, or other rendering environments."
       },
       "requiredInputs": [
-        "Rendered bounding boxes (getBoundingClientRect)",
-        "Viewport dimensions",
-        "Interactive element classification",
-        "Responsive breakpoint context"
+        "Rendered target geometry",
+        "Viewport intersection",
+        "Interactive target classification",
+        "Nearby target geometry",
+        "Computed transform, inert, disabled, and role state"
       ],
       "exclusions": [
-        "Desktop-only interfaces at non-mobile viewports",
-        "Inline text links in paragraphs",
-        "Non-interactive elements",
-        "Parent-handled touch delegation"
+        "Narrow inline exception",
+        "Hidden, inert, disabled, zero-area, and off-viewport targets",
+        "Equivalent and essential semantic boundaries",
+        "Unsupported geometry"
       ],
       "profileRecommendations": [
-        "mobile"
+        "marketing",
+        "editorial",
+        "product-app"
       ],
       "severityRecommendation": "warning",
-      "implementationReadiness": "ready-after-architecture-support",
+      "implementationReadiness": "ready-for-implementation",
       "fixtureAssessment": {
         "violation": {
           "fixtureId": "fixture.mobile.touch-targets.violation.small-buttons",
@@ -339,22 +342,40 @@
       },
       "acceptanceCriteria": {
         "requiredTests": [
-          "Rendered target below 44x44 at mobile viewport triggers finding",
-          "Rendered target above 44x44 produces no finding",
-          "Responsive size change at different breakpoints",
-          "Transform scale() affecting rendered size"
+          "24x24 threshold",
+          "fractional boundary",
+          "spacing circles",
+          "inline exception",
+          "disabled and inert exclusions",
+          "transform and overlap indeterminate",
+          "confirmed-only findings",
+          "static unchanged"
         ],
         "requiredFixtures": [
-          "Transform scale() target",
-          "Viewport-responsive target",
-          "Overlapping touch targets",
-          "Box-sizing border-box vs content-box comparison"
+          "size controls and violations",
+          "spacing and dense clusters",
+          "inline and semantic boundaries",
+          "transform, clipping, overlap, disabled and inert cases"
         ],
-        "cliBehavior": "Not applicable under current architecture. Requires browser-assisted or visual-review pipeline.",
-        "suppressionBehavior": "Not applicable under current architecture.",
-        "performanceConstraints": "Browser rendering pipeline, not static file scan.",
-        "failureBoundaries": "Desktop viewports excluded. Non-interactive elements excluded.",
-        "documentation": "Document this rule as browser-required until rendered analysis infrastructure exists."
+        "cliBehavior": "Browser-only warning findings; operational failures never become violations.",
+        "suppressionBehavior": "Existing rationale-required suppression for confirmed warnings only.",
+        "performanceConstraints": [
+          "single browser",
+          "bounded evaluations",
+          "spatial bucketing",
+          "deadlines"
+        ],
+        "failureBoundaries": [
+          "unsupported geometry indeterminate",
+          "semantic exceptions not inferred",
+          "static emits no F020"
+        ],
+        "documentation": [
+          "24x24 versus 44x44",
+          "exceptions",
+          "spacing-circle model",
+          "confidence boundary"
+        ]
       }
     }
   ],
