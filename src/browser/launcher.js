@@ -141,11 +141,6 @@ export async function createAnalysisPage(instance) {
     }
   });
 
-  // Block popups at the context level
-  context.on('page', async (popupPage) => {
-    await popupPage.close().catch(() => {});
-  });
-
   // Deny all permission requests
   await context.grantPermissions([]);
 
@@ -158,6 +153,13 @@ export async function createAnalysisPage(instance) {
   });
 
   const page = await context.newPage();
+
+  // Block popups at the context level.
+  // Registered AFTER newPage() so the primary analysis page is NOT
+  // closed by the handler — only subsequent popup pages are caught.
+  context.on('page', async (popupPage) => {
+    await popupPage.close().catch(() => {});
+  });
   page.setDefaultTimeout(instance.pageTimeout);
   instance.activePages.add(page);
 

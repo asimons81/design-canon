@@ -105,19 +105,46 @@ const COLLECT_TEXT_ELEMENTS_FN = (() => {
       if (cs.webkitMaskImage && cs.webkitMaskImage !== 'none') return 'mask';
       if (cs.backgroundClip === 'text') return 'background-clip-text';
       if (cs.textShadow && cs.textShadow !== 'none' && cs.textShadow !== '0px 0px 0px transparent') return 'text-shadow';
-      var strokeVal = cs.webkitTextStroke || '0';
+      // webkitTextStroke: Chromium returns "0px rgb(r,g,b)" even when unset.
+      // Extract the width prefix and only flag if non-zero.
+      var strokeVal = (cs.webkitTextStroke || '0').split(/\s+/)[0];
       if (strokeVal !== '0px' && strokeVal !== '0') return 'text-stroke';
 
       var parent = el.parentElement;
       while (parent) {
         var pcs = getComputedStyle(parent);
+
+        // Background image / gradient
+        if (pcs.backgroundImage && pcs.backgroundImage !== 'none') {
+          if (pcs.backgroundImage.toLowerCase().indexOf('gradient') !== -1) return 'gradient';
+          return 'background-image';
+        }
+        // Opacity
         var pop = parseFloat(pcs.opacity);
         if (!isNaN(pop) && pop < 1) return 'opacity';
+        // Blend modes
         if (pcs.mixBlendMode && pcs.mixBlendMode !== 'normal') return 'mix-blend-mode';
+        if (pcs.backgroundBlendMode && pcs.backgroundBlendMode !== 'normal') return 'background-blend-mode';
+        // Filters
         if (pcs.filter && pcs.filter !== 'none') return 'filter';
+        if (pcs.backdropFilter && pcs.backdropFilter !== 'none') return 'backdrop-filter';
+        // Mask
+        if (pcs.maskImage && pcs.maskImage !== 'none') return 'mask';
+        if (pcs.webkitMaskImage && pcs.webkitMaskImage !== 'none') return 'mask';
+
         parent = parent.parentElement;
       }
       return null;
+    }
+
+    function isInDisabledContainer(el) {
+      var current = el;
+      while (current) {
+        if (current.disabled === true) return true;
+        if (current.getAttribute && current.getAttribute('aria-disabled') === 'true') return true;
+        current = current.parentElement;
+      }
+      return false;
     }
 
     var walker = document.createTreeWalker(
@@ -151,24 +178,41 @@ const COLLECT_TEXT_ELEMENTS_FN = (() => {
       var cs = getComputedStyle(parent);
       if (cs.display === 'none') continue;
       if (cs.visibility !== 'visible') continue;
-      if (parent.disabled === true) continue;
-      if (parent.getAttribute('aria-disabled') === 'true') continue;
+      if (isInDisabledContainer(parent)) continue;
 
-      var range = document.createRange();
-      range.selectNodeContents(parent);
-      var rects = range.getClientRects();
-      var hasPositiveArea = false;
-      for (var ri = 0; ri < rects.length; ri++) {
-        if (rects[ri].width > 0 && rects[ri].height > 0) {
-          hasPositiveArea = true;
-          break;
+      // Aggregate only direct child text nodes — NOT descendant text,
+      // which belongs to styled descendant elements and is analyzed
+      // separately when the tree walker reaches those descendants.
+      var directTexts = [];
+      var directText = '';
+      for (var child = parent.firstChild; child; child = child.nextSibling) {
+        if (child.nodeType === 3) { // TEXT_NODE
+          var t = (child.textContent || '').replace(/\s+/g, ' ').trim();
+          if (t) {
+            directTexts.push(child);
+            directText += (directText ? ' ' : '') + t;
+          }
         }
+      }
+      if (!directText) continue;
+
+      // Use range geometry from direct text nodes only
+      var hasPositiveArea = false;
+      for (var di = 0; di < directTexts.length; di++) {
+        var txtRange = document.createRange();
+        txtRange.selectNodeContents(directTexts[di]);
+        var txtRects = txtRange.getClientRects();
+        for (var ri = 0; ri < txtRects.length; ri++) {
+          if (txtRects[ri].width > 0 && txtRects[ri].height > 0) {
+            hasPositiveArea = true;
+            break;
+          }
+        }
+        if (hasPositiveArea) break;
       }
       if (!hasPositiveArea) continue;
 
-      var text = parent.textContent || '';
-      var collapsed = text.replace(/\s+/g, ' ').trim();
-      if (!collapsed) continue;
+      var text = directText;
 
       var effect = hasUnsupportedVisualEffect(parent);
       var ancestorBackgrounds = collectAncestorBackgrounds(parent);
@@ -177,7 +221,7 @@ const COLLECT_TEXT_ELEMENTS_FN = (() => {
       processedElements.add(parent);
       results.push({
         selector: selector,
-        text: collapsed,
+        text: text,
         style: {
           color: cs.color,
           backgroundColor: cs.backgroundColor,
@@ -200,7 +244,7 @@ const COLLECT_TEXT_ELEMENTS_FN = (() => {
     }
     return results;
   }
-  return collectTextElements.toString();
+  return '(' + collectTextElements.toString() + ')()';
 })();
 
 /**
@@ -426,13 +470,21 @@ function checkIndeterminate(style, effect) {
   }
 
   // Text stroke
-  if (style.webkitTextStroke && style.webkitTextStroke !== '0px' && style.webkitTextStroke !== '0') {
-    return { reason: 'text-stroke' };
+  // Text stroke — Chromium returns "0px rgb(r,g,b)" even when unset.
+  if (style.webkitTextStroke) {
+    const strokeVal = style.webkitTextStroke.split(/\s+/)[0];
+    if (strokeVal !== '0px' && strokeVal !== '0') return { reason: 'text-stroke' };
   }
 
   // Check ancestor conditions
   if (style.ancestorBackgrounds) {
     for (const ancestor of style.ancestorBackgrounds) {
+      // Background image / gradient
+      if (ancestor.backgroundImage && ancestor.backgroundImage !== 'none') {
+        const aBi = ancestor.backgroundImage.toLowerCase();
+        if (aBi.includes('gradient')) return { reason: 'gradient' };
+        return { reason: 'image-background' };
+      }
       if (ancestor.opacity !== undefined && ancestor.opacity !== null) {
         const op = parseFloat(ancestor.opacity);
         if (!Number.isNaN(op) && op < 1) return { reason: 'opacity' };

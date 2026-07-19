@@ -47,12 +47,14 @@ async function probeCapability() {
     const { statSync } = await import('node:fs');
     const { resolve, dirname } = await import('node:path');
     const { fileURLToPath } = await import('node:url');
+    const { homedir } = await import('node:os');
 
     // Resolve playwright from several likely locations
     const candidates = [
       resolve(process.cwd(), 'node_modules', 'playwright'),
       resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'node_modules', 'playwright'),
-      resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'playwright')
+      resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'playwright'),
+      resolve(homedir(), 'node_modules', 'playwright')
     ];
     let found = false;
     for (const candidate of candidates) {
