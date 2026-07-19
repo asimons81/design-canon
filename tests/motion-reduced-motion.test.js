@@ -341,3 +341,24 @@ test('shorthand: spin 1s produces finding', () => {
   const r = scanCssMotion('.x { animation: spin 1s; }');
   assert.equal(r.length, 1);
 });
+
+// ── Cross-Block Duplicate Selector Limitation ─────────────────────────
+// Longhands split across separate blocks with the same selector are not
+// aggregated. This is a documented static-analysis limitation.
+
+test('limitation: animation name and duration in separate blocks not aggregated', () => {
+  const css = '.x { animation-name: spin; }\n\n.x { animation-duration: 1s; }';
+  assert.equal(scanCssMotion(css).length, 0,
+    'Cross-block aggregation is not supported');
+});
+
+test('limitation: transition property and duration in separate blocks not aggregated', () => {
+  const css = '.x { transition-property: opacity; }\n\n.x { transition-duration: 1s; }';
+  assert.equal(scanCssMotion(css).length, 0,
+    'Cross-block aggregation is not supported');
+});
+
+test('limitation: single-block name+duration still works', () => {
+  const r = scanCssMotion('.x { animation-name: spin; animation-duration: 1s; }');
+  assert.equal(r.length, 1);
+});
