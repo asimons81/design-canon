@@ -331,7 +331,8 @@
       "rationale": "Users with vestibular disorders can experience discomfort from motion. WCAG 2.3.3 (Animation from Interactions, Level AAA) requires a mechanism to pause or hide non-essential motion. A static prefers-reduced-motion override is the standard CSS technique.",
       "verify": [
         "Every selector with animation or transition properties has a matching selector inside @media (prefers-reduced-motion: reduce) with a disabling override.",
-        "Disabling overrides include: animation: none, transition: none, animation-duration: 0s, transition-duration: 0s."
+        "Disabling overrides include: animation: none, transition: none, animation-duration: 0s, transition-duration: 0s.",
+        "Note: Declarations are analyzed per block. Longhands split across duplicate selector blocks (e.g. .x { animation-name: spin; } and .x { animation-duration: 1s; }) are not aggregated. Combine related motion declarations into a single selector block."
       ],
       "detect": {
         "message": "No supported static reduced-motion override was found for this selector.",
