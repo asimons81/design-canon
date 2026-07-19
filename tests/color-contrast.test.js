@@ -113,8 +113,8 @@ test('relativeLuminance: white is 1', () => {
 test('relativeLuminance: known color', () => {
   // #777 = rgb(119, 119, 119)
   const l = relativeLuminance({ r: 119, g: 119, b: 119 });
-  assert(l > 0.12);
-  assert(l < 0.15);
+  assert(l > 0.15);
+  assert(l < 0.22);
 });
 
 // ── Contrast Ratio ─────────────────────────────────────────────────────────────────

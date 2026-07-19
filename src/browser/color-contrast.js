@@ -29,8 +29,8 @@ export function parseComputedColor(value) {
   const s = value.trim().toLowerCase();
 
   // Match rgb/rgba with modern space-separated or legacy comma syntax
-  const legacyRe = /^rgba?\s*\(\s*(\d+%?)\s*[,]\s*(\d+%?)\s*[,]\s*(\d+%?)(?:\s*[,/]\s*([\d.]+%?))?\s*\)$/;
-  const modernRe = /^rgba?\s*\(\s*(\d+%?)\s+(\d+%?)\s+(\d+%?)(?:\s*/\s*([\d.]+%?))?\s*\)$/;
+  const legacyRe = /^rgba?\s*\(\s*(-?\d+%?)\s*[,]\s*(-?\d+%?)\s*[,]\s*(-?\d+%?)(?:\s*[,/]\s*([\d.]+%?))?\s*\)$/i;
+  const modernRe = /^rgba?\s*\(\s*(-?\d+%?)\s+(-?\d+%?)\s+(-?\d+%?)(?:\s*\/\s*([\d.]+%?))?\s*\)$/i;
 
   let m = s.match(legacyRe);
   if (!m) m = s.match(modernRe);
