@@ -72,7 +72,10 @@ Before invocation, the runner must verify:
 - the workspace cannot read the Design Canon checkout except for the already assembled prompt supplied by the parent runner;
 - no prior condition output is present;
 - no model-readable condition label is included in filenames, prompt text, Git metadata, or environment variables;
-- external network access is blocked by an independently enforced mechanism, not merely by a sentence in the prompt.
+- model-generated commands cannot make external network connections;
+- browser capture cannot make external network connections.
+
+The Codex client itself must retain only the network path required to communicate with the OpenAI service. That control-plane transport is not workspace network access. The runner must enforce and record the distinction: Codex service transport allowed, model-generated command and page egress blocked.
 
 `--ignore-user-config` and `--ignore-rules` are mandatory but are not, by themselves, sufficient evidence of isolation. The runner must also record its workspace inspection and network-block verification.
 
@@ -118,7 +121,9 @@ Candidate calibration budgets are intentionally generous enough to measure norma
 - maximum recorded tool actions: 80;
 - automatic retries: zero;
 - package installations: zero;
-- external network requests: zero.
+- external workspace-command requests: zero;
+- external browser-capture requests: zero;
+- Codex control-plane transport: limited to the OpenAI service path required for inference.
 
 Exceeding a budget marks the attempt partial or failed. It does not authorize truncating the transcript, deleting the workspace, or rerunning the same ID.
 
@@ -138,6 +143,8 @@ Each run must retain:
 - normalized event summary;
 - provider-reported token usage when present;
 - action count with the exact event types counted;
+- generated source files and Git diff;
+- network-isolation evidence for workspace commands and browser capture;
 - generated source files and Git diff;
 - capture, lint, accessibility-calibration, and artifact-hash outputs.
 
@@ -193,7 +200,7 @@ The non-paid test suite must prove:
 11. Timeouts preserve partial evidence and terminate the child process tree.
 12. Automatic retries cannot occur.
 13. Added or missing project files invalidate the result.
-14. Network-block verification is required before launch.
+14. Network-block verification is required before launch and distinguishes Codex service transport from workspace-command and browser egress.
 15. A fake Codex executable can simulate complete, failed, malformed, and timed-out runs.
 16. Capture is invoked only after source validation and does not erase an execution failure.
 17. Aggregate reporting includes every attempt and separates measured usage from estimates.
