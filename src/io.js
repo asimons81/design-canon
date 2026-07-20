@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { assertSafeProfileName, validateCatalog, validateProfile } from './validate.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const CATALOG_PACKS = Object.freeze(['core.json', 'guidance.json']);
 const SOURCE_EXTENSIONS = new Set([
   '.css',
   '.html',
@@ -51,7 +52,20 @@ export async function readJson(path) {
 }
 
 export async function loadCatalog() {
-  return validateCatalog(await readJson(rootPath('rules', 'core.json')));
+  const packs = await Promise.all(
+    CATALOG_PACKS.map(async (name) => {
+      const path = rootPath('rules', name);
+      return validateCatalog(await readJson(path));
+    })
+  );
+  const versions = new Set(packs.map((pack) => pack.version));
+  if (versions.size !== 1) {
+    throw new Error('Rule packs must use the same catalog version.');
+  }
+  return validateCatalog({
+    version: packs[0].version,
+    rules: packs.flatMap((pack) => pack.rules)
+  });
 }
 
 export async function listProfiles() {
