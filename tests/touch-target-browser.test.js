@@ -351,90 +351,118 @@ test('F020 clipping: bottom-clipped via overflow records visible intersection', 
 
 // ── Viewport-edge clipping (all four edges) ───────────────────────────
 
-test('F020 viewport-edge: bottom-clipped records visible height', async () => {
+function f020Samples(result) {
+  const samples = [];
+  for (const rec of (result?.analysisRecords || [])) {
+    if (rec.ruleId !== 'mobile.touch-target-minimum') continue;
+    if (rec.samples) samples.push(...rec.samples);
+  }
+  return samples;
+}
+
+test('F020 viewport-edge: bottom-clipped 40x40→40x20 records correct visible height', async () => {
   const result = await lintFixture('fixtures/touch-target/violations/viewport-bottom-clip.html');
   if (!chromiumAvailable) return;
 
-  const records = f020Records(result);
-  assert.ok(records.length >= 1);
-  // Visible height should be less than full height (clipped by viewport)
   const findings = f020Findings(result);
-  assert.equal(findings.length, 0, 'Viewport-clipped target should not produce findings');
+  assert.equal(findings.length, 0, 'Bottom-clipped should not produce findings');
+
+  const samples = f020Samples(result);
+  assert.ok(samples.length >= 1);
+  const clipped = samples[0];
+  // 40x40 clipped to 40x20 at bottom edge — visible intersection used
+  assert.equal(clipped.visibleHeight, 20, 'visibleHeight should be 20 (clipped from 40)');
+  assert.equal(clipped.visibleWidth, 40, 'visibleWidth should be unchanged');
+  assert.equal(clipped.status, 'confirmed', 'hit test passes within visible area');
+  assert.equal(clipped.outcome, 'spacing-exception', 'undersized visible height gets spacing');
 });
 
-test('F020 viewport-edge: top-clipped records visible height', async () => {
-  const result = await lintFixture('fixtures/touch-target/violations/viewport-top-clip.html');
-  if (!chromiumAvailable) return;
-  const findings = f020Findings(result);
-  assert.equal(findings.length, 0);
-});
-
-test('F020 viewport-edge: left-clipped records visible width', async () => {
-  const result = await lintFixture('fixtures/touch-target/violations/viewport-left-clip.html');
-  if (!chromiumAvailable) return;
-  const findings = f020Findings(result);
-  assert.equal(findings.length, 0);
-});
-
-test('F020 viewport-edge: right-clipped records visible width', async () => {
+test('F020 viewport-edge: right-clipped 40x40→20x40 records correct visible width', async () => {
   const result = await lintFixture('fixtures/touch-target/violations/viewport-right-clip.html');
   if (!chromiumAvailable) return;
+
   const findings = f020Findings(result);
   assert.equal(findings.length, 0);
+
+  const samples = f020Samples(result);
+  assert.ok(samples.length >= 1);
+  const clipped = samples[0];
+  assert.equal(clipped.visibleWidth, 20, 'visibleWidth should be 20 (clipped from 40)');
+  assert.equal(clipped.visibleHeight, 40, 'visibleHeight should be unchanged');
+  assert.equal(clipped.status, 'confirmed');
+  assert.equal(clipped.outcome, 'spacing-exception');
 });
 
 // ── Obscuration regression ────────────────────────────────────────────
 
-test('F020 obscuration: opaque overlay produces indeterminate', async () => {
+test('F020 obscuration: opaque overlay produces indeterminate with reason', async () => {
   const result = await lintFixture('fixtures/touch-target/indeterminate/opaque-overlay.html');
   if (!chromiumAvailable) return;
 
-  // Overlaid target should be indeterminate, not a pass or violation
   const findings = f020Findings(result);
   assert.equal(findings.length, 0, 'Obscured target should not produce findings');
 
-  // Verify it's actually indeterminate (not just a passing target)
-  const records = f020Records(result);
-  assert.ok(records.length >= 1);
-  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  const samples = f020Samples(result);
+  const indeterminate = samples.filter(s => s.status === 'indeterminate');
   assert.ok(indeterminate.length >= 1, 'Obscured target should be indeterminate');
+  for (const s of indeterminate) {
+    assert.equal(s.outcome, undefined, 'Indeterminate sample must not have outcome');
+    assert.ok(s.indeterminateReason, 'Indeterminate sample must have a reason');
+  }
 });
 
-test('F020 obscuration: partial overlay produces indeterminate', async () => {
+test('F020 obscuration: partial overlay produces indeterminate with reason', async () => {
   const result = await lintFixture('fixtures/touch-target/indeterminate/partial-obstruction.html');
   if (!chromiumAvailable) return;
 
   const findings = f020Findings(result);
-  assert.equal(findings.length, 0, 'Partially obscured target should not produce findings');
+  assert.equal(findings.length, 0);
 
-  const records = f020Records(result);
-  const indeterminate = records.filter(r => r.status === 'indeterminate');
-  assert.ok(indeterminate.length >= 1, 'Partially obscured target should be indeterminate');
+  const samples = f020Samples(result);
+  const indeterminate = samples.filter(s => s.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Partially obscured should be indeterminate');
+  for (const s of indeterminate) {
+    assert.equal(s.outcome, undefined);
+    assert.ok(s.indeterminateReason);
+  }
 });
 
 // ── Nested interactive targets regression ─────────────────────────────
 
-test('F020 nested: role=button containing native button is indeterminate', async () => {
+test('F020 nested: role=button containing native button is indeterminate with reason', async () => {
   const result = await lintFixture('fixtures/touch-target/indeterminate/nested-targets.html');
   if (!chromiumAvailable) return;
 
   const findings = f020Findings(result);
-  assert.equal(findings.length, 0, 'Nested targets should not produce findings');
+  assert.equal(findings.length, 0);
 
-  const records = f020Records(result);
-  // Check that at least one sample is indeterminate
-  let hasIndeterminate = false;
-  for (const rec of records) {
-    if (rec.samples) {
-      for (const sample of rec.samples) {
-        if (sample.status === 'indeterminate') {
-          hasIndeterminate = true;
-          assert.equal(sample.outcome, undefined, 'Indeterminate sample must not have outcome');
-        }
-      }
+  const samples = f020Samples(result);
+  let foundNested = false;
+  for (const s of samples) {
+    if (s.status === 'indeterminate' && s.indeterminateReason === 'nested-interactive-target') {
+      foundNested = true;
+      assert.equal(s.outcome, undefined);
     }
   }
-  assert.ok(hasIndeterminate, 'Nested targets should produce at least one indeterminate sample');
+  assert.ok(foundNested, 'Expected a nested-interactive-target indeterminate sample');
+});
+
+// ── Non-rectangular clipping regression ────────────────────────────────
+
+test('F020 clipped-nonrect: clip-path circle produces indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/indeterminate/clipped-nonrect.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0);
+
+  const samples = f020Samples(result);
+  const indeterminate = samples.filter(s => s.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Non-rectangular clip should be indeterminate');
+  for (const s of indeterminate) {
+    assert.equal(s.outcome, undefined);
+    assert.ok(s.indeterminateReason);
+  }
 });
 
 // ── Spacing-proof field-name regression ───────────────────────────────

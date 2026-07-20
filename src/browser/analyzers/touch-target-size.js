@@ -262,6 +262,10 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     var cx = rect.x + rect.width / 2;
     var cy = rect.y + rect.height / 2;
 
+    // Clamp center to viewport — a target whose center is off-viewport
+    // cannot be meaningfully activated at that point
+    var clampedCenter = clampPoint(cx, cy);
+
     // Helper: check if an element is natively interactive
     function isInteractiveElement(e) {
       var tag = e.tagName.toLowerCase();
@@ -307,8 +311,9 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       return { ok: false, blockedBy: top.tagName ? top.tagName.toLowerCase() : 'unknown' };
     }
 
-    // Center hit test
-    var centerResult = topmostHitsTarget(cx, cy);
+    // Center hit test — uses clamped center so off-viewport centers
+    // don't manufacture obscuration from empty hits
+    var centerResult = topmostHitsTarget(clampedCenter.x, clampedCenter.y);
     var centerHitsTarget = centerResult.ok;
     var centerBlockedBy = centerResult.blockedBy;
     var isNestedInteractive = centerResult.blockedBy === 'nested-interactive';
@@ -343,7 +348,7 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     // check if it's an interactive descendant (nested-interactive case)
     var blockedBy = centerBlockedBy;
     if (!centerHitsTarget && !isNestedInteractive) {
-      var centerHit = document.elementsFromPoint(cx, cy);
+      var centerHit = document.elementsFromPoint(clampedCenter.x, clampedCenter.y);
       if (centerHit && centerHit.length > 0) {
         blockedBy = centerHit[0].tagName ? centerHit[0].tagName.toLowerCase() : 'unknown';
       }
@@ -1025,6 +1030,11 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
   // Only confirmed samples carry an outcome; indeterminate samples omit it
   if (sample.status === 'confirmed') {
     sample.outcome = t.outcome || 'violation';
+  }
+
+  // Indeterminate samples carry their reason
+  if (sample.status === 'indeterminate' && t.indeterminateReason) {
+    sample.indeterminateReason = t.indeterminateReason;
   }
 
   // Set exception field
