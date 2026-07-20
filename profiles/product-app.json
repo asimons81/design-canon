@@ -14,6 +14,10 @@
   ],
   "includeRules": [
     "forms.input-labels-required",
-    "mobile.touch-target-minimum"
+    "mobile.touch-target-minimum",
+    "hierarchy.button-visual-levels",
+    "states.empty-state-guidance",
+    "states.specific-error-messages",
+    "mobile.safe-area-viewport"
   ]
 }

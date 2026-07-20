@@ -107,17 +107,15 @@ test('browser mode config is accepted but not activated without Playwright', asy
   assert.ok(result.findings.length > 0);
 });
 
-test('no contrast or touch-target rules exist', async () => {
-  // Verify no production touch-target rule has been registered
+test('browser-only rules remain silent in static mode while the merged catalog is complete', async () => {
   const result = await lintPath({ path: './examples/sloppy', profile: 'marketing' });
   const ruleIds = new Set(result.findings.map((f) => f.rule));
-  // F019 and F020 are browser-only rules — they do not produce findings in static mode
   assert.equal(ruleIds.has('mobile.touch-target-minimum'), false);
   assert.equal(ruleIds.has('accessibility.text-contrast-minimum'), false);
-  // Verify the rule count is now 18 (F019 + F020 added)
-  const catalog = (await import('../src/io.js')).loadCatalog;
-  const core = await catalog();
-  assert.equal(core.rules.length, 18);
+
+  const { loadCatalog } = await import('../src/io.js');
+  const catalog = await loadCatalog();
+  assert.equal(catalog.rules.length, 23);
 });
 
 test('CLI static mode behavior unchanged', async () => {
