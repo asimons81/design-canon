@@ -75,7 +75,7 @@ Before invocation, the runner must verify:
 - model-generated commands cannot make external network connections;
 - browser capture cannot make external network connections.
 
-The Codex client itself must retain only the network path required to communicate with the OpenAI service. That control-plane transport is not workspace network access. The runner must enforce and record the distinction: Codex service transport allowed, model-generated command and page egress blocked.
+The Codex client itself must retain only the network path required to communicate with the OpenAI service. That control-plane transport is not workspace network access. The runner must enforce and record the distinction: Codex service transport allowed, workspace-command and browser egress blocked.
 
 `--ignore-user-config` and `--ignore-rules` are mandatory but are not, by themselves, sufficient evidence of isolation. The runner must also record its workspace inspection and network-block verification.
 
@@ -143,7 +143,6 @@ Each run must retain:
 - normalized event summary;
 - provider-reported token usage when present;
 - action count with the exact event types counted;
-- generated source files and Git diff;
 - network-isolation evidence for workspace commands and browser capture;
 - generated source files and Git diff;
 - capture, lint, accessibility-calibration, and artifact-hash outputs.
