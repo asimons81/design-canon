@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildCodexExecArgs, deriveCodexCapabilities, REQUIRED_EXEC_OPTIONS, REQUIRED_GLOBAL_OPTIONS } from '../research/benchmark/harness/codex-adapter.js';
 import { classifyExecutionFailure, executeJsonlProcess } from '../research/benchmark/harness/execution-state.js';
+import { REQUIRED_WORKSPACE_WRITE_PROBES } from '../research/benchmark/harness/isolation.js';
 
 const fake = fileURLToPath(new URL('./fixtures/fake-codex.js', import.meta.url));
 const fragmenter = fileURLToPath(new URL('./fixtures/fragmented-jsonl-child.js', import.meta.url));
@@ -34,6 +35,12 @@ test('global approval precedes exec and exec-scoped options; no evidence path re
   assert.ok(!args.includes('--output-last-message'));
   assert.equal(args.at(-1), '-');
   assert.throws(() => buildCodexExecArgs({ workspace: '/x', model: 'other' }, capabilities), /requires model/);
+});
+
+test('attempt-bound isolation requires write probes for every allowed source file', () => {
+  assert.deepEqual(REQUIRED_WORKSPACE_WRITE_PROBES, {
+    indexFileWrite: 'index.html', stylesFileWrite: 'styles.css', scriptFileWrite: 'script.js'
+  });
 });
 
 test('lossless recorder preserves fragmented multibyte bytes, malformed line, and incomplete tail', async (t) => {

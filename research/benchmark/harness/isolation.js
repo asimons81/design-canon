@@ -7,6 +7,11 @@ import { writeJson } from './lib.js';
 export const AGENT_USER = 'dcbench-agent';
 export const RUNNER_USER = 'dcbench-runner';
 export const COLLECT_GROUP = 'dcbench-collect';
+export const REQUIRED_WORKSPACE_WRITE_PROBES = Object.freeze({
+  indexFileWrite: 'index.html',
+  stylesFileWrite: 'styles.css',
+  scriptFileWrite: 'script.js'
+});
 export const SAFE_AGENT_ENVIRONMENT = Object.freeze({
   HOME: '/home/dcbench-agent',
   CODEX_HOME: '/home/dcbench-agent/.codex',
@@ -56,6 +61,13 @@ async function idFor(user) {
   return { uid: Number(uid.stdout.trim()), gid: Number(gid.stdout.trim()) };
 }
 
+async function repositoryHeadFor(repositoryPath) {
+  const result = await runCapture('/usr/bin/git', ['-C', repositoryPath, 'rev-parse', '--verify', 'HEAD']);
+  const head = result.stdout.trim();
+  if (result.exitCode !== 0 || !/^[0-9a-f]{40}$/.test(head)) throw new Error('Cannot bind isolation evidence to repository HEAD.');
+  return head;
+}
+
 async function setTreeAccess(path, uid, gid, directoryMode, fileMode) {
   const info = await lstat(path);
   await chown(path, uid, gid);
@@ -90,6 +102,7 @@ export async function generateIsolationEvidence({ runId, workspace, workspaceRoo
   const repositoryRealPath = await realpath(repositoryRoot);
   const evidenceRealPath = await realpath(evidenceDirectory);
   const workspaceInfo = await stat(workspaceRealPath);
+  const repositoryHead = await repositoryHeadFor(repositoryRealPath);
   const agent = await idFor(AGENT_USER);
   const runner = { uid: process.getuid(), gid: process.getgid() };
   const binaryPath = await realpath(codexExecutable);
@@ -107,8 +120,15 @@ export async function generateIsolationEvidence({ runId, workspace, workspaceRoo
   ], { timeoutMs: 7000 });
   let probes;
   try {
+    const workspaceFileWrites = Object.fromEntries(await Promise.all(
+      Object.entries(REQUIRED_WORKSPACE_WRITE_PROBES).map(async ([probeName, fileName]) => [
+        probeName,
+        assertProbe(await agentRun('/usr/bin/truncate', ['--size', '0', join(workspaceRealPath, fileName)]), true, probeName)
+      ])
+    ));
     probes = {
       workspaceWrite: assertProbe(await agentRun('/usr/bin/touch', [join(workspaceRealPath, '.probe-write')]), true, 'workspace-write'),
+      ...workspaceFileWrites,
       repositoryReadDenied: assertProbe(await agentRun('/usr/bin/test', ['-r', join(repositoryRealPath, 'package.json')]), false, 'repository-read-denied'),
       evidenceReadDenied: assertProbe(await agentRun('/usr/bin/test', ['-r', evidenceRealPath]), false, 'evidence-read-denied'),
       siblingReadDenied: assertProbe(await agentRun('/usr/bin/test', ['-r', siblingWorkspace]), false, 'sibling-read-denied'),
@@ -129,7 +149,8 @@ export async function generateIsolationEvidence({ runId, workspace, workspaceRoo
   const evidence = {
     schemaVersion: 2, runId, generatedAt: new Date().toISOString(), workspaceRealPath,
     workspaceIdentity: { device: String(workspaceInfo.dev), inode: String(workspaceInfo.ino) },
-    agent, runner, repositoryRealPath, evidenceRealPath, codex: { path: binaryPath, sha256: binarySha256, version: codexVersion },
+    agent, runner, repositoryRealPath, repositoryHead, evidenceRealPath,
+    codex: { path: binaryPath, sha256: binarySha256, version: codexVersion },
     effectiveCommandHash, safeEnvironmentNames: Object.keys(SAFE_AGENT_ENVIRONMENT).sort(),
     sandbox: { permissionProfile: ':workspace', workspaceWrite: true, workspaceCommandNetworkDisabled: true, openAiControlPlaneExemptFromCommandSandbox: true },
     probes
@@ -143,6 +164,7 @@ export async function assertIsolationEvidence(evidence, { runId, workspace, effe
   if (evidence?.evidenceSha256 !== sha256(canonicalEvidence(evidence))) throw new Error('Isolation evidence hash mismatch.');
   if (evidence.runId !== runId) throw new Error('Isolation evidence belongs to another run.');
   if (evidence.workspaceRealPath !== await realpath(workspace)) throw new Error('Isolation evidence belongs to another workspace.');
+  if (evidence.repositoryHead !== await repositoryHeadFor(evidence.repositoryRealPath)) throw new Error('Isolation evidence repository HEAD mismatch.');
   if (evidence.effectiveCommandHash !== effectiveCommandHash) throw new Error('Isolation evidence command mismatch.');
   if (Date.now() - Date.parse(evidence.generatedAt) > maximumAgeMs) throw new Error('Isolation evidence is stale.');
   if (!Object.values(evidence.probes ?? {}).every((probe) => probe.passed === true)) throw new Error('Isolation evidence contains a failed probe.');

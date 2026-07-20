@@ -14,6 +14,7 @@ The runner owns the checkout and evidence. The agent has a clean mode-0700 HOME 
 
 ```bash
 node scripts/benchmark-codex-preflight.js --output .benchmark/calibration/b000/preflight --codex /usr/local/bin/codex
+node scripts/benchmark-auth-model-preflight.js --output .benchmark/calibration/b000/auth-model-preflight --workspace-root /var/lib/dcbench/workspaces --codex /usr/local/bin/codex
 node scripts/benchmark-browser-preflight.js --output .benchmark/calibration/b000/browser-preflight
 npm test
 node scripts/verify-repository.js
@@ -24,7 +25,7 @@ npm audit --omit=dev --audit-level=high
 npm pack --dry-run
 ```
 
-The Codex preflight records complete top-level and `exec` help independently and requires exactly 0.144.4. The browser preflight records Chromium, viewport and full-page screenshots, attempted HTTP/HTTPS assets, zero accepted external responses, browser lint, the calibration accessibility audit, and artifact hashes. Neither command makes a model call.
+The Codex capability preflight records complete top-level and `exec` help independently and requires exactly 0.144.4. The separately classified authentication/model preflight makes one minimal non-measured request with the frozen runtime, a zero-action budget, no benchmark brief or guidance, and separately recorded usage. The browser preflight records Chromium, viewport and full-page screenshots, attempted HTTP/HTTPS assets, zero accepted external responses, browser lint, the calibration accessibility audit, and artifact hashes. The capability and browser preflights do not make model calls.
 
 ## Initialize and execute
 
