@@ -634,6 +634,72 @@ test('F020 descendant: nested interactive target — indeterminate', async () =>
   });
 });
 
+test('F020 descendant: nested button with decorative span child — indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/indeterminate/nested-decorative-child.html');
+  if (!chromiumAvailable) return;
+
+  const records = f020Records(result);
+  const findings = f020Findings(result);
+
+  assert.equal(findings.length, 0, 'Expected zero F020 findings');
+
+  // The outer div[role=button] contains a <button> containing a <span>.
+  // When the span is topmost, classifyTopmost must walk past the span
+  // to the interactive <button> and return interactive-descendant.
+  let foundNested = false;
+  for (const rec of records) {
+    if (rec.samples) {
+      for (const sample of rec.samples) {
+        if (sample.indeterminateReason === 'nested-interactive-target') {
+          foundNested = true;
+          assert.equal(sample.status, 'indeterminate', 'status');
+          assert.equal(sample.outcome, undefined, 'outcome must be undefined');
+        }
+      }
+    }
+  }
+  assert.ok(foundNested,
+    'Expected at least one sample with indeterminateReason "nested-interactive-target"');
+
+  assertBuckets(records, {
+    violatingTargets: 0,
+    excludedTargets: 0
+  });
+});
+
+test('F020 descendant: interactive at corner only, not center — nested', async () => {
+  const result = await lintFixture('fixtures/touch-target/indeterminate/nested-corner-interactive.html');
+  if (!chromiumAvailable) return;
+
+  const records = f020Records(result);
+  const findings = f020Findings(result);
+
+  assert.equal(findings.length, 0, 'Expected zero F020 findings');
+
+  // The outer <a> contains a <button> at bottom-right corner.
+  // The center hits the <a> itself, but a corner hits the button.
+  // isNestedInteractive must propagate from the corner probe.
+  let foundNested = false;
+  for (const rec of records) {
+    if (rec.samples) {
+      for (const sample of rec.samples) {
+        if (sample.indeterminateReason === 'nested-interactive-target') {
+          foundNested = true;
+          assert.equal(sample.status, 'indeterminate', 'status');
+          assert.equal(sample.outcome, undefined, 'outcome must be undefined');
+        }
+      }
+    }
+  }
+  assert.ok(foundNested,
+    'Expected at least one sample with indeterminateReason "nested-interactive-target"');
+
+  assertBuckets(records, {
+    violatingTargets: 0,
+    excludedTargets: 0
+  });
+});
+
 // ── Non-rectangular clip-path regression ──────────────────────────────
 
 test('F020 clip-path: circle() clipping produces clipped-nonrectangular-target', async () => {

@@ -270,6 +270,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
 
   function classifyTopmost(topmost, target) {
     // Determine relationship of topmost painted element to the target.
+    // Walks the full ancestor chain from topmost to target, checking
+    // every intermediate for interactivity.
     if (topmost === target) return 'self';
     var check = topmost;
     var isDescendant = false;
@@ -278,7 +280,16 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       check = check.parentElement;
     }
     if (!isDescendant) return 'foreign';
-    return isInteractiveElement(topmost) ? 'interactive-descendant' : 'noninteractive-descendant';
+
+    // Walk from topmost up to (but not including) target.
+    // If any intermediate ancestor is interactive, the target has
+    // an interactive descendant on top — nested-interactive-target.
+    var walk = topmost;
+    while (walk && walk !== target) {
+      if (isInteractiveElement(walk)) return 'interactive-descendant';
+      walk = walk.parentElement;
+    }
+    return 'noninteractive-descendant';
   }
 
   function clampToViewport(x, y) {
@@ -330,6 +341,7 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
         }
       } else if (cornerClass === 'interactive-descendant') {
         consistentHit = false;
+        isNestedInteractive = true;
       }
       // 'self', 'noninteractive-descendant', 'none' — corner is reachable
     }
