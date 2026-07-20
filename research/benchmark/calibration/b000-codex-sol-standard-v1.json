@@ -43,7 +43,9 @@
     "processKillGraceSeconds": 30,
     "maximumToolActionsPerRun": 80,
     "automaticRetries": 0,
-    "externalNetwork": "blocked",
+    "modelControlPlaneNetwork": "OpenAI service transport only",
+    "workspaceCommandNetwork": "blocked",
+    "browserCaptureNetwork": "blocked",
     "packageInstallation": "forbidden",
     "allowedWorkspaceFiles": ["index.html", "styles.css", "script.js"]
   },
@@ -82,7 +84,7 @@
     "Do not automatically retry a model run.",
     "Do not continue when the requested model or reasoning effort cannot be verified.",
     "Do not continue when user configuration, repository instructions, MCP servers, plugins, skills, or prior-run state can reach the model.",
-    "Do not continue when the workspace has external network access.",
+    "Do not continue when workspace commands or browser capture have external network access beyond the Codex control-plane transport required to reach OpenAI.",
     "Do not edit protocol-v1 frozen inputs or any B001-B015 brief.",
     "Do not admit B000 into protocol v1 or any superiority analysis."
   ],
