@@ -46,6 +46,7 @@ The repository already includes:
 - compilation to `DESIGN.md`, `SKILL.md`, or general agent instructions
 - a zero-runtime-dependency linter for mechanical heuristics
 - project-local, rationale-required suppressions that preserve evidence
+- safe dry-run installation and uninstall adapters for AGENTS.md, Codex, Hermes, Claude Code, Cursor, and Windsurf
 - an installable Agent Skill for Codex, Hermes Agent, Claude Code, Cursor, and compatible tools
 - tests and an intentionally terrible example fixture
 
@@ -69,6 +70,27 @@ Available profiles:
 ```bash
 node ./bin/design-canon.js profiles
 ```
+
+## Install into an Agent
+
+Preview a portable root `AGENTS.md` installation:
+
+```bash
+node ./bin/design-canon.js init . \
+  --profile product-app \
+  --target agents
+```
+
+Apply it only after reviewing the preview:
+
+```bash
+node ./bin/design-canon.js init . \
+  --profile product-app \
+  --target agents \
+  --write
+```
+
+Targets include `agents`, `codex`, `hermes`, `claude`, `cursor`, and `windsurf`. See [`docs/ADAPTERS.md`](docs/ADAPTERS.md) for file locations, scope behavior, safety guarantees, and uninstall commands.
 
 ## Justified Exceptions
 
@@ -117,7 +139,7 @@ See [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) for the complete contract.
 
 ```text
 bin/                    CLI entry point
-src/                    compiler, selector, and linter
+src/                    compiler, selector, linter, and adapters
 rules/                  atomic design-policy catalog
 profiles/               surface-specific rule selection
 schema/                 open JSON schemas
@@ -126,6 +148,7 @@ examples/sloppy/        violation fixture
 tests/                  regression tests
 docs/ARCHITECTURE.md    system design
 docs/CONFIGURATION.md   configuration and suppression contract
+docs/ADAPTERS.md        safe agent installation and uninstall
 ROADMAP.md              path to visual QA, benchmarks, and taste memory
 ```
 
