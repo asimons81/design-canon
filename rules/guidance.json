@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "layout.visual-focal-point",
+      "category": "layout",
+      "title": "Establish one clear visual entry point",
+      "severity": "warning",
+      "appliesTo": [
+        "marketing",
+        "product-app"
+      ],
+      "instruction": "Give each view a clear visual entry point that establishes the intended reading order. Secondary regions should support rather than compete with that entry point. Equal-weight grids are acceptable when comparison or browsing is the task.",
+      "rationale": "Interfaces become harder to scan when every region receives the same size, contrast, and emphasis. A focal point can come from typography, composition, contrast, position, or whitespace rather than a mandatory oversized container.",
+      "verify": [
+        "A first-time viewer can identify where to begin without reading every label.",
+        "Index, gallery, search-result, and comparison views may intentionally distribute weight evenly.",
+        "The focal point supports the task instead of acting as decoration."
+      ]
+    },
+    {
+      "id": "hierarchy.button-visual-levels",
+      "category": "hierarchy",
+      "title": "Give actions distinct visual levels",
+      "severity": "warning",
+      "appliesTo": [
+        "marketing",
+        "product-app"
+      ],
+      "instruction": "Use distinct visual levels for primary, secondary, tertiary, and destructive actions when their importance differs. Do not style every action as a filled primary button. Equal-weight controls are acceptable in toolbars and comparison choices where no action is preferred.",
+      "rationale": "A flat action hierarchy forces users to infer priority from labels alone and makes destructive or low-frequency actions compete with the intended next step.",
+      "verify": [
+        "The recommended next action is visually identifiable where one exists.",
+        "Cancel, back, destructive, and low-frequency actions do not compete with the primary action.",
+        "Equal styling is intentional for genuinely equal-weight controls."
+      ]
+    },
+    {
+      "id": "states.empty-state-guidance",
+      "category": "states",
+      "title": "Make empty states actionable",
+      "severity": "warning",
+      "appliesTo": [
+        "product-app"
+      ],
+      "instruction": "When a feature has no content, explain the relevant reason or condition and give the user the most useful available next step. Avoid empty states that consist only of a decorative illustration and generic text such as 'Nothing here yet.'",
+      "rationale": "An empty state is often the first encounter with a feature. Useful context and a concrete next step reduce confusion and shorten the path to value.",
+      "verify": [
+        "The message distinguishes first-use, filtered, permission, disabled, and error-based emptiness where relevant.",
+        "A clear recovery, creation, import, filter-reset, or navigation action is present when one exists.",
+        "The illustration, when used, supports rather than replaces functional guidance."
+      ]
+    },
+    {
+      "id": "states.specific-error-messages",
+      "category": "states",
+      "title": "Make errors specific and recoverable",
+      "severity": "warning",
+      "appliesTo": [
+        "product-app"
+      ],
+      "instruction": "Error messages should state what failed, preserve useful context, and offer a safe recovery step when the system knows one. Avoid generic messages such as 'Something went wrong' when more specific information is available. Do not reveal sensitive security details merely to appear specific.",
+      "rationale": "Users cannot correct, retry, or report a problem when the interface hides the failure behind interchangeable language. Specificity must remain bounded by privacy and security requirements.",
+      "verify": [
+        "The message identifies the failed action or affected data when safe.",
+        "A retry, correction, reconnection, support, or fallback path is offered when possible.",
+        "Authentication and security errors do not disclose account existence or internal system details."
+      ]
+    },
+    {
+      "id": "mobile.safe-area-viewport",
+      "category": "mobile",
+      "title": "Protect edge controls with mobile safe areas",
+      "severity": "warning",
+      "appliesTo": [
+        "marketing",
+        "product-app"
+      ],
+      "instruction": "For edge-to-edge mobile layouts, protect fixed or sticky controls near viewport edges with the appropriate CSS safe-area environment insets. Apply this where notches, rounded display corners, browser chrome, or home indicators could cover actionable content. Do not add safe-area padding blindly to ordinary in-flow layouts.",
+      "rationale": "Viewport-edge controls can become difficult or impossible to operate on devices with nonrectangular displays or persistent system affordances. CSS environment insets provide device-specific spacing while allowing sensible fallbacks.",
+      "verify": [
+        "Fixed bottom navigation, sheets, and action bars account for safe-area-inset-bottom where applicable.",
+        "Top edge controls account for safe-area-inset-top when using edge-to-edge presentation.",
+        "Immersive media may intentionally use the full display when controls remain protected and the choice is explicit."
+      ]
+    }
+  ]
+}
