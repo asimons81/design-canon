@@ -267,8 +267,25 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     // Check for CSS classes or IDs that could be targeted by author stylesheets
     if (el.getAttribute('class') || el.getAttribute('id')) return false;
 
-    // Check for explicit sizing via computed style vs natural size
-    // If the element has explicit width/height set, it's not unmodified
+    // Check that computed dimensions are consistent with native defaults.
+    // If the author applied a tag-selector stylesheet rule that modifies
+    // padding/border/width/height, the computed values will differ from
+    // what a native unstyled control would have.
+    var padTop = parseFloat(cs.paddingTop) || 0;
+    var padRight = parseFloat(cs.paddingRight) || 0;
+    var padBottom = parseFloat(cs.paddingBottom) || 0;
+    var padLeft = parseFloat(cs.paddingLeft) || 0;
+    var borderTop = parseFloat(cs.borderTopWidth) || 0;
+    var borderRight = parseFloat(cs.borderRightWidth) || 0;
+    var borderBottom = parseFloat(cs.borderBottomWidth) || 0;
+    var borderLeft = parseFloat(cs.borderLeftWidth) || 0;
+
+    // Native controls always have at least 1px border and 1px padding.
+    // If any is zero, the author has modified the control.
+    if (borderTop < 1 || borderRight < 1 || borderBottom < 1 || borderLeft < 1) return false;
+    if (padTop < 1 || padBottom < 1 || padLeft < 1 || padRight < 1) return false;
+
+    // Check for explicit sizing via inline styles
     var explicitWidth = el.style.width || '';
     var explicitHeight = el.style.height || '';
     var explicitMinWidth = el.style.minWidth || '';
@@ -278,11 +295,11 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     if (explicitWidth || explicitHeight || explicitMinWidth || explicitMinHeight ||
         explicitMaxWidth || explicitMaxHeight) return false;
 
-    // Check padding modifications
+    // Check padding modifications via inline styles
     if (el.style.padding || el.style.paddingTop || el.style.paddingRight ||
         el.style.paddingBottom || el.style.paddingLeft) return false;
 
-    // Check border modifications
+    // Check border modifications via inline styles
     if (el.style.border || el.style.borderTop || el.style.borderRight ||
         el.style.borderBottom || el.style.borderLeft ||
         el.style.borderWidth || el.style.borderTopWidth || el.style.borderRightWidth ||
