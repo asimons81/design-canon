@@ -11,7 +11,6 @@ import {
   loadProtocol,
   loadStrictProfile,
   measureText,
-  readJson,
   repositoryPath,
   writeGuidanceBundle
 } from '../research/benchmark/harness/lib.js';
@@ -88,8 +87,9 @@ test('monolith and compiled guidance share wording but differ by frozen selectio
     assert.ok(first.records.D.utf8Bytes < first.records.C.utf8Bytes);
     for (const ruleId of first.records.D.ruleIds) {
       const marker = `### ${ruleId}:`;
-      assert.match(first.contents.C, new RegExp(marker.replaceAll('.', '\\.')));
-      assert.match(first.contents.D, new RegExp(marker.replaceAll('.', '\\.')));
+      const escaped = marker.replaceAll('.', '\\.');
+      assert.match(first.contents.C, new RegExp(escaped));
+      assert.match(first.contents.D, new RegExp(escaped));
     }
   }
 });
@@ -128,7 +128,9 @@ test('guidance bundle writes immutable artifacts and manifest', async (t) => {
     profileName: 'marketing',
     catalogCommit: CATALOG_COMMIT
   });
-  const manifest = await readJson(join(directory, 'guidance-manifest.json'));
+  const manifest = JSON.parse(
+    await readFile(join(directory, 'guidance-manifest.json'), 'utf8')
+  );
   assert.equal(manifest.profile, 'marketing');
   assert.equal(manifest.artifacts.C.ruleIds.length, 18);
   assert.equal(manifest.artifacts.D.ruleIds.length, 16);
