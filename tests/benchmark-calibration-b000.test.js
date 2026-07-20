@@ -93,7 +93,12 @@ test('B000 budget and isolation policy fail closed', async () => {
   assert.equal(calibration.candidateBudgets.wallClockSecondsPerRun, 1200);
   assert.equal(calibration.candidateBudgets.maximumToolActionsPerRun, 80);
   assert.equal(calibration.candidateBudgets.automaticRetries, 0);
-  assert.equal(calibration.candidateBudgets.externalNetwork, 'blocked');
+  assert.equal(
+    calibration.candidateBudgets.modelControlPlaneNetwork,
+    'OpenAI service transport only'
+  );
+  assert.equal(calibration.candidateBudgets.workspaceCommandNetwork, 'blocked');
+  assert.equal(calibration.candidateBudgets.browserCaptureNetwork, 'blocked');
   assert.equal(calibration.candidateBudgets.packageInstallation, 'forbidden');
   assert.deepEqual(
     calibration.candidateBudgets.allowedWorkspaceFiles,
@@ -156,6 +161,8 @@ test('runner contract requires safe noninteractive Codex execution', async () =>
     'model_reasoning_effort="medium"',
     'web_search="disabled"',
     'automatic retries: zero',
+    'Codex service transport allowed',
+    'workspace-command and browser egress blocked',
     'Do not edit protocol-v1 admission fields'
   ]) {
     assert.match(contract, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
