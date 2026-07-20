@@ -111,14 +111,13 @@ test('no contrast or touch-target rules exist', async () => {
   // Verify no production touch-target rule has been registered
   const result = await lintPath({ path: './examples/sloppy', profile: 'marketing' });
   const ruleIds = new Set(result.findings.map((f) => f.rule));
-  // F019 is a browser-only rule — it does not produce findings in static mode
-  assert.equal(ruleIds.has('mobile.touch-target-size'), false);
-  // F019 should not produce findings in static mode (no browser)
+  // F019 and F020 are browser-only rules — they do not produce findings in static mode
+  assert.equal(ruleIds.has('mobile.touch-target-minimum'), false);
   assert.equal(ruleIds.has('accessibility.text-contrast-minimum'), false);
-  // Verify the rule count is now 17 (F019 added)
+  // Verify the rule count is now 18 (F019 + F020 added)
   const catalog = (await import('../src/io.js')).loadCatalog;
   const core = await catalog();
-  assert.equal(core.rules.length, 17);
+  assert.equal(core.rules.length, 18);
 });
 
 test('CLI static mode behavior unchanged', async () => {

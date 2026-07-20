@@ -399,6 +399,33 @@
           ]
         }
       }
+    },
+    {
+      "id": "mobile.touch-target-minimum",
+      "category": "mobile",
+      "title": "Require minimum rendered touch-target size",
+      "severity": "warning",
+      "appliesTo": [
+        "marketing",
+        "editorial",
+        "product-app"
+      ],
+      "instruction": "Ensure rendered pointer targets meet the minimum size or a confirmed spacing exception in the intended viewport.",
+      "rationale": "Small or densely packed targets can be difficult to activate accurately for users with limited dexterity or imprecise pointer input.",
+      "verify": [
+        "Supported targets contain an axis-aligned 24 by 24 CSS-pixel area.",
+        "Undersized targets satisfy the official spacing-circle exception.",
+        "Unsupported geometry remains indeterminate rather than being treated as a pass."
+      ],
+      "detect": {
+        "message": "Rendered interactive target measured below the configured minimum in the analyzed Chromium state.",
+        "browserAnalyzer": {
+          "id": "rendered.touch-target-size",
+          "extensions": [
+            ".html"
+          ]
+        }
+      }
     }
   ]
 }
