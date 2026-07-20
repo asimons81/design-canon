@@ -253,6 +253,68 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     return false;
   }
 
+  function getHitTestData(el, rect) {
+    // Check if the center point and representative inset points
+    // actually hit this element. If another painted element is on top,
+    // the target is partially or fully obscured.
+    var cx = rect.x + rect.width / 2;
+    var cy = rect.y + rect.height / 2;
+
+    // Center hit test
+    var centerHit = document.elementsFromPoint(cx, cy);
+    var centerHitsTarget = centerHit && centerHit.length > 0 && centerHit[0] === el;
+
+    // Bounded inset corners — use points slightly inside the edges
+    var inset = Math.min(3, rect.width / 4, rect.height / 4);
+    var corners = [
+      { x: rect.x + inset, y: rect.y + inset },
+      { x: rect.x + rect.width - inset, y: rect.y + inset },
+      { x: rect.x + inset, y: rect.y + rect.height - inset },
+      { x: rect.x + rect.width - inset, y: rect.y + rect.height - inset }
+    ];
+
+    var consistentHit = true;
+    if (centerHitsTarget) {
+      for (var ci = 0; ci < corners.length; ci++) {
+        var ch = document.elementsFromPoint(corners[ci].x, corners[ci].y);
+        // Check if el is among the hit elements (it might not be topmost at corners)
+        var found = false;
+        if (ch) {
+          for (var cj = 0; cj < ch.length; cj++) {
+            if (ch[cj] === el) { found = true; break; }
+          }
+        }
+        if (!found) { consistentHit = false; break; }
+      }
+    }
+
+    // Check for ancestor-only hits (descendants of el on top are ok)
+    var blockedBy = null;
+    if (!centerHitsTarget && centerHit && centerHit.length > 0) {
+      var topEl = centerHit[0];
+      // If the top element is a descendant of el, that's ok
+      var isDescendant = false;
+      var check = topEl;
+      while (check) {
+        if (check === el) { isDescendant = true; break; }
+        check = check.parentElement;
+      }
+      if (!isDescendant) {
+        blockedBy = topEl.tagName ? topEl.tagName.toLowerCase() : 'unknown';
+      } else {
+        // Descendant is on top — center still reaches target via descendant
+        centerHitsTarget = true;
+      }
+    }
+
+    return {
+      centerHitsTarget: centerHitsTarget,
+      consistentHit: consistentHit,
+      blockedBy: blockedBy,
+      isObscured: !centerHitsTarget || !consistentHit
+    };
+  }
+
   function isUnmodifiedNativeControl(el) {
     var tag = el.tagName.toLowerCase();
     var cs;
@@ -362,7 +424,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       isUnmodifiedNative: isUnmodifiedNativeControl(el),
       tabindex: el.getAttribute('tabindex'),
       ariaDisabled: el.getAttribute('aria-disabled'),
-      inert: el.inert === true
+      inert: el.inert === true,
+      hitTest: getHitTestData(el, rect)
     });
   }
 
@@ -419,7 +482,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       isUnmodifiedNative: isUnmodifiedNativeControl(rel),
       tabindex: rel.getAttribute('tabindex'),
       ariaDisabled: rel.getAttribute('aria-disabled'),
-      inert: rel.inert === true
+      inert: rel.inert === true,
+      hitTest: getHitTestData(rel, rrect)
     });
   }
 
@@ -472,7 +536,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       isUnmodifiedNative: isUnmodifiedNativeControl(tel),
       tabindex: tel.getAttribute('tabindex'),
       ariaDisabled: tel.getAttribute('aria-disabled'),
-      inert: tel.inert === true
+      inert: tel.inert === true,
+      hitTest: getHitTestData(tel, trect)
     });
   }
 
@@ -623,7 +688,7 @@ function processTargets(rawTargets, viewportDims, viewportName, colorScheme, bro
       continue;
     }
 
-    if (t.intersection && t.intersection.width !== t.rect.width) {
+    if (t.intersection && (t.intersection.width !== t.rect.width || t.intersection.height !== t.rect.height)) {
       // Partially clipped — check if still rectangular
       classified.push({
         ...t,
@@ -668,10 +733,23 @@ function processTargets(rawTargets, viewportDims, viewportName, colorScheme, bro
       continue;
     }
 
-    // Check overlap/obscuration
-    if (t.opacity && parseFloat(t.opacity) < 1) {
+    // Check overlap/obscuration via hit testing
+    if (t.hitTest && t.hitTest.isObscured) {
       t.status = 'indeterminate';
-      t.indeterminateReason = 'ambiguous-overlap';
+      if (t.hitTest.blockedBy) {
+        t.indeterminateReason = 'ambiguous-overlap';
+      } else if (!t.hitTest.centerHitsTarget) {
+        t.indeterminateReason = 'partially-obscured';
+      } else {
+        t.indeterminateReason = 'ambiguous-overlap';
+      }
+      continue;
+    }
+
+    // Check for nested interactive targets
+    if (t.hitTest && !t.hitTest.centerHitsTarget && !t.hitTest.blockedBy) {
+      t.status = 'indeterminate';
+      t.indeterminateReason = 'nested-interactive-target';
       continue;
     }
 
@@ -798,16 +876,16 @@ function applySpacingException(targets, viewportDims) {
         if (dist < CIRCLE_TANGENCY) {
           spacingProof.passed = false;
           spacingProof.nearest = neighborTarget.selector;
-          spacingProof.nearestUndersignedCircleDistance = dist;
+          spacingProof.nearestUndersizedCircleDistance = dist;
           spacingProof.reason = 'circle-intersects-undersized-circle';
           break;
         }
 
         // Track nearest undersized circle for evidence
-        if (spacingProof.nearestUndersignedCircleDistance === null ||
-            dist < spacingProof.nearestUndersignedCircleDistance) {
-          spacingProof.nearestUndersignedCircle = neighborTarget.selector;
-          spacingProof.nearestUndersignedCircleDistance = dist;
+        if (spacingProof.nearestUndersizedCircleDistance === null ||
+            dist < spacingProof.nearestUndersizedCircleDistance) {
+          spacingProof.nearestUndersizedCircle = neighborTarget.selector;
+          spacingProof.nearestUndersizedCircleDistance = dist;
         }
       }
     }
