@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "sourceCatalogVersion": 1,
+  "sourceCatalogCommit": "5caa9e0315a1f10f0e5f70e6218d4fc9049d2530",
+  "rules": [
+    {
+      "id": "direction.name-the-direction",
+      "category": "direction",
+      "title": "Name the visual direction",
+      "severity": "error",
+      "instruction": "Before implementation, state the visual direction in one concrete sentence. It must describe composition, typography, color behavior, and emotional register. Avoid mood-word soup.",
+      "rationale": "A named direction prevents the model from blending unrelated trends into a generic interface.",
+      "verify": [
+        "The direction could guide a second designer without screenshots.",
+        "Every major visual choice supports the same direction."
+      ]
+    },
+    {
+      "id": "tokens.establish-system",
+      "category": "tokens",
+      "title": "Establish a small token system",
+      "severity": "error",
+      "instruction": "Define reusable tokens for type scale, spacing, color roles, radius, and depth before multiplying components. Prefer a deliberate small system over scattered one-off values.",
+      "verify": [
+        "Repeated values are represented by tokens.",
+        "Token names describe roles rather than raw appearance."
+      ]
+    },
+    {
+      "id": "typography.generic-primary-font",
+      "category": "typography",
+      "title": "Do not default to the model's favorite font",
+      "severity": "warning",
+      "instruction": "Do not choose Inter, Roboto, Arial, or system-ui as the primary display face without an explicit reason. Select typography that supports the content and brand, then pair it with a readable text face.",
+      "rationale": "The problem is unexamined defaulting, not the fonts themselves.",
+      "verify": [
+        "Display typography has a documented role.",
+        "Body text remains readable across target viewports."
+      ]
+    },
+    {
+      "id": "color.purple-gradient-default",
+      "category": "color",
+      "title": "Reject decorative purple-gradient defaulting",
+      "severity": "warning",
+      "instruction": "Do not use a purple or indigo gradient as generic technological decoration. A gradient is acceptable only when it carries brand meaning, hierarchy, state, or spatial function.",
+      "verify": [
+        "The gradient has a stated job beyond making the interface look 'AI'."
+      ]
+    },
+    {
+      "id": "layout.centered-everything",
+      "category": "layout",
+      "title": "Do not center every decision",
+      "severity": "warning",
+      "instruction": "Avoid stacking a centered headline, centered paragraph, centered buttons, and centered decorative art by reflex. Choose alignment and asymmetry based on reading flow and focal hierarchy.",
+      "verify": [
+        "The composition has an intentional reading path.",
+        "Alignment changes are structural, not random."
+      ]
+    },
+    {
+      "id": "depth.shadow-soup",
+      "category": "depth",
+      "title": "Use one depth language",
+      "severity": "warning",
+      "instruction": "Do not combine large soft shadows, glows, glass blur, borders, and floating cards on every surface. Choose one dominant depth language and reserve stronger elevation for meaningful hierarchy.",
+      "verify": [
+        "Elevation levels map to semantic importance.",
+        "Most surfaces remain visually quiet."
+      ]
+    },
+    {
+      "id": "radius.everything-pill",
+      "category": "shape",
+      "title": "Do not turn every surface into a pill",
+      "severity": "warning",
+      "instruction": "Use radius as part of the product's shape language. Avoid large rounded corners on every card, control, image, panel, and badge unless the direction explicitly demands it.",
+      "verify": [
+        "Radius values come from tokens.",
+        "Different component roles do not all collapse into the same blob shape."
+      ]
+    },
+    {
+      "id": "motion.transition-all",
+      "category": "motion",
+      "title": "Animate named properties",
+      "severity": "warning",
+      "instruction": "Do not animate every property. Name the properties that communicate state, preserve reduced-motion behavior, and keep motion subordinate to interaction.",
+      "verify": [
+        "Animations have a user-facing purpose.",
+        "prefers-reduced-motion is respected where motion is nonessential."
+      ]
+    },
+    {
+      "id": "a11y.visible-focus",
+      "category": "accessibility",
+      "title": "Preserve visible keyboard focus",
+      "severity": "error",
+      "instruction": "Never remove focus indication without replacing it with an equally visible focus-visible treatment that meets contrast requirements.",
+      "verify": [
+        "Every interactive element can be located with keyboard focus.",
+        "Focus treatment is visible in light and dark contexts."
+      ]
+    },
+    {
+      "id": "copy.generic-hero",
+      "category": "content",
+      "title": "Ban placeholder hero language",
+      "severity": "warning",
+      "instruction": "Replace abstract claims with a concrete promise, mechanism, or proof. Avoid interchangeable hero phrases that could headline any AI startup.",
+      "verify": [
+        "The headline identifies a specific outcome or tension.",
+        "The supporting copy explains how the product earns the claim."
+      ]
+    },
+    {
+      "id": "editorial.reading-measure",
+      "category": "typography",
+      "title": "Protect reading measure",
+      "severity": "error",
+      "instruction": "Keep long-form body text within a deliberate reading measure, generally near 55 to 75 characters per line, and provide enough line-height for sustained reading.",
+      "verify": [
+        "Article paragraphs do not span the full viewport.",
+        "Body size and leading remain comfortable on mobile and desktop."
+      ]
+    },
+    {
+      "id": "product-app.density-by-task",
+      "category": "layout",
+      "title": "Set density from task frequency",
+      "severity": "error",
+      "instruction": "Choose spacing and control density from task frequency and information load. Do not apply spacious marketing-page rhythm to operational interfaces or cram occasional workflows into permanent dashboard density.",
+      "verify": [
+        "Primary repeated tasks are fast to scan and operate.",
+        "Low-frequency actions do not dominate permanent space."
+      ]
+    },
+    {
+      "id": "marketing.single-primary-action",
+      "category": "hierarchy",
+      "title": "Protect one primary action",
+      "severity": "error",
+      "instruction": "Each major section should have one obvious primary action. Secondary links may exist, but competing button styles must not flatten the hierarchy.",
+      "verify": [
+        "A first-time visitor can identify the intended next step within seconds.",
+        "Primary action styling remains consistent across the page."
+      ]
+    },
+    {
+      "id": "forms.input-labels-required",
+      "category": "forms",
+      "title": "Form controls must have an accessible name",
+      "severity": "error",
+      "instruction": "Every input, textarea, and select element must have an accessible name. Provide it via a <label> element, aria-label, or aria-labelledby. Do not rely on placeholder text as the sole identifier.",
+      "rationale": "Placeholder text disappears on input, leaving users without a referent. WCAG requires every interactive control to have an accessible name. A label element is preferred because it provides both a visible label and an accessible name.",
+      "verify": [
+        "Every form control has a <label for=\"\"> association, wrapping label, aria-label, or aria-labelledby.",
+        "Controls labeled by placeholder text alone are not compliant."
+      ]
+    },
+    {
+      "id": "motion.respect-reduced-motion",
+      "category": "motion",
+      "title": "Provide prefers-reduced-motion overrides for CSS motion",
+      "severity": "warning",
+      "instruction": "When using CSS animation or transition properties, provide a corresponding override inside @media (prefers-reduced-motion: reduce) that disables or neutralizes the motion for the same selector.",
+      "rationale": "Users with vestibular disorders can experience discomfort from motion. WCAG 2.3.3 (Animation from Interactions, Level AAA) requires a mechanism to pause or hide non-essential motion. A static prefers-reduced-motion override is the standard CSS technique.",
+      "verify": [
+        "Every selector with animation or transition properties has a matching selector inside @media (prefers-reduced-motion: reduce) with a disabling override.",
+        "Disabling overrides include: animation: none, transition: none, animation-duration: 0s, transition-duration: 0s.",
+        "Note: Declarations are analyzed per block. Longhands split across duplicate selector blocks (e.g. .x { animation-name: spin; } and .x { animation-duration: 1s; }) are not aggregated. Combine related motion declarations into a single selector block."
+      ]
+    },
+    {
+      "id": "accessibility.skip-link",
+      "category": "accessibility",
+      "title": "Provide a static skip link to main content",
+      "severity": "warning",
+      "instruction": "Include a same-document anchor as one of the first focusable elements that targets the main-content region. The link must have a supported accessible name (visible text, aria-label, or aria-labelledby) and resolve to a <main> element or an element with role=\"main\" in the same file. Static analysis cannot verify runtime focus behavior or CSS visibility.",
+      "rationale": "Keyboard users need a mechanism to bypass repeated navigation blocks. A skip link targeting the main-content region is the most widely supported technique. Static analysis can confirm the presence of a supported skip-link structure but cannot prove runtime keyboard behavior or complete WCAG 2.4.1 (Bypass Blocks) conformance.",
+      "verify": [
+        "The page contains an <a href=\"#...\"> element before the first <nav> element, with visible link text or aria-label.",
+        "The fragment target exists in the same file and is a <main> element or an element with role=\"main\".",
+        "Note: Static analysis does not verify CSS visibility on focus, client-side routing, JavaScript focus management, or alternative bypass mechanisms such as ARIA landmarks."
+      ]
+    },
+    {
+      "id": "accessibility.text-contrast-minimum",
+      "category": "accessibility",
+      "title": "Require minimum rendered text contrast",
+      "severity": "warning",
+      "instruction": "Ensure rendered text reaches the applicable minimum contrast ratio in the intended viewport and color scheme.",
+      "rationale": "Low-contrast text can be difficult to read for people with low vision, reduced contrast sensitivity, or color-vision differences.",
+      "verify": [
+        "Normal text measures at least 4.5:1 against its rendered background.",
+        "Large-scale text measures at least 3:1 against its rendered background.",
+        "Unsupported visual composition is reviewed manually rather than treated as a pass."
+      ]
+    },
+    {
+      "id": "mobile.touch-target-minimum",
+      "category": "mobile",
+      "title": "Require minimum rendered touch-target size",
+      "severity": "warning",
+      "instruction": "Ensure rendered pointer targets meet the minimum size or a confirmed spacing exception in the intended viewport.",
+      "rationale": "Small or densely packed targets can be difficult to activate accurately for users with limited dexterity or imprecise pointer input.",
+      "verify": [
+        "Supported targets contain an axis-aligned 24 by 24 CSS-pixel area.",
+        "Undersized targets satisfy the official spacing-circle exception.",
+        "Unsupported geometry remains indeterminate rather than being treated as a pass."
+      ]
+    }
+  ]
+}
