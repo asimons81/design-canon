@@ -1,0 +1,885 @@
+/**
+ * browser/analyzers/touch-target-size.js
+ *
+ * Production analyzer for F020: Rendered touch-target minimum.
+ *
+ * Measures rendered interactive target sizes in the loaded Chromium page
+ * against WCAG 2.2 SC 2.5.8 (24 × 24 CSS pixels). Applies the spacing-circle
+ * exception, inline exception, and user-agent-control exception according
+ * to ADR-004.
+ *
+ * The analyzer receives a controlled page adapter with evaluate() and
+ * getComputedStyle(). It never uses raw browser lifecycle access, network
+ * requests, screenshots, or filesystem access.
+ */
+
+import {
+  MIN_TARGET_WIDTH,
+  MIN_TARGET_HEIGHT,
+  SPACING_RADIUS,
+  CIRCLE_TANGENCY,
+  viewportIntersection,
+  rectCenter,
+  euclideanDistance,
+  pointToRectDistance,
+  circlesIntersect,
+  circleIntersectsRect,
+  meetsMinimumSize,
+  classifySize,
+  classifyTransform,
+  SpatialIndex,
+  formatEvidence
+} from '../touch-target-geometry.js';
+
+// ── Constants ─────────────────────────────────────────────────────────
+
+const SUPPORTED_NATIVE = new Set([
+  'a', 'button', 'input', 'select', 'textarea', 'summary'
+]);
+
+const SUPPORTED_ROLES = new Set([
+  'button', 'link', 'checkbox', 'radio', 'switch', 'tab',
+  'menuitem', 'menuitemcheckbox', 'menuitemradio', 'option',
+  'slider', 'spinbutton', 'textbox', 'combobox', 'searchbox'
+]);
+
+const STANDALONE_CONTROL_LOOKALIKES = new Set([
+  'nav', 'header', 'footer', 'toolbar', 'menu', 'menubar'
+]);
+
+const VALID_OUTCOMES = new Set([
+  'pass', 'spacing-exception', 'inline-exception', 'user-agent-exception',
+  'violation', 'excluded'
+]);
+
+const VALID_INDETERMINATE_REASONS = new Set([
+  'non-axis-aligned-transform',
+  'perspective-transform',
+  'ambiguous-fragmentation',
+  'ambiguous-overlap',
+  'partially-obscured',
+  'unsupported-hit-area',
+  'unsupported-native-control',
+  'unresolved-target-geometry',
+  'dynamic-target-state',
+  'nested-interactive-target',
+  'clipped-nonrectangular-target'
+]);
+
+// ── Self-contained browser collection function ────────────────────────
+
+/**
+ * Self-contained function that runs in the browser page context.
+ * Collects all eligible interactive targets with computed geometry,
+ * transforms, disabled/inert state, and context for inline detection.
+ *
+ * Must be entirely self-contained — no references to module-level variables.
+ *
+ * @returns {Array<object>}
+ */
+const COLLECT_TARGETS_FN = function collectTouchTargets() {
+  var results = [];
+
+  // ── Helpers ──────────────────────────────────────────────────────
+
+  function generateSelector(el) {
+    if (el.id) {
+      try { return '#' + CSS.escape(el.id); } catch (e) { /* fallthrough */ }
+    }
+    var parts = [];
+    var current = el;
+    while (current && current !== document.body && current !== document.documentElement) {
+      var parent = current.parentElement;
+      if (!parent) break;
+      var tag = current.tagName.toLowerCase();
+      var nth = 1;
+      var siblings = parent.children;
+      for (var i = 0; i < siblings.length; i++) {
+        if (siblings[i] === current) break;
+        if (siblings[i].tagName === current.tagName) nth++;
+      }
+      parts.unshift(tag + ':nth-of-type(' + nth + ')');
+      current = parent;
+    }
+    return parts.join(' > ');
+  }
+
+  function getVisibleLabel(el) {
+    var text = (el.textContent || '').trim();
+    if (text.length > 60) text = text.substring(0, 57) + '...';
+    return text;
+  }
+
+  function isDisplayNone(el) {
+    try { return getComputedStyle(el).display === 'none'; } catch (e) { return false; }
+  }
+
+  function isVisibilityHidden(el) {
+    try { return getComputedStyle(el).visibility === 'hidden'; } catch (e) { return false; }
+  }
+
+  function hasHiddenAttribute(el) {
+    return el.hasAttribute('hidden');
+  }
+
+  function isInert(el) {
+    var current = el;
+    while (current) {
+      if (current.inert) return true;
+      current = current.parentElement;
+    }
+    return false;
+  }
+
+  function isAriaDisabled(el) {
+    var current = el;
+    while (current) {
+      if (current.getAttribute && current.getAttribute('aria-disabled') === 'true') return true;
+      current = current.parentElement;
+    }
+    return false;
+  }
+
+  function isNativeDisabled(el) {
+    var tag = el.tagName.toLowerCase();
+    if (tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea') {
+      return el.disabled === true;
+    }
+    return false;
+  }
+
+  function isHidden(el) {
+    return isDisplayNone(el) || isVisibilityHidden(el) || hasHiddenAttribute(el);
+  }
+
+  function getEffectiveRole(el) {
+    var role = el.getAttribute('role');
+    if (role) return role.trim().toLowerCase();
+    var tag = el.tagName.toLowerCase();
+    if (tag === 'a') return 'link';
+    if (tag === 'button') return 'button';
+    if (tag === 'input') {
+      var type = (el.getAttribute('type') || 'text').toLowerCase();
+      var explicitRoles = { checkbox: 'checkbox', radio: 'radio', submit: 'button', reset: 'button' };
+      return explicitRoles[type] || 'textbox';
+    }
+    if (tag === 'select') return 'combobox';
+    if (tag === 'textarea') return 'textbox';
+    if (tag === 'summary') return 'button';
+    return null;
+  }
+
+  function hasActivationSignal(el) {
+    // Check for deterministic activation signals
+    var tag = el.tagName.toLowerCase();
+    if (tag === 'a' || tag === 'button' || tag === 'summary') return true;
+    if (tag === 'input' || tag === 'select' || tag === 'textarea') return true;
+    if (el.getAttribute('onclick') || el.getAttribute('onkeydown')) return true;
+    if (el.getAttribute('role') && SUPPORTED_ROLES.has(el.getAttribute('role').trim().toLowerCase())) return true;
+    if (el.getAttribute('tabindex') !== null) {
+      var ti = parseInt(el.getAttribute('tabindex'), 10);
+      if (!isNaN(ti) && ti >= 0) return true;
+    }
+    return false;
+  }
+
+  function isInInlineContext(el) {
+    var cs;
+    try { cs = getComputedStyle(el); } catch (e) { return false; }
+    if (cs.display === 'inline') return true;
+    if (cs.display.startsWith('inline-')) return true;
+    return false;
+  }
+
+  function hasAdjacentNonTargetText(el) {
+    // Check for text nodes before or after the element
+    var prev = el.previousSibling;
+    while (prev) {
+      if (prev.nodeType === 3 && (prev.textContent || '').trim().length > 0) return true;
+      if (prev.nodeType === 1) {
+        var tag = prev.tagName.toLowerCase();
+        // Skip non-text elements like <br>, <wbr>
+        if (tag === 'br' || tag === 'wbr') { prev = prev.previousSibling; continue; }
+        break;
+      }
+      prev = prev.previousSibling;
+    }
+    var next = el.nextSibling;
+    while (next) {
+      if (next.nodeType === 3 && (next.textContent || '').trim().length > 0) return true;
+      if (next.nodeType === 1) {
+        var tag2 = next.tagName.toLowerCase();
+        if (tag2 === 'br' || tag2 === 'wbr') { next = next.nextSibling; continue; }
+        break;
+      }
+      next = next.nextSibling;
+    }
+    return false;
+  }
+
+  function isConstrainedByLineHeight(el) {
+    try {
+      var cs = getComputedStyle(el);
+      var parent = el.parentElement;
+      if (!parent) return false;
+      var pcs = getComputedStyle(parent);
+      var parentLH = parseFloat(pcs.lineHeight);
+      var elH = parseFloat(cs.height);
+      if (isNaN(parentLH) || isNaN(elH)) return false;
+      return elH <= parentLH * 1.5;
+    } catch (e) { return false; }
+  }
+
+  function isStandaloneControlContext(el) {
+    var parent = el.parentElement;
+    while (parent) {
+      var tag = parent.tagName.toLowerCase();
+      var role = parent.getAttribute('role');
+      if (STANDALONE_CONTROL_LOOKALIKES.has(tag)) return true;
+      if (role && STANDALONE_CONTROL_LOOKALIKES.has(role.trim().toLowerCase())) return true;
+      // Check for list-based controls (menus, tab lists)
+      if (tag === 'ul' || tag === 'ol') {
+        var parentRole = role ? role.trim().toLowerCase() : null;
+        if (parentRole === 'menu' || parentRole === 'tablist' || parentRole === 'toolbar') return true;
+      }
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
+  function isUnmodifiedNativeControl(el) {
+    var tag = el.tagName.toLowerCase();
+    var cs;
+    try { cs = getComputedStyle(el); } catch (e) { return false; }
+
+    // Check appearance
+    if (cs.appearance && cs.appearance !== 'auto' && cs.appearance !== 'none') return false;
+    // Check for sizing modifications
+    var w = parseFloat(cs.width);
+    var h = parseFloat(cs.height);
+    var minW = parseFloat(cs.minWidth);
+    var minH = parseFloat(cs.minHeight);
+    var maxW = parseFloat(cs.maxWidth);
+    var maxH = parseFloat(cs.maxHeight);
+    var padT = parseFloat(cs.paddingTop);
+    var padR = parseFloat(cs.paddingRight);
+    var padB = parseFloat(cs.paddingBottom);
+    var padL = parseFloat(cs.paddingLeft);
+    var borderT = parseFloat(cs.borderTopWidth);
+    var borderR = parseFloat(cs.borderRightWidth);
+    var borderB = parseFloat(cs.borderBottomWidth);
+    var borderL = parseFloat(cs.borderLeftWidth);
+
+    // If any explicit sizing is present, treat as modified
+    if (el.style.width || el.style.height || el.style.minWidth || el.style.minHeight ||
+        el.style.maxWidth || el.style.maxHeight) return false;
+    if (!isNaN(padT) && padT > 0 && el.style.paddingTop) return false;
+    if (!isNaN(padR) && padR > 0 && el.style.paddingRight) return false;
+    if (!isNaN(padB) && padB > 0 && el.style.paddingBottom) return false;
+    if (!isNaN(padL) && padL > 0 && el.style.paddingLeft) return false;
+
+    // Check for transform
+    if (cs.transform && cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') return false;
+
+    return true;
+  }
+
+  // ── Main collection ──────────────────────────────────────────────
+
+  // Query native targets
+  var nativeSelector = 'a[href], button, input:not([type="hidden"]), select, textarea, summary';
+  var nativeEls = document.querySelectorAll(nativeSelector);
+
+  var seen = new Set();
+
+  for (var i = 0; i < nativeEls.length; i++) {
+    var el = nativeEls[i];
+    if (seen.has(el)) continue;
+    seen.add(el);
+
+    if (isNativeDisabled(el)) continue;
+    if (isAriaDisabled(el)) continue;
+    if (isInert(el)) continue;
+    if (isHidden(el)) continue;
+
+    var rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) continue;
+
+    var selector = generateSelector(el);
+    var cs;
+    try { cs = getComputedStyle(el); } catch (e) { continue; }
+
+    var clientRects = Array.from(el.getClientRects());
+
+    results.push({
+      selector: selector,
+      targetType: el.tagName.toLowerCase(),
+      role: getEffectiveRole(el),
+      label: getVisibleLabel(el),
+      rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      clientRects: clientRects.map(function(r) {
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      }),
+      display: cs.display,
+      visibility: cs.visibility,
+      transform: cs.transform,
+      zoom: cs.zoom,
+      overflow: cs.overflow,
+      opacity: cs.opacity,
+      isNative: true,
+      isReadonly: el.readOnly === true,
+      isInline: isInInlineContext(el),
+      hasAdjacentText: hasAdjacentNonTargetText(el),
+      lineHeightConstrained: isConstrainedByLineHeight(el),
+      isStandaloneControl: isStandaloneControlContext(el),
+      isUnmodifiedNative: isUnmodifiedNativeControl(el),
+      tabindex: el.getAttribute('tabindex'),
+      ariaDisabled: el.getAttribute('aria-disabled'),
+      inert: el.inert === true
+    });
+  }
+
+  // Query role-based targets
+  var roleSelector = '[role]';
+  var roleEls = document.querySelectorAll(roleSelector);
+
+  for (var j = 0; j < roleEls.length; j++) {
+    var rel = roleEls[j];
+    if (seen.has(rel)) continue;
+    var role = rel.getAttribute('role');
+    if (!role) continue;
+    var normalizedRole = role.trim().toLowerCase();
+    if (!SUPPORTED_ROLES.has(normalizedRole)) continue;
+
+    if (isNativeDisabled(rel)) continue;
+    if (isAriaDisabled(rel)) continue;
+    if (isInert(rel)) continue;
+    if (isHidden(rel)) continue;
+
+    var rrect = rel.getBoundingClientRect();
+    if (rrect.width === 0 || rrect.height === 0) continue;
+
+    seen.add(rel);
+
+    var rselector = generateSelector(rel);
+    var rcs;
+    try { rcs = getComputedStyle(rel); } catch (e) { continue; }
+
+    var rclientRects = Array.from(rel.getClientRects());
+
+    results.push({
+      selector: rselector,
+      targetType: rel.tagName.toLowerCase(),
+      role: normalizedRole,
+      label: getVisibleLabel(rel),
+      rect: { x: rrect.x, y: rrect.y, width: rrect.width, height: rrect.height },
+      clientRects: rclientRects.map(function(r) {
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      }),
+      display: rcs.display,
+      visibility: rcs.visibility,
+      transform: rcs.transform,
+      zoom: rcs.zoom,
+      overflow: rcs.overflow,
+      opacity: rcs.opacity,
+      isNative: false,
+      isReadonly: rel.readOnly === true,
+      isInline: isInInlineContext(rel),
+      hasAdjacentText: hasAdjacentNonTargetText(rel),
+      lineHeightConstrained: isConstrainedByLineHeight(rel),
+      isStandaloneControl: isStandaloneControlContext(rel),
+      isUnmodifiedNative: isUnmodifiedNativeControl(rel),
+      tabindex: rel.getAttribute('tabindex'),
+      ariaDisabled: rel.getAttribute('aria-disabled'),
+      inert: rel.inert === true
+    });
+  }
+
+  // Query tabindex >= 0 targets with activation signals
+  var tabindexEls = document.querySelectorAll('[tabindex]');
+  for (var k = 0; k < tabindexEls.length; k++) {
+    var tel = tabindexEls[k];
+    if (seen.has(tel)) continue;
+    var ti = parseInt(tel.getAttribute('tabindex'), 10);
+    if (isNaN(ti) || ti < 0) continue;
+    if (!hasActivationSignal(tel)) continue;
+
+    if (isNativeDisabled(tel)) continue;
+    if (isAriaDisabled(tel)) continue;
+    if (isInert(tel)) continue;
+    if (isHidden(tel)) continue;
+
+    var trect = tel.getBoundingClientRect();
+    if (trect.width === 0 || trect.height === 0) continue;
+
+    seen.add(tel);
+
+    var tselector = generateSelector(tel);
+    var tcs;
+    try { tcs = getComputedStyle(tel); } catch (e) { continue; }
+
+    var tclientRects = Array.from(tel.getClientRects());
+
+    results.push({
+      selector: tselector,
+      targetType: tel.tagName.toLowerCase(),
+      role: getEffectiveRole(tel),
+      label: getVisibleLabel(tel),
+      rect: { x: trect.x, y: trect.y, width: trect.width, height: trect.height },
+      clientRects: tclientRects.map(function(r) {
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      }),
+      display: tcs.display,
+      visibility: tcs.visibility,
+      transform: tcs.transform,
+      zoom: tcs.zoom,
+      overflow: tcs.overflow,
+      opacity: tcs.opacity,
+      isNative: false,
+      isReadonly: tel.readOnly === true,
+      isInline: isInInlineContext(tel),
+      hasAdjacentText: hasAdjacentNonTargetText(tel),
+      lineHeightConstrained: isConstrainedByLineHeight(tel),
+      isStandaloneControl: isStandaloneControlContext(tel),
+      isUnmodifiedNative: isUnmodifiedNativeControl(tel),
+      tabindex: tel.getAttribute('tabindex'),
+      ariaDisabled: tel.getAttribute('aria-disabled'),
+      inert: tel.inert === true
+    });
+  }
+
+  return results;
+};
+
+// ── Analyzer ──────────────────────────────────────────────────────────
+
+/**
+ * Main analyzer function for F020: Rendered touch-target minimum.
+ *
+ * @param {object} context - analyzer context from runAnalyzer
+ * @param {object} context.pageAdapters - page adapters { evaluate, getComputedStyle }
+ * @param {string} context.viewport - viewport preset name
+ * @param {string} context.colorScheme - color scheme
+ * @param {string} context.browserVersion - Chromium version
+ * @param {number} context.deadline - operation deadline
+ * @param {object} context.rule - rule metadata
+ * @returns {Promise<{status:string, measurements:object, message:string, confidence:string, samples:Array}>}
+ */
+export async function analyzeTouchTargetSize(context) {
+  const { pageAdapters, viewport, colorScheme, browserVersion, deadline } = context;
+
+  if (!pageAdapters || !pageAdapters.evaluate) {
+    return {
+      status: 'failed',
+      measurements: {},
+      message: 'No page adapter available for touch-target analysis.',
+      confidence: 'low',
+      samples: []
+    };
+  }
+
+  try {
+    // Check deadline
+    if (Date.now() >= deadline) {
+      return {
+        status: 'failed',
+        measurements: {},
+        message: 'Operation deadline exceeded before touch-target analysis could run.',
+        confidence: 'low',
+        samples: []
+      };
+    }
+
+    // Collect all eligible targets in one browser evaluation
+    const rawTargets = await pageAdapters.evaluate(COLLECT_TARGETS_FN);
+
+    if (!Array.isArray(rawTargets)) {
+      return {
+        status: 'failed',
+        measurements: {},
+        message: 'Target collection returned unexpected data.',
+        confidence: 'low',
+        samples: []
+      };
+    }
+
+    // Get viewport dimensions
+    const viewportDims = await pageAdapters.evaluate(function() {
+      return { width: window.innerWidth, height: window.innerHeight };
+    });
+
+    // Process targets
+    const samples = processTargets(rawTargets, viewportDims, viewport, colorScheme, browserVersion);
+
+    // Compute measurements
+    const measurements = {
+      checkedTargets: samples.length,
+      passingTargets: samples.filter(s => s.outcome === 'pass').length,
+      spacingExceptionTargets: samples.filter(s => s.outcome === 'spacing-exception').length,
+      inlineExceptionTargets: samples.filter(s => s.outcome === 'inline-exception').length,
+      userAgentExceptionTargets: samples.filter(s => s.outcome === 'user-agent-exception').length,
+      violatingTargets: samples.filter(s => s.outcome === 'violation').length,
+      indeterminateTargets: samples.filter(s => s.status === 'indeterminate').length,
+      excludedTargets: samples.filter(s => s.outcome === 'excluded').length
+    };
+
+    // Determine run status
+    const confirmedCount = samples.filter(s => s.status === 'confirmed').length;
+    const indeterminateCount = samples.filter(s => s.status === 'indeterminate').length;
+
+    let runStatus = 'confirmed';
+    if (confirmedCount === 0 && indeterminateCount > 0) {
+      runStatus = 'indeterminate';
+    }
+
+    return {
+      status: runStatus,
+      measurements,
+      message: 'Rendered touch-target analysis completed.',
+      confidence: 'high',
+      samples
+    };
+
+  } catch (err) {
+    return {
+      status: 'failed',
+      measurements: {},
+      message: `Touch-target analysis error: ${err.message}`,
+      confidence: 'low',
+      samples: []
+    };
+  }
+}
+
+// ── Target processing ─────────────────────────────────────────────────
+
+/**
+ * Process raw target data into classified samples.
+ *
+ * @param {Array<object>} rawTargets - targets from browser collection
+ * @param {{width:number, height:number}} viewportDims
+ * @param {string} viewportName
+ * @param {string} colorScheme
+ * @param {string} browserVersion
+ * @returns {Array<object>} samples
+ */
+function processTargets(rawTargets, viewportDims, viewportName, colorScheme, browserVersion) {
+  // Phase 1: Exclude wholly off-viewport targets
+  const visibleTargets = [];
+  for (const t of rawTargets) {
+    const intersection = viewportIntersection(t.rect, viewportDims);
+    if (!intersection) {
+      // Wholly off-viewport — excluded
+      visibleTargets.push({
+        ...t,
+        status: 'confirmed',
+        outcome: 'excluded',
+        reason: 'wholly-off-viewport',
+        visibleRect: null
+      });
+      continue;
+    }
+    visibleTargets.push({
+      ...t,
+      intersection,
+      visibleRect: (intersection.width === t.rect.width && intersection.height === t.rect.height)
+        ? t.rect : intersection
+    });
+  }
+
+  // Phase 2: Transform classification
+  const classified = [];
+  for (const t of visibleTargets) {
+    if (t.outcome === 'excluded') {
+      classified.push(t);
+      continue;
+    }
+
+    if (t.intersection && t.intersection.width !== t.rect.width) {
+      // Partially clipped — check if still rectangular
+      classified.push({
+        ...t,
+        transformClass: classifyTransform(t.transform),
+        effectiveRect: t.intersection
+      });
+    } else {
+      classified.push({
+        ...t,
+        transformClass: classifyTransform(t.transform),
+        effectiveRect: t.rect
+      });
+    }
+  }
+
+  // Phase 3: Classify each target
+  for (const t of classified) {
+    if (t.outcome === 'excluded') continue;
+
+    const effectiveRect = t.effectiveRect;
+
+    // Check for indeterminate transforms
+    if (t.transformClass === 'indeterminate') {
+      t.status = 'indeterminate';
+      t.indeterminateReason = t.transform && /\bperspective\b/.test(t.transform)
+        ? 'perspective-transform'
+        : 'non-axis-aligned-transform';
+      continue;
+    }
+
+    // Check fragmentation
+    if (t.clientRects && t.clientRects.length > 1) {
+      // Apply inline exception first
+      if (isInlineException(t)) {
+        t.status = 'confirmed';
+        t.outcome = 'inline-exception';
+        continue;
+      }
+      // Non-inline fragmentation — indeterminate unless each fragment passes
+      t.status = 'indeterminate';
+      t.indeterminateReason = 'ambiguous-fragmentation';
+      continue;
+    }
+
+    // Check overlap/obscuration
+    if (t.opacity && parseFloat(t.opacity) < 1) {
+      t.status = 'indeterminate';
+      t.indeterminateReason = 'ambiguous-overlap';
+      continue;
+    }
+
+    // Check inline exception
+    if (isInlineException(t)) {
+      t.status = 'confirmed';
+      t.outcome = 'inline-exception';
+      continue;
+    }
+
+    // Check user-agent-control exception
+    if (t.isUnmodifiedNative && t.isNative) {
+      t.status = 'confirmed';
+      t.outcome = 'user-agent-exception';
+      continue;
+    }
+
+    // Primary size check
+    if (meetsMinimumSize(effectiveRect)) {
+      t.status = 'confirmed';
+      t.outcome = 'pass';
+    } else {
+      // Undersized — flag for spacing check in phase 4
+      t.status = 'confirmed';
+      t.outcome = 'undersized';
+      t.sizeClass = classifySize(effectiveRect.width, effectiveRect.height);
+    }
+  }
+
+  // Phase 4: Spacing exception for undersized targets
+  applySpacingException(classified, viewportDims);
+
+  // Phase 5: Convert undersized without spacing to violations, finalize
+  for (const t of classified) {
+    if (t.outcome === 'excluded' || t.outcome === 'pass' ||
+        t.outcome === 'inline-exception' || t.outcome === 'user-agent-exception' ||
+        t.outcome === 'spacing-exception' || t.outcome === 'violation' ||
+        t.status === 'indeterminate') continue;
+
+    if (t.outcome === 'undersized') {
+      t.outcome = 'violation';
+    }
+  }
+
+  // Phase 6: Build final sample objects
+  return classified.map(t => buildSample(t, viewportDims, viewportName, colorScheme, browserVersion));
+}
+
+// ── Inline exception ─────────────────────────────────────────────────
+
+/**
+ * Determine if a target qualifies for the narrow automatic inline exception.
+ *
+ * All conditions must be met:
+ * - inline formatting context
+ * - sentence or text-block context
+ * - adjacent non-target text before or after
+ * - size constrained by surrounding non-target text line height
+ * - not a standalone navigation, toolbar, menu, tab, chip, badge, or button-like control
+ *
+ * @param {object} t - target data
+ * @returns {boolean}
+ */
+function isInlineException(t) {
+  if (!t.isInline) return false;
+  if (!t.hasAdjacentText) return false;
+  if (!t.lineHeightConstrained) return false;
+  if (t.isStandaloneControl) return false;
+  return true;
+}
+
+// ── Spacing exception ─────────────────────────────────────────────────
+
+/**
+ * Apply the spacing-circle exception to all undersized targets.
+ * Uses spatial bucketing for bounded neighborhood queries.
+ *
+ * @param {Array<object>} targets - all classified targets (mutated in place)
+ * @param {{width:number, height:number}} viewportDims
+ */
+function applySpacingException(targets, viewportDims) {
+  // Build spatial index of all targets
+  const index = new SpatialIndex(48);
+  const undersizedTargets = [];
+
+  for (let i = 0; i < targets.length; i++) {
+    const t = targets[i];
+    if (t.outcome === 'excluded' || t.status === 'indeterminate') continue;
+    t._index = i;
+    index.insert(String(i), t.effectiveRect || t.rect);
+    if (t.outcome === 'undersized') {
+      undersizedTargets.push(t);
+    }
+  }
+
+  if (undersizedTargets.length === 0) return;
+
+  for (const ut of undersizedTargets) {
+    const center = rectCenter(ut.effectiveRect || ut.rect);
+    const spacingProof = {
+      center: { x: center.x, y: center.y },
+      radius: SPACING_RADIUS,
+      passed: true,
+      nearest: null,
+      nearestDistance: null,
+      nearestUndersizedCircle: null,
+      nearestUndersizedCircleDistance: null,
+      reason: null
+    };
+
+    // Find neighbors within search radius
+    const neighbors = index.findNeighbors(center, SPACING_RADIUS + 24, String(ut._index));
+
+    // First check: circle-to-circle with other undersized targets
+    for (const neighbor of neighbors) {
+      const neighborTarget = targets[parseInt(neighbor.id, 10)];
+      if (!neighborTarget || neighborTarget.outcome === 'excluded') continue;
+      if (neighborTarget.status === 'indeterminate') continue;
+
+      if (neighborTarget.outcome === 'undersized') {
+        const neighborCenter = rectCenter(neighborTarget.effectiveRect || neighborTarget.rect);
+        const dist = euclideanDistance(center, neighborCenter);
+
+        if (dist < CIRCLE_TANGENCY) {
+          spacingProof.passed = false;
+          spacingProof.nearest = neighborTarget.selector;
+          spacingProof.nearestUndersignedCircleDistance = dist;
+          spacingProof.reason = 'circle-intersects-undersized-circle';
+          break;
+        }
+
+        // Track nearest undersized circle for evidence
+        if (spacingProof.nearestUndersignedCircleDistance === null ||
+            dist < spacingProof.nearestUndersignedCircleDistance) {
+          spacingProof.nearestUndersignedCircle = neighborTarget.selector;
+          spacingProof.nearestUndersignedCircleDistance = dist;
+        }
+      }
+    }
+
+    // Second check: circle-to-rectangle with all other targets
+    if (spacingProof.passed) {
+      for (const neighbor of neighbors) {
+        const neighborTarget = targets[parseInt(neighbor.id, 10)];
+        if (!neighborTarget || neighborTarget.outcome === 'excluded') continue;
+        if (neighborTarget.status === 'indeterminate') continue;
+        if (neighborTarget._index === ut._index) continue;
+
+        const neighborRect = neighborTarget.effectiveRect || neighborTarget.rect;
+        const dist = pointToRectDistance(center, neighborRect);
+
+        if (dist < SPACING_RADIUS) {
+          spacingProof.passed = false;
+          spacingProof.nearest = neighborTarget.selector;
+          spacingProof.nearestDistance = dist;
+          spacingProof.reason = 'circle-intersects-target-area';
+          break;
+        }
+
+        // Track nearest for evidence
+        if (spacingProof.nearestDistance === null || dist < spacingProof.nearestDistance) {
+          spacingProof.nearest = neighborTarget.selector;
+          spacingProof.nearestDistance = dist;
+        }
+      }
+    }
+
+    // Check coincident centers with other undersized targets
+    if (spacingProof.passed) {
+      for (const neighbor of neighbors) {
+        const neighborTarget = targets[parseInt(neighbor.id, 10)];
+        if (!neighborTarget || neighborTarget.outcome === 'excluded') continue;
+        if (neighborTarget._index === ut._index) continue;
+
+        const neighborCenter = rectCenter(neighborTarget.effectiveRect || neighborTarget.rect);
+        if (center.x === neighborCenter.x && center.y === neighborCenter.y) {
+          spacingProof.passed = false;
+          spacingProof.nearest = neighborTarget.selector;
+          spacingProof.reason = 'coincident-centers';
+          break;
+        }
+      }
+    }
+
+    ut.spacingProof = spacingProof;
+
+    if (spacingProof.passed) {
+      ut.outcome = 'spacing-exception';
+    }
+  }
+}
+
+// ── Sample builder ────────────────────────────────────────────────────
+
+/**
+ * Build a deterministic sample object from a classified target.
+ *
+ * @param {object} t - classified target
+ * @param {{width:number, height:number}} viewportDims
+ * @param {string} viewportName
+ * @param {string} colorScheme
+ * @param {string} browserVersion
+ * @returns {object}
+ */
+function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion) {
+  const effectiveRect = t.effectiveRect || t.rect;
+  const center = rectCenter(effectiveRect);
+
+  const sample = {
+    selector: t.selector,
+    targetType: t.targetType,
+    role: t.role,
+    label: t.label,
+    width: t.rect.width,
+    height: t.rect.height,
+    visibleWidth: effectiveRect.width,
+    visibleHeight: effectiveRect.height,
+    centerX: center.x,
+    centerY: center.y,
+    requiredWidth: MIN_TARGET_WIDTH,
+    requiredHeight: MIN_TARGET_HEIGHT,
+    status: t.status || 'confirmed',
+    outcome: t.outcome || 'violation',
+    exception: null,
+    spacingProof: t.spacingProof || null,
+    viewport: viewportName,
+    viewportWidth: viewportDims.width,
+    viewportHeight: viewportDims.height,
+    colorScheme: colorScheme,
+    browserVersion: browserVersion
+  };
+
+  // Set exception field
+  if (t.outcome === 'spacing-exception') sample.exception = 'spacing-exception';
+  if (t.outcome === 'inline-exception') sample.exception = 'inline-exception';
+  if (t.outcome === 'user-agent-exception') sample.exception = 'user-agent-exception';
+
+  return sample;
+}

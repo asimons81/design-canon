@@ -11,6 +11,7 @@
 
 import { registerAnalyzer, hasAnalyzer } from '../analyzer.js';
 import { analyzeTextContrast } from './text-contrast.js';
+import { analyzeTouchTargetSize } from './touch-target-size.js';
 
 let initialized = false;
 
@@ -24,6 +25,10 @@ export function setupAnalyzers() {
 
   if (!hasAnalyzer('rendered.text-contrast')) {
     registerAnalyzer('rendered.text-contrast', analyzeTextContrast);
+  }
+
+  if (!hasAnalyzer('rendered.touch-target-size')) {
+    registerAnalyzer('rendered.touch-target-size', analyzeTouchTargetSize);
   }
 }
 
@@ -44,7 +49,8 @@ export function resetAnalyzers() {
  */
 export function hasProductionAnalyzer(analyzerId) {
   const productionIds = new Set([
-    'rendered.text-contrast'
+    'rendered.text-contrast',
+    'rendered.touch-target-size'
   ]);
   return productionIds.has(analyzerId);
 }
@@ -54,5 +60,5 @@ export function hasProductionAnalyzer(analyzerId) {
  * @returns {Set<string>}
  */
 export function getProductionAnalyzerIds() {
-  return new Set(['rendered.text-contrast']);
+  return new Set(['rendered.text-contrast', 'rendered.touch-target-size']);
 }
