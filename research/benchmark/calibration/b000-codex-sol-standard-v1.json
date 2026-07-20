@@ -7,7 +7,7 @@
   "purpose": "Validate the Codex execution runner, isolation, accounting, capture, and failure-preservation pipeline before admitting any B001-B015 output.",
   "brief": {
     "benchmarkId": "B000",
-    "path": "research/benchmarks/B000-calibration-shakedown.md",
+    "path": "research/benchmark/calibration/B000-calibration-shakedown.md",
     "profile": "marketing"
   },
   "conditions": ["A", "B", "C", "D"],
