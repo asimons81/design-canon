@@ -23,6 +23,7 @@
     "schema/",
     "skills/",
     "docs/CONFIGURATION.md",
+    "docs/ADAPTERS.md",
     "README.md",
     "LICENSE",
     "SECURITY.md",
