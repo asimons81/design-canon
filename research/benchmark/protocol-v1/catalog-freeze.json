@@ -4,6 +4,7 @@
   "catalogVersion": 1,
   "catalogCommit": "5caa9e0315a1f10f0e5f70e6218d4fc9049d2530",
   "catalogBlobSha": "5b6fea282955c5175d5a8425b9e2806ad52ed9c4",
+  "guidanceCatalogPath": "research/benchmark/protocol-v1/guidance-catalog.json",
   "acceptedRuleCount": 18,
   "ruleIds": [
     "direction.name-the-direction",
