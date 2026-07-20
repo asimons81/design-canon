@@ -12,7 +12,7 @@ import {
 } from '../research/benchmark/harness/isolation.js';
 import { parseCliArgs, REPOSITORY_ROOT, writeJson } from '../research/benchmark/harness/lib.js';
 
-const PREFLIGHT_ID = 'authentication-model-preflight';
+const PREFLIGHT_ID = 'auth-model-preflight-sol-canonical-r1';
 const PROMPT = 'Reply with exactly PREFLIGHT_OK. Do not use tools or modify files.\n';
 
 async function main() {
@@ -69,7 +69,10 @@ async function main() {
     const report = {
       schemaVersion: 1, classification: 'authentication/model preflight', preflightId: PREFLIGHT_ID,
       measuredBenchmarkRun: false, benchmarkId: null, generatedAt: new Date().toISOString(), passed,
-      requestedModel: 'gpt-5.6', modelDisplayName: 'GPT-5.6 Sol',
+      priorRequestedIdentifier: 'gpt-5.6', requestedModel: 'gpt-5.6-sol',
+      reason: 'canonical-model-ID verification', modelDisplayName: 'GPT-5.6 Sol',
+      official: false, claimEligible: false, measuredB000Usage: false,
+      benchmarkBriefIncluded: false, benchmarkGuidanceIncluded: false,
       resolvedModelIdentifier: execution.normalized.resolvedModelIdentifier,
       reasoningEffort: 'medium', reasoningLabel: 'Standard', serviceTier: 'default',
       fastMode: false, maxMode: false, webSearch: 'disabled', sandbox: 'workspace-write', approvalPolicy: 'never',

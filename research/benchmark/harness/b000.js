@@ -82,7 +82,7 @@ export async function initializeB000({ outputRoot, guidanceDirectory }) {
       benchmarkId: 'B000',
       runId: run.runId,
       attemptId: `${run.runId}-${randomUUID()}`,
-      runnerContractAmendment: 'research/benchmark/calibration/B000-RUNNER-CONTRACT-AMENDMENT-1.md',
+      runnerContractAmendment: 'research/benchmark/calibration/B000-RUNNER-CONTRACT-AMENDMENT-2.md',
       condition: run.condition,
       repetition: 1,
       executionOrder: run.executionOrder,

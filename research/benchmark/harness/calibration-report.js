@@ -51,7 +51,7 @@ export async function buildB000CalibrationReport({ runsRoot, repositoryCommit, c
       wsl: process.env.WSL_DISTRO_NAME ?? null,
       chromiumVersion: attempts.find((attempt) => attempt.environment?.browser)?.environment.browser ?? null
     },
-    runtime: { requestedModel: 'gpt-5.6', modelDisplayName: 'GPT-5.6 Sol', reasoningEffort: 'medium', preflight },
+    runtime: { requestedModel: 'gpt-5.6-sol', modelDisplayName: 'GPT-5.6 Sol', reasoningEffort: 'medium', preflight },
     frozenExecutionOrder: ['B000-A-r1', 'B000-B-r1', 'B000-D-r1', 'B000-C-r1'],
     attempts,
     totalProviderUsage,

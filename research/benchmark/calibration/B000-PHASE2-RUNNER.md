@@ -2,7 +2,7 @@
 
 This is a nonofficial, claim-ineligible calibration surface. It cannot initialize or execute B001-B015 and does not modify protocol v1.
 
-The Phase-1 command assumption is corrected transparently by [B000-RUNNER-CONTRACT-AMENDMENT-1.md](./B000-RUNNER-CONTRACT-AMENDMENT-1.md): approval policy is a global Codex option, while execution controls remain `exec` options. No model call was made under the incorrect form.
+The Phase-1 command assumption is corrected transparently by [B000-RUNNER-CONTRACT-AMENDMENT-1.md](./B000-RUNNER-CONTRACT-AMENDMENT-1.md): approval policy is a global Codex option, while execution controls remain `exec` options. [B000-RUNNER-CONTRACT-AMENDMENT-2.md](./B000-RUNNER-CONTRACT-AMENDMENT-2.md) replaces the rejected `gpt-5.6` alias with the accepted canonical `gpt-5.6-sol` identifier and requires provider-free proof that runtime-created skill caches remain absent from model-visible instructions and capabilities.
 
 ## Authoritative environment
 
@@ -45,7 +45,7 @@ DESIGN_CANON_B000_LIVE=1 node scripts/benchmark-batch-b000.js \
   --live true
 ```
 
-The effective form is `codex --ask-for-approval never exec ...`. It requests model alias `gpt-5.6`, medium reasoning, the Standard/default tier, workspace-write, disabled workspace-command network, disabled web search, ephemeral state, ignored user config and execution rules, disabled optional integration features, and JSONL. It never passes an evidence or repository path to the measured child.
+The effective form is `codex --ask-for-approval never exec ...`. It requests canonical model ID `gpt-5.6-sol`, medium reasoning, the Standard/default tier, workspace-write, disabled workspace-command network, disabled web search, ephemeral state, ignored user config and execution rules, disabled skill instructions and optional integration features, and JSONL. It never passes an evidence or repository path to the measured child.
 
 The batch stops at the first terminal failure and never retries. Raw stdout/stderr are written losslessly and flushed before normalization. Spawn, timeout, budget, JSONL, source, and capture failures remain terminal evidence; a later attempt requires a newly initialized immutable attempt ID.
 

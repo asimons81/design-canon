@@ -42,7 +42,8 @@ test('acceptance 1-4: boundary, order, nonofficial initialization, and pinned co
     assert.equal(manifest.benchmarkId, 'B000');
   }
   const args = buildCodexExecArgs({ workspace: 'opaque' }, deriveCodexCapabilities(globalHelp, execHelp));
-  for (const required of ['gpt-5.6', 'workspace-write', 'never', '--ignore-user-config', '--ignore-rules', '--ephemeral', '--json', 'model_reasoning_effort="medium"', 'web_search="disabled"']) assert.ok(args.includes(required));
+  for (const required of ['gpt-5.6-sol', 'workspace-write', 'never', '--ignore-user-config', '--ignore-rules', '--ephemeral', '--json', 'model_reasoning_effort="medium"', 'web_search="disabled"', 'skills.include_instructions=false', 'skill_mcp_dependency_install']) assert.ok(args.includes(required));
+  assert.equal(args.includes('gpt-5.6'), false);
 });
 
 test('acceptance 5: unsupported flags and old versions fail closed', async (t) => {

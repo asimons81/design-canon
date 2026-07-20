@@ -13,12 +13,14 @@ export const REQUIRED_EXEC_OPTIONS = Object.freeze([
 export const REQUIRED_CODEX_OPTIONS = Object.freeze([...REQUIRED_GLOBAL_OPTIONS, ...REQUIRED_EXEC_OPTIONS]);
 
 const DISABLED_FEATURES = Object.freeze([
-  'apps', 'browser_use', 'computer_use', 'fast_mode', 'image_generation', 'plugins'
+  'apps', 'browser_use', 'computer_use', 'fast_mode', 'image_generation', 'plugins',
+  'skill_mcp_dependency_install'
 ]);
 const REQUIRED_CONFIG = Object.freeze([
   'model_reasoning_effort="medium"',
   'service_tier="default"',
   'web_search="disabled"',
+  'skills.include_instructions=false',
   'sandbox_workspace_write.network_access=false',
   'sandbox_workspace_write.exclude_tmpdir_env_var=true',
   'sandbox_workspace_write.exclude_slash_tmp=true'
@@ -52,10 +54,10 @@ export function deriveCodexCapabilities(globalHelp, execHelp = globalHelp) {
   };
 }
 
-export function buildCodexExecArgs({ workspace, model = 'gpt-5.6', effort = 'medium', serviceTier = 'default' }, capabilities) {
+export function buildCodexExecArgs({ workspace, model = 'gpt-5.6-sol', effort = 'medium', serviceTier = 'default' }, capabilities) {
   if (!capabilities?.valid) throw new Error(`Codex CLI lacks required options: ${(capabilities?.missing ?? REQUIRED_CODEX_OPTIONS).join(', ')}`);
-  if (model !== 'gpt-5.6' || effort !== 'medium' || serviceTier !== 'default') {
-    throw new Error('B000 requires model gpt-5.6, medium reasoning, and the Standard/default service tier.');
+  if (model !== 'gpt-5.6-sol' || effort !== 'medium' || serviceTier !== 'default') {
+    throw new Error('B000 requires model gpt-5.6-sol, medium reasoning, and the Standard/default service tier.');
   }
   const args = ['--ask-for-approval', 'never', 'exec', '--cd', workspace, '--model', model,
     '--sandbox', 'workspace-write', '--ignore-user-config', '--ignore-rules', '--ephemeral',
