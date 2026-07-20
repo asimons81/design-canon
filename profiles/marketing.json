@@ -18,6 +18,7 @@
   "includeRules": [
     "forms.input-labels-required",
     "motion.respect-reduced-motion",
-    "mobile.touch-target-minimum"
+    "mobile.touch-target-minimum",
+    "mobile.safe-area-viewport"
   ]
 }
