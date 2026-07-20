@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
-import { basename, join, relative, resolve } from 'node:path';
+import { mkdir, readFile, readdir, stat } from 'node:fs/promises';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { lintPath } from '../../../src/lint.js';
 import { writeJson } from './lib.js';
@@ -17,6 +17,11 @@ export function validateRunManifestForCapture(manifest) {
     throw new Error(`Run '${manifest.runId}' cannot be captured from status '${manifest.status}'.`);
   }
   return manifest;
+}
+
+export function isPathInside(parent, candidate) {
+  const value = relative(resolve(parent), resolve(candidate));
+  return value === '' || (!value.startsWith('..') && !isAbsolute(value));
 }
 
 export function summarizeAccessibilitySnapshots(snapshots) {
@@ -150,7 +155,7 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
   const manifest = validateRunManifestForCapture(JSON.parse(await readFile(manifestPath, 'utf8')));
   const entryPath = resolve(root, entry);
   const sourceRoot = join(root, 'source');
-  if (!entryPath.startsWith(`${sourceRoot}/`) && entryPath !== sourceRoot) {
+  if (!isPathInside(sourceRoot, entryPath)) {
     throw new Error('Capture entry must remain inside the run source directory.');
   }
   const entryInfo = await stat(entryPath).catch(() => null);
@@ -168,6 +173,7 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
   await writeJson(manifestPath, manifest);
 
   const browser = await chromium.launch({ headless: true });
+  const browserVersion = browser.version();
   const viewportResults = [];
   const accessibilitySnapshots = [];
   const consoleMessages = [];
@@ -233,7 +239,7 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
     schemaVersion: 1,
     entry: relative(root, entryPath).replaceAll('\\', '/'),
     captureTool: 'playwright',
-    browser: lintReport.analysisRecords?.[0]?.environment?.browserVersion ?? null,
+    browser: browserVersion,
     networkPolicy: 'local-file-only',
     reducedMotion: 'reduce',
     colorScheme: 'light',
@@ -256,7 +262,7 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
     operatingSystem: process.platform,
     architecture: process.arch,
     nodeVersion: process.version,
-    browser: renderMetadata.browser,
+    browser: browserVersion,
     captureTool: 'playwright',
     accessibilityTool: accessibilityReport.scanner
   };
