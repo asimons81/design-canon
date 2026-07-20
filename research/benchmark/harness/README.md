@@ -124,9 +124,21 @@ node scripts/benchmark-report.js \
 
 Missing artifacts remain missing. The report does not impute results or convert incomplete calibration data into a superiority claim.
 
+## B000 calibration boundary
+
+Before any B001-B015 output is generated, the provider execution layer is calibrated with B000.
+
+- Brief: `research/benchmark/calibration/B000-calibration-shakedown.md`
+- Frozen settings: `research/benchmark/calibration/b000-codex-sol-standard-v1.json`
+- Runner contract: `research/benchmark/calibration/B000-RUNNER-CONTRACT.md`
+
+B000 executes A, B, D, and C once in the frozen order. It is nonofficial, claim-ineligible, excluded from the protocol-v1 plan, and may be inspected freely to tune the runner and propose official budgets. Its artifacts must never be pooled with the 180 protocol-v1 runs.
+
 ## Provider boundary
 
-The harness deliberately does not contain provider credentials, paid-model calls, or a preferred agent framework. Tomorrow's execution adapter should consume one initialized run, operate within the pinned limits, store its transcript and source tree, and then call the capture command.
+The core harness deliberately contains no provider credentials. Provider adapters consume initialized runs, operate within pinned limits, store raw transcripts and source trees, preserve failures, and then call the capture command.
+
+The B000 contract selects Codex CLI with GPT-5.6 Sol at medium reasoning only for calibration. Protocol-v1 remains execution-pending until a separate admission commit freezes the official runtime after B000 is audited.
 
 ## Human boundary
 
