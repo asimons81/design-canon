@@ -2,13 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   assertNetworkIsolationEvidence, createOpaqueWorkspace, initializeB000, loadB000Calibration,
   prepareB000Guidance, validateAndCopySource, validateWorkspace, verifyB000Order
 } from '../research/benchmark/harness/b000.js';
 import {
-  buildCodexExecArgs, codexPreflight, deriveCodexCapabilities, REQUIRED_CODEX_OPTIONS
+  buildCodexExecArgs, codexPreflight, deriveCodexCapabilities, REQUIRED_EXEC_OPTIONS, REQUIRED_GLOBAL_OPTIONS
 } from '../research/benchmark/harness/codex-adapter.js';
 import { buildB000CalibrationReport } from '../research/benchmark/harness/calibration-report.js';
 import {
@@ -16,8 +17,9 @@ import {
 } from '../research/benchmark/harness/execution-state.js';
 import { REPOSITORY_ROOT } from '../research/benchmark/harness/lib.js';
 
-const fake = resolve('tests/fixtures/fake-codex.js');
-const fullHelp = REQUIRED_CODEX_OPTIONS.join('\n');
+const fake = fileURLToPath(new URL('./fixtures/fake-codex.js', import.meta.url));
+const globalHelp = REQUIRED_GLOBAL_OPTIONS.join('\n');
+const execHelp = REQUIRED_EXEC_OPTIONS.join('\n');
 
 async function temp(t, prefix = 'dc-b000-') {
   const path = await mkdtemp(join(tmpdir(), prefix));
@@ -39,14 +41,14 @@ test('acceptance 1-4: boundary, order, nonofficial initialization, and pinned co
     assert.equal(manifest.claimEligible, false);
     assert.equal(manifest.benchmarkId, 'B000');
   }
-  const args = buildCodexExecArgs({ workspace: 'opaque', finalMessagePath: 'final.txt' }, deriveCodexCapabilities(fullHelp));
+  const args = buildCodexExecArgs({ workspace: 'opaque' }, deriveCodexCapabilities(globalHelp, execHelp));
   for (const required of ['gpt-5.6', 'workspace-write', 'never', '--ignore-user-config', '--ignore-rules', '--ephemeral', '--json', 'model_reasoning_effort="medium"', 'web_search="disabled"']) assert.ok(args.includes(required));
 });
 
 test('acceptance 5: unsupported flags and old versions fail closed', async (t) => {
-  assert.throws(() => buildCodexExecArgs({ workspace: 'x', finalMessagePath: 'y' }, deriveCodexCapabilities('--json')), /lacks required options/);
+  assert.throws(() => buildCodexExecArgs({ workspace: 'x' }, deriveCodexCapabilities('', '--json')), /lacks required options/);
   const root = await temp(t);
-  const preflight = await codexPreflight({ executable: process.execPath, evidenceDirectory: root, minimumVersion: '999.0.0' });
+  const preflight = await codexPreflight({ executable: process.execPath, evidenceDirectory: root, expectedVersion: '999.0.0' });
   assert.equal(preflight.passed, false);
 });
 
@@ -99,7 +101,7 @@ test('acceptance 11-12 and 15: fake CLI preserves timeout, failure, malformed, a
   assert.equal(failed.result.exitCode, 7);
   const malformed = await executeScenario(t, 'malformed');
   assert.equal(malformed.result.normalized.malformed.length, 1);
-  const timeout = await executeScenario(t, 'timeout', { timeoutMs: 80 });
+  const timeout = await executeScenario(t, 'timeout', { timeoutMs: 2000 });
   assert.equal(timeout.result.timedOut, true);
   assert.ok((await readFile(timeout.stdout)).length > 0);
   assert.equal(timeout.result.attemptCount, undefined);

@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
-import { open, mkdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { open, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { writeJson } from './lib.js';
 
@@ -125,13 +126,35 @@ async function terminateTree(child, graceMs) {
 }
 
 async function copyStreamLosslessly(readable, handle, onChunk = null) {
-  if (!readable) return;
-  for await (const chunk of readable) {
+  const chunks = [];
+  const hash = createHash('sha256');
+  let byteLength = 0;
+  if (readable) for await (const chunk of readable) {
     const bytes = Buffer.from(chunk);
-    await handle.write(bytes);
+    let offset = 0;
+    while (offset < bytes.length) {
+      const { bytesWritten } = await handle.write(bytes, offset, bytes.length - offset, null);
+      if (bytesWritten === 0) throw new Error('Evidence handle accepted a zero-byte write.');
+      offset += bytesWritten;
+    }
+    chunks.push(bytes);
+    byteLength += bytes.length;
+    hash.update(bytes);
     onChunk?.(bytes);
   }
   await handle.sync();
+  return { chunks, byteLength, sha256: hash.digest('hex') };
+}
+
+async function verifyHandleBackedEvidence(label, handle, capture) {
+  await handle.sync();
+  const stat = await handle.stat();
+  const bytes = Buffer.concat(capture.chunks, capture.byteLength);
+  const memoryHash = createHash('sha256').update(bytes).digest('hex');
+  if (stat.size !== capture.byteLength || bytes.length !== capture.byteLength || memoryHash !== capture.sha256) {
+    throw new Error(label + ' evidence verification failed: handle size or in-memory SHA-256 mismatch.');
+  }
+  return bytes;
 }
 
 export async function executeJsonlProcess({ executable, args, cwd, stdin, rawStdoutPath, stderrPath, normalizedPath, timeoutMs, killGraceMs, actionBudget, env }) {
@@ -167,19 +190,23 @@ export async function executeJsonlProcess({ executable, args, cwd, stdin, rawStd
     const outputPromises = [copyStreamLosslessly(child.stdout, stdoutHandle, (bytes) => counter.push(bytes)), copyStreamLosslessly(child.stderr, stderrHandle)];
     const timer = setTimeout(() => void stop('timeout'), timeoutMs);
     exit = await settled.finally(() => clearTimeout(timer));
-    await Promise.all(outputPromises);
+    const [stdoutCapture, stderrCapture] = await Promise.all(outputPromises);
+    const [raw, stderr] = await Promise.all([
+      verifyHandleBackedEvidence('stdout', stdoutHandle, stdoutCapture),
+      verifyHandleBackedEvidence('stderr', stderrHandle, stderrCapture)
+    ]);
+    const normalized = normalizeJsonl(raw);
+    await writeJson(normalizedPath, normalized);
+    return {
+      startedAt, endedAt: new Date().toISOString(), runtimeMs: Date.now() - start,
+      exitCode: exit.code, exitSignal: exit.signal, spawnError, timedOut, actionBudgetExceeded,
+      terminationSignal: terminationSignal ?? exit.signal, normalized, stderrText: stderr.toString('utf8'),
+      sourceMayBePartial: Boolean(spawnError || timedOut || actionBudgetExceeded || exit.code !== 0 || exit.signal || normalized.malformed.length)
+    };
   } catch (error) {
     spawnError = { code: error.code ?? null, message: error.message };
   } finally {
     await Promise.all([stdoutHandle.close(), stderrHandle.close()]);
   }
-  const [raw, stderr] = await Promise.all([readFile(rawStdoutPath), readFile(stderrPath)]);
-  const normalized = normalizeJsonl(raw);
-  await writeJson(normalizedPath, normalized);
-  return {
-    startedAt, endedAt: new Date().toISOString(), runtimeMs: Date.now() - start,
-    exitCode: exit.code, exitSignal: exit.signal, spawnError, timedOut, actionBudgetExceeded,
-    terminationSignal: terminationSignal ?? exit.signal, normalized, stderrText: stderr.toString('utf8'),
-    sourceMayBePartial: Boolean(spawnError || timedOut || actionBudgetExceeded || exit.code !== 0 || exit.signal || normalized.malformed.length)
-  };
+  throw Object.assign(new Error(spawnError.message), { code: spawnError.code });
 }

@@ -69,7 +69,7 @@ test('B000 pins the requested Sol Standard Codex settings', async () => {
     },
     {
       framework: 'Codex CLI',
-      minimumVersion: '0.144.0',
+      minimumVersion: '0.144.4',
       model: 'gpt-5.6',
       display: 'GPT-5.6 Sol',
       effort: 'medium',
@@ -84,7 +84,7 @@ test('B000 pins the requested Sol Standard Codex settings', async () => {
       approval: 'never'
     }
   );
-  assert.equal(calibration.candidateRuntime.exactCodexCliVersion, null);
+  assert.equal(calibration.candidateRuntime.exactCodexCliVersion, '0.144.4');
   assert.equal(calibration.candidateRuntime.resolvedModelIdentifier, null);
 });
 
