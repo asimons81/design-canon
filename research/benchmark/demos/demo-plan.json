@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "status": "prepared-not-executed",
+  "protocolId": "monolith-vs-compiled-v1",
+  "purpose": "Three reproducible public demonstrations selected before model outputs exist.",
+  "selectionPolicy": "One representative brief from each executable profile. Preserve all four benchmark conditions and do not substitute outputs after inspection.",
+  "demos": [
+    {
+      "id": "demo-marketing-b001",
+      "benchmarkId": "B001",
+      "profile": "marketing",
+      "title": "SaaS landing page",
+      "conditions": ["A", "B", "C", "D"],
+      "requiredArtifacts": [
+        "assembled instructions",
+        "source tree",
+        "desktop and mobile viewport screenshots",
+        "desktop and mobile full-page screenshots",
+        "Design Canon lint report",
+        "calibration accessibility report",
+        "artifact hashes"
+      ]
+    },
+    {
+      "id": "demo-product-b002",
+      "benchmarkId": "B002",
+      "profile": "product-app",
+      "title": "Developer dashboard",
+      "conditions": ["A", "B", "C", "D"],
+      "requiredArtifacts": [
+        "assembled instructions",
+        "source tree",
+        "desktop and mobile viewport screenshots",
+        "desktop and mobile full-page screenshots",
+        "Design Canon lint report",
+        "calibration accessibility report",
+        "artifact hashes"
+      ]
+    },
+    {
+      "id": "demo-editorial-b003",
+      "benchmarkId": "B003",
+      "profile": "editorial",
+      "title": "Editorial article",
+      "conditions": ["A", "B", "C", "D"],
+      "requiredArtifacts": [
+        "assembled instructions",
+        "source tree",
+        "desktop and mobile viewport screenshots",
+        "desktop and mobile full-page screenshots",
+        "Design Canon lint report",
+        "calibration accessibility report",
+        "artifact hashes"
+      ]
+    }
+  ],
+  "claimBoundary": "These demonstrations may illustrate workflow and observed differences. They do not establish superiority without the complete preregistered study."
+}
