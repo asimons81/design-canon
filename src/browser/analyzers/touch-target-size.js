@@ -258,34 +258,38 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     var cs;
     try { cs = getComputedStyle(el); } catch (e) { return false; }
 
-    // Check appearance
-    if (cs.appearance && cs.appearance !== 'auto' && cs.appearance !== 'none') return false;
-    // Check for sizing modifications
-    var w = parseFloat(cs.width);
-    var h = parseFloat(cs.height);
-    var minW = parseFloat(cs.minWidth);
-    var minH = parseFloat(cs.minHeight);
-    var maxW = parseFloat(cs.maxWidth);
-    var maxH = parseFloat(cs.maxHeight);
-    var padT = parseFloat(cs.paddingTop);
-    var padR = parseFloat(cs.paddingRight);
-    var padB = parseFloat(cs.paddingBottom);
-    var padL = parseFloat(cs.paddingLeft);
-    var borderT = parseFloat(cs.borderTopWidth);
-    var borderR = parseFloat(cs.borderRightWidth);
-    var borderB = parseFloat(cs.borderBottomWidth);
-    var borderL = parseFloat(cs.borderLeftWidth);
+    // Check appearance — if the author modified appearance, it's not unmodified
+    if (cs.appearance && cs.appearance !== 'auto') return false;
 
-    // If any explicit sizing is present, treat as modified
-    if (el.style.width || el.style.height || el.style.minWidth || el.style.minHeight ||
-        el.style.maxWidth || el.style.maxHeight) return false;
-    if (!isNaN(padT) && padT > 0 && el.style.paddingTop) return false;
-    if (!isNaN(padR) && padR > 0 && el.style.paddingRight) return false;
-    if (!isNaN(padB) && padB > 0 && el.style.paddingBottom) return false;
-    if (!isNaN(padL) && padL > 0 && el.style.paddingLeft) return false;
+    // Check for any inline styles on the element
+    if (el.getAttribute('style') && el.getAttribute('style').trim().length > 0) return false;
 
-    // Check for transform
-    if (cs.transform && cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') return false;
+    // Check for CSS classes or IDs that could be targeted by author stylesheets
+    if (el.getAttribute('class') || el.getAttribute('id')) return false;
+
+    // Check for explicit sizing via computed style vs natural size
+    // If the element has explicit width/height set, it's not unmodified
+    var explicitWidth = el.style.width || '';
+    var explicitHeight = el.style.height || '';
+    var explicitMinWidth = el.style.minWidth || '';
+    var explicitMinHeight = el.style.minHeight || '';
+    var explicitMaxWidth = el.style.maxWidth || '';
+    var explicitMaxHeight = el.style.maxHeight || '';
+    if (explicitWidth || explicitHeight || explicitMinWidth || explicitMinHeight ||
+        explicitMaxWidth || explicitMaxHeight) return false;
+
+    // Check padding modifications
+    if (el.style.padding || el.style.paddingTop || el.style.paddingRight ||
+        el.style.paddingBottom || el.style.paddingLeft) return false;
+
+    // Check border modifications
+    if (el.style.border || el.style.borderTop || el.style.borderRight ||
+        el.style.borderBottom || el.style.borderLeft ||
+        el.style.borderWidth || el.style.borderTopWidth || el.style.borderRightWidth ||
+        el.style.borderBottomWidth || el.style.borderLeftWidth) return false;
+
+    // Check transform
+    if (cs.transform && cs.transform !== 'none') return false;
 
     return true;
   }

@@ -307,7 +307,13 @@ export class SpatialIndex {
           if (excludeId && entry.id === excludeId) continue;
           if (seen.has(entry.id)) continue;
           seen.add(entry.id);
-          results.push(entry);
+          // Only include if the rect is within searchRadius of the point
+          const dx = Math.max(entry.rect.x - point.x, 0, point.x - (entry.rect.x + entry.rect.width));
+          const dy = Math.max(entry.rect.y - point.y, 0, point.y - (entry.rect.y + entry.rect.height));
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < searchRadius) {
+            results.push(entry);
+          }
         }
       }
     }
