@@ -128,7 +128,7 @@ Missing artifacts remain missing. The report does not impute results or convert 
 
 Before any B001-B015 output is generated, the provider execution layer is calibrated with B000.
 
-- Brief: `research/benchmarks/B000-calibration-shakedown.md`
+- Brief: `research/benchmark/calibration/B000-calibration-shakedown.md`
 - Frozen settings: `research/benchmark/calibration/b000-codex-sol-standard-v1.json`
 - Runner contract: `research/benchmark/calibration/B000-RUNNER-CONTRACT.md`
 
