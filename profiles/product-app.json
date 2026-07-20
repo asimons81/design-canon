@@ -13,6 +13,7 @@
     "tokens"
   ],
   "includeRules": [
-    "forms.input-labels-required"
+    "forms.input-labels-required",
+    "mobile.touch-target-minimum"
   ]
 }
