@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadCatalog } from '../../../src/io.js';
 
 export const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 export const PROTOCOL_PATH = 'research/benchmark/protocol-v1/protocol.json';
@@ -56,6 +55,14 @@ export async function loadCatalogFreeze(protocol = null) {
   return readJson(resolved.catalogFreezePath);
 }
 
+export async function loadFrozenGuidanceCatalog(freeze = null) {
+  const resolved = freeze ?? await loadCatalogFreeze();
+  if (!resolved.guidanceCatalogPath) {
+    throw new Error('Catalog freeze does not identify an immutable guidance snapshot.');
+  }
+  return readJson(resolved.guidanceCatalogPath);
+}
+
 export async function loadStrictProfile(profileName, protocol = null) {
   const resolved = protocol ?? await loadProtocol();
   const path = resolved.profiles?.[profileName];
@@ -70,19 +77,22 @@ export async function loadStrictProfile(profileName, protocol = null) {
 }
 
 export function validateFrozenCatalog(catalog, freeze) {
-  if (catalog.version !== freeze.catalogVersion) {
+  if (catalog.sourceCatalogVersion !== freeze.catalogVersion) {
     throw new Error(
-      `Catalog version ${catalog.version} does not match frozen version ${freeze.catalogVersion}.`
+      `Guidance snapshot version ${catalog.sourceCatalogVersion} does not match frozen version ${freeze.catalogVersion}.`
     );
+  }
+  if (catalog.sourceCatalogCommit !== freeze.catalogCommit) {
+    throw new Error('Guidance snapshot commit does not match the catalog freeze.');
   }
   const actualIds = catalog.rules.map((rule) => rule.id);
   if (actualIds.length !== freeze.acceptedRuleCount) {
     throw new Error(
-      `Catalog contains ${actualIds.length} rules; freeze expects ${freeze.acceptedRuleCount}.`
+      `Guidance snapshot contains ${actualIds.length} rules; freeze expects ${freeze.acceptedRuleCount}.`
     );
   }
   if (JSON.stringify(actualIds) !== JSON.stringify(freeze.ruleIds)) {
-    throw new Error('Catalog rule order or membership differs from the protocol-v1 freeze.');
+    throw new Error('Guidance snapshot rule order or membership differs from protocol v1.');
   }
   return true;
 }
@@ -166,7 +176,7 @@ export async function buildGuidanceArtifacts({
   }
 
   const [catalog, strictProfile, genericContent] = await Promise.all([
-    loadCatalog(),
+    loadFrozenGuidanceCatalog(freeze),
     loadStrictProfile(profileName, protocol),
     readFile(repositoryPath(protocol.genericGuidance.path), 'utf8')
   ]);
