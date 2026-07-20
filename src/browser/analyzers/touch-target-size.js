@@ -253,18 +253,61 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     return false;
   }
 
+  function isInteractiveElement(el) {
+    var tag = el.tagName.toLowerCase();
+    if (tag === 'a' || tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'summary') return true;
+    if (el.getAttribute('onclick') || el.getAttribute('onkeydown')) return true;
+    var role = el.getAttribute('role');
+    if (role) {
+      var r = role.trim().toLowerCase();
+      var supportedInteractive = ['button','link','checkbox','radio','switch','tab','menuitem','menuitemcheckbox','menuitemradio','option','slider','spinbutton','textbox','combobox','searchbox'];
+      if (supportedInteractive.indexOf(r) !== -1) return true;
+    }
+    var ti = parseInt(el.getAttribute('tabindex'), 10);
+    if (!isNaN(ti) && ti >= 0) return true;
+    return false;
+  }
+
+  function classifyTopmost(topmost, target) {
+    // Determine relationship of topmost painted element to the target.
+    if (topmost === target) return 'self';
+    var check = topmost;
+    var isDescendant = false;
+    while (check) {
+      if (check === target) { isDescendant = true; break; }
+      check = check.parentElement;
+    }
+    if (!isDescendant) return 'foreign';
+    return isInteractiveElement(topmost) ? 'interactive-descendant' : 'noninteractive-descendant';
+  }
+
+  function clampToViewport(x, y) {
+    return {
+      x: Math.max(0, Math.min(x, window.innerWidth - 1)),
+      y: Math.max(0, Math.min(y, window.innerHeight - 1))
+    };
+  }
+
   function getHitTestData(el, rect) {
-    // Check if the center point and representative inset points
-    // actually hit this element. If another painted element is on top,
-    // the target is partially or fully obscured.
-    var cx = rect.x + rect.width / 2;
-    var cy = rect.y + rect.height / 2;
+    var vpW = window.innerWidth;
+    var vpH = window.innerHeight;
 
-    // Center hit test
-    var centerHit = document.elementsFromPoint(cx, cy);
-    var centerHitsTarget = centerHit && centerHit.length > 0 && centerHit[0] === el;
+    // Clamp center to viewport
+    var rawCx = rect.x + rect.width / 2;
+    var rawCy = rect.y + rect.height / 2;
+    var cp = clampToViewport(rawCx, rawCy);
 
-    // Bounded inset corners — use points slightly inside the edges
+    var centerHit = document.elementsFromPoint(cp.x, cp.y);
+    var centerTopmost = centerHit && centerHit.length > 0 ? centerHit[0] : null;
+    var centerClass = centerTopmost ? classifyTopmost(centerTopmost, el) : 'none';
+
+    var centerHitsTarget = centerClass === 'self' || centerClass === 'noninteractive-descendant';
+    var isNestedInteractive = centerClass === 'interactive-descendant';
+    var blockedBy = centerClass === 'foreign'
+      ? (centerTopmost.tagName ? centerTopmost.tagName.toLowerCase() : 'unknown')
+      : null;
+
+    // Bounded inset corners — clamp each to viewport
     var inset = Math.min(3, rect.width / 4, rect.height / 4);
     var corners = [
       { x: rect.x + inset, y: rect.y + inset },
@@ -273,53 +316,22 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       { x: rect.x + rect.width - inset, y: rect.y + rect.height - inset }
     ];
 
-    // Filter corners to only those within the viewport
-    var vpW = window.innerWidth;
-    var vpH = window.innerHeight;
-    var visibleCorners = [];
-    for (var ci = 0; ci < corners.length; ci++) {
-      var cp = corners[ci];
-      if (cp.x >= 0 && cp.x < vpW && cp.y >= 0 && cp.y < vpH) {
-        visibleCorners.push(cp);
-      }
-    }
-
     var consistentHit = true;
-    if (centerHitsTarget && visibleCorners.length > 0) {
-      for (var cj = 0; cj < visibleCorners.length; cj++) {
-        var ch = document.elementsFromPoint(visibleCorners[cj].x, visibleCorners[cj].y);
-        // Check if el is among the hit elements (it might not be topmost at corners)
-        var found = false;
-        if (ch) {
-          for (var ck = 0; ck < ch.length; ck++) {
-            if (ch[ck] === el) { found = true; break; }
-          }
-        }
-        if (!found) { consistentHit = false; break; }
-      }
-    } else if (!centerHitsTarget && visibleCorners.length === 0) {
-      // No corners are within viewport — can't verify obscuration
-      // Return a special flag so the analyzer can detect viewport clipping
-      consistentHit = false;
-    }
+    for (var ci = 0; ci < corners.length; ci++) {
+      var corner = clampToViewport(corners[ci].x, corners[ci].y);
+      var ch = document.elementsFromPoint(corner.x, corner.y);
+      var cornerTopmost = ch && ch.length > 0 ? ch[0] : null;
+      var cornerClass = cornerTopmost ? classifyTopmost(cornerTopmost, el) : 'none';
 
-    // Check for ancestor-only hits (descendants of el on top are ok)
-    var blockedBy = null;
-    if (!centerHitsTarget && centerHit && centerHit.length > 0) {
-      var topEl = centerHit[0];
-      // If the top element is a descendant of el, that's ok
-      var isDescendant = false;
-      var check = topEl;
-      while (check) {
-        if (check === el) { isDescendant = true; break; }
-        check = check.parentElement;
+      if (cornerClass === 'foreign') {
+        consistentHit = false;
+        if (!blockedBy) {
+          blockedBy = cornerTopmost.tagName ? cornerTopmost.tagName.toLowerCase() : 'unknown';
+        }
+      } else if (cornerClass === 'interactive-descendant') {
+        consistentHit = false;
       }
-      if (!isDescendant) {
-        blockedBy = topEl.tagName ? topEl.tagName.toLowerCase() : 'unknown';
-      } else {
-        // Descendant is on top — center still reaches target via descendant
-        centerHitsTarget = true;
-      }
+      // 'self', 'noninteractive-descendant', 'none' — corner is reachable
     }
 
     return {
@@ -327,7 +339,7 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       consistentHit: consistentHit,
       blockedBy: blockedBy,
       isObscured: !centerHitsTarget || !consistentHit,
-      allCornersOffViewport: visibleCorners.length === 0 && centerHitsTarget === false
+      isNestedInteractive: isNestedInteractive
     };
   }
 
@@ -804,15 +816,15 @@ function processTargets(rawTargets, viewportDims, viewportName, colorScheme, bro
       continue;
     }
 
-    // Check for viewport clipping — targets partially off-viewport
-    // should skip the standard obscuration check because inset corners
-    // may fall outside the viewport, producing false-positive obscuration.
-    // Viewport-clipped targets proceed to the size check using the visible
-    // intersection as the effective rect.
-    if (t.viewportClipped) {
-      // Skip the obscuration check — the target is clipped by viewport edge
-      // not obscured by another element
-    } else if (t.hitTest && t.hitTest.isObscured) {
+    // Check for nested interactive targets (from hit testing)
+    if (t.hitTest && t.hitTest.isNestedInteractive) {
+      t.status = 'indeterminate';
+      t.indeterminateReason = 'nested-interactive-target';
+      continue;
+    }
+
+    // Check overlap/obscuration via hit testing
+    if (t.hitTest && t.hitTest.isObscured) {
       // Check overlap/obscuration via hit testing (standard path)
       t.status = 'indeterminate';
       if (t.hitTest.blockedBy) {
@@ -822,13 +834,6 @@ function processTargets(rawTargets, viewportDims, viewportName, colorScheme, bro
       } else {
         t.indeterminateReason = 'ambiguous-overlap';
       }
-      continue;
-    }
-
-    // Check for nested interactive targets (only when not viewport-clipped)
-    if (!t.viewportClipped && t.hitTest && !t.hitTest.centerHitsTarget && !t.hitTest.blockedBy) {
-      t.status = 'indeterminate';
-      t.indeterminateReason = 'nested-interactive-target';
       continue;
     }
 

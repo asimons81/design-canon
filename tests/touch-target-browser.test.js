@@ -487,6 +487,33 @@ test('F020 viewport: right-edge clipping — exact symmetric boundary', async ()
   });
 });
 
+// ── Viewport clipping + obstruction regression ────────────────────────
+
+test('F020 viewport+obstruction: clipped target with visible-area overlay — indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/indeterminate/viewport-clipped-overlay.html');
+  if (!chromiumAvailable) return;
+
+  const records = f020Records(result);
+  const findings = f020Findings(result);
+  const sample = firstSample(records);
+
+  // Viewport clipping must not disable obstruction analysis.
+  // The overlay covers the visible portion of the viewport-clipped target.
+  assert.ok(sample, 'Expected a sample');
+  assert.equal(sample.status, 'indeterminate',
+    'Clipped target with overlay must be indeterminate, not confirmed');
+  assert.equal(sample.outcome, undefined, 'outcome');
+  assert.ok(sample.indeterminateReason, 'Expected an indeterminateReason');
+  assert.equal(findings.length, 0, 'Expected zero F020 findings');
+
+  assertBuckets(records, {
+    checkedTargets: 1,
+    violatingTargets: 0,
+    indeterminateTargets: 1,
+    excludedTargets: 0
+  });
+});
+
 // ── Obscuration regression ────────────────────────────────────────────
 
 test('F020 obscuration: full opaque overlay — indeterminate, no overlap ambiguity', async () => {
@@ -532,20 +559,20 @@ test('F020 obscuration: partial overlay covering one inset point — indetermina
   assert.ok(sample, 'Expected a sample');
   assert.equal(findings.length, 0, 'Expected zero F020 findings');
 
-  // The partial overlay may or may not trigger obscuration depending on
-  // Chromium hit-test behaviour with absolute-positioned elements. Either
-  // outcome is valid as long as no findings are produced.
-  if (sample.status === 'indeterminate') {
-    assert.equal(sample.outcome, undefined);
-    assert.ok(sample.indeterminateReason, 'Expected an indeterminateReason');
-  } else {
-    assert.equal(sample.status, 'confirmed');
-    assert.equal(sample.indeterminateReason, undefined);
-  }
+  // The blocker (z-index:2) covers the top-left inset point of the button.
+  // The topmost painted element at that corner is the foreign blocker, not
+  // the target or an acceptable descendant.
+  assert.equal(sample.status, 'indeterminate', 'status');
+  assert.equal(sample.outcome, undefined, 'outcome');
+  assert.ok(
+    sample.indeterminateReason === 'ambiguous-overlap' || sample.indeterminateReason === 'partially-obscured',
+    `Expected obscuration reason, got ${sample.indeterminateReason}`
+  );
 
   assertBuckets(records, {
     checkedTargets: 1,
     violatingTargets: 0,
+    indeterminateTargets: 1,
     excludedTargets: 0
   });
 });
@@ -584,7 +611,23 @@ test('F020 descendant: nested interactive target — indeterminate', async () =>
 
   assert.equal(findings.length, 0, 'Nested interactive should not produce findings');
 
-  // Check measurements: should have indeterminate targets, zero violations
+  // At least one sample must have the exact nested-interactive classification
+  let foundNested = false;
+  for (const rec of records) {
+    if (rec.samples) {
+      for (const sample of rec.samples) {
+        if (sample.indeterminateReason === 'nested-interactive-target') {
+          foundNested = true;
+          assert.equal(sample.status, 'indeterminate', 'status');
+          assert.equal(sample.outcome, undefined, 'outcome must be undefined');
+        }
+      }
+    }
+  }
+  assert.ok(foundNested,
+    'Expected at least one sample with indeterminateReason "nested-interactive-target"');
+
+  // Check measurements: indeterminate targets exist, zero violations
   assertBuckets(records, {
     violatingTargets: 0,
     excludedTargets: 0
