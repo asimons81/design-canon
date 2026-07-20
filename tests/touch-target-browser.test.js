@@ -422,8 +422,19 @@ test('F020 nested: role=button containing native button is indeterminate', async
   assert.equal(findings.length, 0, 'Nested targets should not produce findings');
 
   const records = f020Records(result);
-  const indeterminate = records.filter(r => r.status === 'indeterminate');
-  assert.ok(indeterminate.length >= 1, 'Nested targets should be indeterminate');
+  // Check that at least one sample is indeterminate
+  let hasIndeterminate = false;
+  for (const rec of records) {
+    if (rec.samples) {
+      for (const sample of rec.samples) {
+        if (sample.status === 'indeterminate') {
+          hasIndeterminate = true;
+          assert.equal(sample.outcome, undefined, 'Indeterminate sample must not have outcome');
+        }
+      }
+    }
+  }
+  assert.ok(hasIndeterminate, 'Nested targets should produce at least one indeterminate sample');
 });
 
 // ── Spacing-proof field-name regression ───────────────────────────────
