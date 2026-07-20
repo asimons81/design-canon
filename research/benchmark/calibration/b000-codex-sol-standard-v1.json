@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "calibrationId": "b000-codex-sol-standard-v1",
+  "status": "phase-1-frozen-phase-2-pending",
+  "official": false,
+  "claimEligible": false,
+  "purpose": "Validate the Codex execution runner, isolation, accounting, capture, and failure-preservation pipeline before admitting any B001-B015 output.",
+  "brief": {
+    "benchmarkId": "B000",
+    "path": "research/benchmarks/B000-calibration-shakedown.md",
+    "profile": "marketing"
+  },
+  "conditions": ["A", "B", "C", "D"],
+  "executionOrderSeed": "design-canon-b000-sol-calibration-v1:B000-r1",
+  "expectedExecutionOrder": ["A", "B", "D", "C"],
+  "runs": [
+    { "runId": "B000-A-r1", "condition": "A", "executionOrder": 1 },
+    { "runId": "B000-B-r1", "condition": "B", "executionOrder": 2 },
+    { "runId": "B000-D-r1", "condition": "D", "executionOrder": 3 },
+    { "runId": "B000-C-r1", "condition": "C", "executionOrder": 4 }
+  ],
+  "candidateRuntime": {
+    "provider": "OpenAI",
+    "agentFramework": "Codex CLI",
+    "minimumCodexCliVersion": "0.144.0",
+    "exactCodexCliVersion": null,
+    "modelAlias": "gpt-5.6",
+    "modelDisplayName": "GPT-5.6 Sol",
+    "resolvedModelIdentifier": null,
+    "reasoningEffort": "medium",
+    "reasoningLabel": "Standard",
+    "fastMode": false,
+    "maxMode": false,
+    "webSearch": "disabled",
+    "userConfig": "ignored",
+    "userExecPolicyRules": "ignored",
+    "sessionPersistence": "ephemeral",
+    "sandbox": "workspace-write",
+    "approvalPolicy": "never"
+  },
+  "candidateBudgets": {
+    "wallClockSecondsPerRun": 1200,
+    "processKillGraceSeconds": 30,
+    "maximumToolActionsPerRun": 80,
+    "automaticRetries": 0,
+    "externalNetwork": "blocked",
+    "packageInstallation": "forbidden",
+    "allowedWorkspaceFiles": ["index.html", "styles.css", "script.js"]
+  },
+  "isolation": {
+    "freshWorkspacePerRun": true,
+    "workspaceOutsideRepository": true,
+    "freshGitRepositoryPerRun": true,
+    "parentProjectInstructionsAllowed": false,
+    "projectAgentsFilesAllowed": false,
+    "mcpServersAllowed": false,
+    "pluginsAllowed": false,
+    "skillsAllowed": false,
+    "crossRunStateAllowed": false,
+    "priorRunOutputsVisible": false,
+    "conditionLabelsVisibleToModel": false
+  },
+  "requiredRawEvidence": [
+    "codex --version output",
+    "codex exec --help output",
+    "effective command arguments with secrets redacted",
+    "raw Codex JSONL event stream",
+    "assistant final message",
+    "process exit code and termination reason",
+    "wall-clock runtime",
+    "tool-action count derived from JSONL",
+    "provider-reported token usage when available",
+    "generated source tree",
+    "desktop and mobile screenshots",
+    "Design Canon lint report",
+    "accessibility calibration report",
+    "artifact hashes"
+  ],
+  "failClosedRules": [
+    "Do not invent or estimate provider token counts inside a run manifest.",
+    "Do not overwrite a failed, partial, invalid, or completed attempt.",
+    "Do not automatically retry a model run.",
+    "Do not continue when the requested model or reasoning effort cannot be verified.",
+    "Do not continue when user configuration, repository instructions, MCP servers, plugins, skills, or prior-run state can reach the model.",
+    "Do not continue when the workspace has external network access.",
+    "Do not edit protocol-v1 frozen inputs or any B001-B015 brief.",
+    "Do not admit B000 into protocol v1 or any superiority analysis."
+  ],
+  "phase2CompletionGate": {
+    "runnerImplementedAndTested": false,
+    "allFourAttemptsAccountedFor": false,
+    "allArtifactsValidated": false,
+    "actualRuntimeFieldsRecorded": false,
+    "actualUsageAndCostReportGenerated": false,
+    "recommendedOfficialBudgetsProposed": false,
+    "protocolV1AdmissionModified": false
+  }
+}
