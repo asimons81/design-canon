@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "freezeId": "design-canon-catalog-v1",
+  "catalogVersion": 1,
+  "catalogCommit": "5caa9e0315a1f10f0e5f70e6218d4fc9049d2530",
+  "catalogBlobSha": "5b6fea282955c5175d5a8425b9e2806ad52ed9c4",
+  "acceptedRuleCount": 18,
+  "ruleIds": [
+    "direction.name-the-direction",
+    "tokens.establish-system",
+    "typography.generic-primary-font",
+    "color.purple-gradient-default",
+    "layout.centered-everything",
+    "depth.shadow-soup",
+    "radius.everything-pill",
+    "motion.transition-all",
+    "a11y.visible-focus",
+    "copy.generic-hero",
+    "editorial.reading-measure",
+    "product-app.density-by-task",
+    "marketing.single-primary-action",
+    "forms.input-labels-required",
+    "motion.respect-reduced-motion",
+    "accessibility.skip-link",
+    "accessibility.text-contrast-minimum",
+    "mobile.touch-target-minimum"
+  ]
+}
