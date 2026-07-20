@@ -8,6 +8,7 @@ import {
   buildGuidanceArtifacts,
   generateRunPlan,
   loadCatalogFreeze,
+  loadFrozenGuidanceCatalog,
   loadProtocol,
   loadStrictProfile,
   measureText,
@@ -16,6 +17,15 @@ import {
 } from '../research/benchmark/harness/lib.js';
 
 const CATALOG_COMMIT = '5caa9e0315a1f10f0e5f70e6218d4fc9049d2530';
+const GUIDANCE_FIELDS = ['id', 'category', 'title', 'severity', 'instruction', 'rationale', 'verify'];
+
+function guidanceShape(rule) {
+  return Object.fromEntries(
+    GUIDANCE_FIELDS
+      .filter((field) => rule[field] !== undefined)
+      .map((field) => [field, rule[field]])
+  );
+}
 
 test('protocol v1 freezes four conditions and 180 planned runs', async () => {
   const protocol = await loadProtocol();
@@ -37,12 +47,26 @@ test('generic baseline matches its frozen hash and exact size', async () => {
   });
 });
 
-test('catalog freeze matches the accepted production catalog exactly', async () => {
-  const [catalog, freeze] = await Promise.all([loadCatalog(), loadCatalogFreeze()]);
-  assert.equal(catalog.version, freeze.catalogVersion);
-  assert.equal(catalog.rules.length, 18);
-  assert.deepEqual(catalog.rules.map((rule) => rule.id), freeze.ruleIds);
-  assert.equal(freeze.catalogCommit, CATALOG_COMMIT);
+test('guidance snapshot matches the protocol-v1 freeze exactly', async () => {
+  const freeze = await loadCatalogFreeze();
+  const snapshot = await loadFrozenGuidanceCatalog(freeze);
+  assert.equal(snapshot.sourceCatalogVersion, freeze.catalogVersion);
+  assert.equal(snapshot.sourceCatalogCommit, CATALOG_COMMIT);
+  assert.equal(snapshot.rules.length, 18);
+  assert.deepEqual(snapshot.rules.map((rule) => rule.id), freeze.ruleIds);
+});
+
+test('live catalog still contains every frozen rule with the accepted wording', async () => {
+  const [catalog, snapshot] = await Promise.all([
+    loadCatalog(),
+    loadFrozenGuidanceCatalog()
+  ]);
+  const byId = new Map(catalog.rules.map((rule) => [rule.id, rule]));
+  for (const frozenRule of snapshot.rules) {
+    const liveRule = byId.get(frozenRule.id);
+    assert.ok(liveRule, `Live catalog no longer contains '${frozenRule.id}'.`);
+    assert.deepEqual(guidanceShape(liveRule), frozenRule);
+  }
 });
 
 test('frozen strict profiles select explicit stable subsets', async () => {
