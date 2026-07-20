@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "product-app-strict-v1",
+  "sourceProfile": "product-app",
+  "name": "Frozen Product Application Benchmark Profile v1",
+  "intent": "Create an operational interface that makes repeated work fast, legible, and predictable. Distinctiveness should come from coherent product character, not reduced usability or ornamental friction.",
+  "ruleIds": [
+    "direction.name-the-direction",
+    "tokens.establish-system",
+    "color.purple-gradient-default",
+    "depth.shadow-soup",
+    "radius.everything-pill",
+    "motion.transition-all",
+    "a11y.visible-focus",
+    "product-app.density-by-task",
+    "forms.input-labels-required",
+    "accessibility.skip-link",
+    "accessibility.text-contrast-minimum",
+    "mobile.touch-target-minimum"
+  ]
+}

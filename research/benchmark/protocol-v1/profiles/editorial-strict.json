@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "editorial-strict-v1",
+  "sourceProfile": "editorial",
+  "name": "Frozen Editorial Benchmark Profile v1",
+  "intent": "Create a reading experience with strong typographic hierarchy, controlled measure, expressive pacing, and restrained interface chrome. The content is the primary visual material.",
+  "ruleIds": [
+    "direction.name-the-direction",
+    "tokens.establish-system",
+    "typography.generic-primary-font",
+    "layout.centered-everything",
+    "depth.shadow-soup",
+    "radius.everything-pill",
+    "motion.transition-all",
+    "a11y.visible-focus",
+    "editorial.reading-measure",
+    "motion.respect-reduced-motion",
+    "accessibility.skip-link",
+    "accessibility.text-contrast-minimum",
+    "mobile.touch-target-minimum"
+  ]
+}

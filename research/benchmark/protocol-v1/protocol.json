@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "monolith-vs-compiled-v1",
+  "protocolVersion": "1.0.0",
+  "status": "tooling-frozen-execution-pending",
+  "researchQuestion": "Does profile-aware compilation from the same accepted Design Canon catalog produce equal or better frontend results than injecting the full catalog into every task while using materially less instruction context?",
+  "catalogFreezePath": "research/benchmark/protocol-v1/catalog-freeze.json",
+  "conditions": [
+    {
+      "id": "A",
+      "slug": "brief-only",
+      "guidance": null
+    },
+    {
+      "id": "B",
+      "slug": "generic-guidance",
+      "guidance": "research/benchmark/baselines/generic-guidance-v1.md"
+    },
+    {
+      "id": "C",
+      "slug": "full-monolith",
+      "guidance": "generated from every frozen accepted rule in canonical catalog order"
+    },
+    {
+      "id": "D",
+      "slug": "compiled-design-canon",
+      "guidance": "generated from the frozen benchmark profile declared by the brief"
+    }
+  ],
+  "genericGuidance": {
+    "path": "research/benchmark/baselines/generic-guidance-v1.md",
+    "sha256": "b50e452d5c16c2f775aee7fe683a9549954025880c58344c71cee35c40aa40c3",
+    "characters": 3719,
+    "utf8Bytes": 3719,
+    "provenance": "Original model-neutral guidance authored for this benchmark and committed before any official results are inspected."
+  },
+  "profiles": {
+    "marketing": "research/benchmark/protocol-v1/profiles/marketing-strict.json",
+    "product-app": "research/benchmark/protocol-v1/profiles/product-app-strict.json",
+    "editorial": "research/benchmark/protocol-v1/profiles/editorial-strict.json"
+  },
+  "benchmarks": [
+    { "id": "B001", "profile": "marketing" },
+    { "id": "B002", "profile": "product-app" },
+    { "id": "B003", "profile": "editorial" },
+    { "id": "B004", "profile": "editorial" },
+    { "id": "B005", "profile": "product-app" },
+    { "id": "B006", "profile": "product-app" },
+    { "id": "B007", "profile": "marketing" },
+    { "id": "B008", "profile": "marketing" },
+    { "id": "B009", "profile": "marketing" },
+    { "id": "B010", "profile": "product-app" },
+    { "id": "B011", "profile": "editorial" },
+    { "id": "B012", "profile": "product-app" },
+    { "id": "B013", "profile": "product-app" },
+    { "id": "B014", "profile": "product-app" },
+    { "id": "B015", "profile": "product-app" }
+  ],
+  "repetitionsPerCondition": 3,
+  "minimumRunCount": 180,
+  "conditionOrderSeed": "design-canon-monolith-vs-compiled-v1",
+  "execution": {
+    "model": null,
+    "modelVersion": null,
+    "agentFramework": null,
+    "agentVersion": null,
+    "tokenizer": null,
+    "contextWindowTokens": null,
+    "timeBudgetSeconds": null,
+    "actionBudget": null,
+    "sampling": null
+  },
+  "tooling": {
+    "capture": null,
+    "accessibility": null,
+    "browser": "Chromium through the benchmark harness",
+    "designCanonCommit": "5caa9e0315a1f10f0e5f70e6218d4fc9049d2530"
+  },
+  "admission": {
+    "officialRunsAdmitted": false,
+    "blockers": [
+      "Pin the exact model and immutable version when available.",
+      "Pin the agent framework and version.",
+      "Pin the tokenizer and record token counts for B, C, and D.",
+      "Pin context-window size and prove all four assembled conditions fit without truncation.",
+      "Pin capture and accessibility tooling.",
+      "Pin time, action, and sampling budgets."
+    ]
+  }
+}
