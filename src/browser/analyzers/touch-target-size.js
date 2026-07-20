@@ -175,7 +175,11 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     if (tag === 'a' || tag === 'button' || tag === 'summary') return true;
     if (tag === 'input' || tag === 'select' || tag === 'textarea') return true;
     if (el.getAttribute('onclick') || el.getAttribute('onkeydown')) return true;
-    if (el.getAttribute('role') && SUPPORTED_ROLES.has(el.getAttribute('role').trim().toLowerCase())) return true;
+    if (el.getAttribute('role')) {
+      var r = el.getAttribute('role').trim().toLowerCase();
+      var supportedRoles = ['button','link','checkbox','radio','switch','tab','menuitem','menuitemcheckbox','menuitemradio','option','slider','spinbutton','textbox','combobox','searchbox'];
+      if (supportedRoles.indexOf(r) !== -1) return true;
+    }
     if (el.getAttribute('tabindex') !== null) {
       var ti = parseInt(el.getAttribute('tabindex'), 10);
       if (!isNaN(ti) && ti >= 0) return true;
@@ -231,12 +235,14 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
   }
 
   function isStandaloneControlContext(el) {
+    var lookalikes = ['nav','header','footer','toolbar','menu','menubar'];
+    function isLookalike(s) { return lookalikes.indexOf(s) !== -1; }
     var parent = el.parentElement;
     while (parent) {
       var tag = parent.tagName.toLowerCase();
       var role = parent.getAttribute('role');
-      if (STANDALONE_CONTROL_LOOKALIKES.has(tag)) return true;
-      if (role && STANDALONE_CONTROL_LOOKALIKES.has(role.trim().toLowerCase())) return true;
+      if (isLookalike(tag)) return true;
+      if (role && isLookalike(role.trim().toLowerCase())) return true;
       // Check for list-based controls (menus, tab lists)
       if (tag === 'ul' || tag === 'ol') {
         var parentRole = role ? role.trim().toLowerCase() : null;
@@ -349,7 +355,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     var role = rel.getAttribute('role');
     if (!role) continue;
     var normalizedRole = role.trim().toLowerCase();
-    if (!SUPPORTED_ROLES.has(normalizedRole)) continue;
+    var supportedRoles = ['button','link','checkbox','radio','switch','tab','menuitem','menuitemcheckbox','menuitemradio','option','slider','spinbutton','textbox','combobox','searchbox'];
+    if (supportedRoles.indexOf(normalizedRole) === -1) continue;
 
     if (isNativeDisabled(rel)) continue;
     if (isAriaDisabled(rel)) continue;

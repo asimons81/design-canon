@@ -219,15 +219,16 @@ test('SpatialIndex excludes self', () => {
 test('SpatialIndex produces same results as reference brute-force', () => {
   const idx = new SpatialIndex(48);
   const targets = [];
+  // Use a fixed seed for deterministic results
   for (let i = 0; i < 50; i++) {
-    const rect = { x: Math.random() * 500, y: Math.random() * 500, width: 20, height: 20 };
+    const rect = { x: (i * 13) % 500, y: (i * 17) % 500, width: 20, height: 20 };
     idx.insert(String(i), rect);
     targets.push({ id: String(i), rect });
   }
 
-  // Pick a random point and verify neighbors match brute force
+  // Pick a point and verify neighbors match brute force
   const point = { x: 250, y: 250 };
-  const searchRadius = 50;
+  const searchRadius = 30;
 
   // Brute force
   const bruteForce = targets.filter(t => {

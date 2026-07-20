@@ -103,5 +103,5 @@ test('decision adds F019 to the production catalog', async () => {
   const { catalog } = await load();
   const ids = catalog.rules.map((rule) => rule.id);
   assert.ok(ids.includes('accessibility.text-contrast-minimum'));
-  assert.equal(ids.length, 17);
+  assert.equal(ids.length, 18);
 });
