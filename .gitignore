@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+.benchmark/
 .DS_Store
 payload.*
 DESIGN.md
