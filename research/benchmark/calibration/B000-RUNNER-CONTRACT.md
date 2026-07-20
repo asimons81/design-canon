@@ -78,7 +78,7 @@ Before invocation, the runner must verify:
 
 ## Workspace contract
 
-The model receives the contents of `research/benchmarks/B000-calibration-shakedown.md`, followed by the guidance for its condition when guidance exists.
+The model receives the contents of `research/benchmark/calibration/B000-calibration-shakedown.md`, followed by the guidance for its condition when guidance exists.
 
 The starter workspace contains exactly:
 
