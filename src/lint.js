@@ -451,7 +451,9 @@ export async function lintPath({
                 if (result.samples && result.status === 'confirmed') {
                   for (const sample of result.samples) {
                     if (sample.status === 'confirmed' && sample.outcome === 'violation') {
-                      const evidence = buildContrastEvidence(sample, browserConfig.viewport, browserConfig.colorScheme, browserVersion);
+                      const evidence = rule.id === 'mobile.touch-target-minimum'
+                        ? buildTouchTargetEvidence(sample, browserConfig.viewport, browserConfig.colorScheme, browserVersion)
+                        : buildContrastEvidence(sample, browserConfig.viewport, browserConfig.colorScheme, browserVersion);
                       const finding = {
                         file: normalizePath(relative(process.cwd(), file)),
                         line: 1,
@@ -563,6 +565,38 @@ function buildContrastEvidence(sample, viewport, colorScheme, browserVersion) {
   const scheme = colorScheme || 'light';
   const ver = browserVersion || 'unknown';
   return `selector="${sample.selector}"; text="${sample.text}"; foreground=${sample.foreground}; background=${sample.background}; ratio=${sample.displayRatio}:1; required=${sample.requiredRatio}:1; font=${sample.fontSizePx}px/${sample.fontWeight}; viewport=${vp}(${sample.viewportWidth || ''}x${sample.viewportHeight || ''}); scheme=${scheme}; chromium=${ver}`;
+}
+
+/**
+ * Build a concise deterministic evidence string for a touch-target violation.
+ */
+function buildTouchTargetEvidence(sample, viewport, colorScheme, browserVersion) {
+  const vp = typeof viewport === 'string' ? viewport : (viewport?.name || 'desktop');
+  const scheme = colorScheme || 'light';
+  const ver = browserVersion || 'unknown';
+  const parts = [
+    `selector="${sample.selector}"`,
+    `target=${sample.targetType}`,
+    `label="${sample.label || ''}"`,
+    `size=${(sample.width || 0).toFixed(3)}x${(sample.height || 0).toFixed(3)}`,
+    `required=24x24`
+  ];
+
+  if (sample.spacingProof) {
+    parts.push(`spacing=${sample.spacingProof.passed ? 'passed' : 'failed'}`);
+    if (sample.spacingProof.nearest) {
+      parts.push(`nearest="${sample.spacingProof.nearest}"`);
+    }
+    if (sample.spacingProof.nearestDistance !== null && sample.spacingProof.nearestDistance !== undefined) {
+      parts.push(`centerDistance=${sample.spacingProof.nearestDistance.toFixed(3)}`);
+    }
+  }
+
+  parts.push(`viewport=${vp}(${sample.viewportWidth || ''}x${sample.viewportHeight || ''})`);
+  parts.push(`scheme=${scheme}`);
+  parts.push(`chromium=${ver}`);
+
+  return parts.join('; ');
 }
 
 export async function lintCommand({ path, profile, format, configPath = null, mode = null }) {
