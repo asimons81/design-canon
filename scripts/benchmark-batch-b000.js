@@ -15,7 +15,7 @@ function execute(args) {
 async function main() {
   const options = parseCliArgs(process.argv.slice(2), {
     '--root': { required: true }, '--workspace-root': { required: true },
-    '--network-evidence': { required: true }, '--codex': { required: false, default: 'codex' },
+    '--codex': { required: false, default: '/usr/local/bin/codex' },
     '--live': { required: false, default: 'false' }
   });
   if (options['--live'] !== 'true' || process.env.DESIGN_CANON_B000_LIVE !== '1') throw new Error('Explicit live opt-in is required.');
@@ -24,7 +24,7 @@ async function main() {
   for (const run of runs) {
     const code = await execute([
       '--run', join(root, 'runs', run.runId), '--workspace-root', resolve(options['--workspace-root']),
-      '--network-evidence', resolve(options['--network-evidence']), '--codex', options['--codex'], '--live', 'true'
+      '--codex', options['--codex'], '--live', 'true'
     ]);
     if (code !== 0) throw new Error(`Batch stopped after ${run.runId}; common runtime controls require review.`);
   }

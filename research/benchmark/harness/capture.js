@@ -177,6 +177,8 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
   const viewportResults = [];
   const accessibilitySnapshots = [];
   const consoleMessages = [];
+  const attemptedExternalRequests = [];
+  const acceptedExternalResponses = [];
   try {
     for (const viewport of CAPTURE_VIEWPORTS) {
       const context = await browser.newContext({
@@ -188,11 +190,19 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
         serviceWorkers: 'block'
       });
       await context.route('**/*', async (route) => {
-        const url = route.request().url();
+        const request = route.request();
+        const url = request.url();
         if (url.startsWith('file:') || url.startsWith('data:') || url.startsWith('blob:')) await route.continue();
-        else await route.abort('blockedbyclient');
+        else {
+          attemptedExternalRequests.push({ viewport: viewport.id, url, method: request.method(), resourceType: request.resourceType(), disposition: 'aborted' });
+          await route.abort('blockedbyclient');
+        }
       });
       const page = await context.newPage();
+      page.on('response', (response) => {
+        const url = response.url();
+        if (!url.startsWith('file:') && !url.startsWith('data:') && !url.startsWith('blob:')) acceptedExternalResponses.push({ viewport: viewport.id, url, status: response.status() });
+      });
       page.on('console', (message) => {
         if (['error', 'warning'].includes(message.type())) {
           consoleMessages.push({ viewport: viewport.id, type: message.type(), text: message.text() });
@@ -244,6 +254,9 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
     reducedMotion: 'reduce',
     colorScheme: 'light',
     consoleMessages,
+    attemptedExternalRequests,
+    acceptedExternalResponses,
+    externalNetworkBlocked: attemptedExternalRequests.length > 0 && acceptedExternalResponses.length === 0,
     viewportResults
   };
   await writeJson(join(root, 'render-metadata.json'), renderMetadata);

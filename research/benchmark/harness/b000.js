@@ -1,4 +1,4 @@
-﻿import { spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import {
   cp, lstat, mkdir, readFile, readdir, realpath, stat, writeFile
@@ -81,6 +81,8 @@ export async function initializeB000({ outputRoot, guidanceDirectory }) {
       claimEligible: false,
       benchmarkId: 'B000',
       runId: run.runId,
+      attemptId: `${run.runId}-${randomUUID()}`,
+      runnerContractAmendment: 'research/benchmark/calibration/B000-RUNNER-CONTRACT-AMENDMENT-1.md',
       condition: run.condition,
       repetition: 1,
       executionOrder: run.executionOrder,

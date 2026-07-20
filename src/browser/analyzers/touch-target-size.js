@@ -1068,7 +1068,6 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
     requiredWidth: MIN_TARGET_WIDTH,
     requiredHeight: MIN_TARGET_HEIGHT,
     status: t.status || 'confirmed',
-    outcome: t.status === 'indeterminate' ? undefined : (t.outcome || 'violation'),
     exception: null,
     indeterminateReason: t.indeterminateReason || undefined,
     spacingProof: t.spacingProof || null,
@@ -1078,6 +1077,8 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
     colorScheme: colorScheme,
     browserVersion: browserVersion
   };
+
+  if (t.status !== 'indeterminate') sample.outcome = t.outcome || 'violation';
 
   // Set exception field
   if (t.outcome === 'spacing-exception') sample.exception = 'spacing-exception';

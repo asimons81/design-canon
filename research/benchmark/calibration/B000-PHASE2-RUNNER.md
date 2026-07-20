@@ -1,59 +1,63 @@
 # B000 Phase-2 runner
 
-This is a nonofficial calibration surface. It cannot initialize or execute B001-B015 and does not modify protocol-v1 admission.
+This is a nonofficial, claim-ineligible calibration surface. It cannot initialize or execute B001-B015 and does not modify protocol v1.
 
-## Commands
+The Phase-1 command assumption is corrected transparently by [B000-RUNNER-CONTRACT-AMENDMENT-1.md](./B000-RUNNER-CONTRACT-AMENDMENT-1.md): approval policy is a global Codex option, while execution controls remain `exec` options. No model call was made under the incorrect form.
 
-Initialize the four immutable run directories and regenerate guidance from the frozen protocol-v1 catalog:
+## Authoritative environment
+
+Run Phase 2 only in the dedicated Ubuntu WSL2 installation bootstrapped by `scripts/bootstrap-b000-wsl.sh`. The script pins Node.js 24.13.0, Codex CLI 0.144.4, Playwright 1.61.1, and its associated Chromium; creates `dcbench-runner` and `dcbench-agent`; clones the branch into the Linux filesystem; and preserves version/help hashes without credentials.
+
+The runner owns the checkout and evidence. The agent has a clean mode-0700 HOME and `CODEX_HOME`, no sudo, and temporary group access only to the current opaque workspace. The execution CLI generates fresh filesystem and Codex-sandbox network probes immediately before every attempt and binds them to the run, workspace inode, identities, binary, command hash, and timestamp.
+
+## Non-paid gates
+
+```bash
+node scripts/benchmark-codex-preflight.js --output .benchmark/calibration/b000/preflight --codex /usr/local/bin/codex
+node scripts/benchmark-browser-preflight.js --output .benchmark/calibration/b000/browser-preflight
+npm test
+node scripts/verify-repository.js
+node scripts/verify-fixture-integrity.js
+node scripts/validate-research.js
+node scripts/validate-research.js --examples
+npm audit --omit=dev --audit-level=high
+npm pack --dry-run
+```
+
+The Codex preflight records complete top-level and `exec` help independently and requires exactly 0.144.4. The browser preflight records Chromium, viewport and full-page screenshots, attempted HTTP/HTTPS assets, zero accepted external responses, browser lint, the calibration accessibility audit, and artifact hashes. Neither command makes a model call.
+
+## Initialize and execute
+
+Initialize exactly four immutable attempts:
 
 ```bash
 node scripts/benchmark-calibration-b000-init.js --output .benchmark/calibration/b000
 ```
 
-Record the installed CLI version, complete `codex exec --help`, its SHA-256 hash, and the required-option check:
-
-```bash
-node scripts/benchmark-codex-preflight.js --output .benchmark/calibration/b000/preflight
-```
-
-The preflight exits nonzero when Codex is older than 0.144.0 or a frozen option is unavailable. It does not make a model call.
-
-One run can be executed only with both opt-ins and independently produced network evidence:
-
-```bash
-DESIGN_CANON_B000_LIVE=1 node scripts/benchmark-execute-b000.js \
-  --run .benchmark/calibration/b000/runs/B000-A-r1 \
-  --workspace-root <isolated-opaque-root> \
-  --network-evidence <verified-network-evidence.json> \
-  --live true
-```
-
-The network evidence must separately establish Codex service transport, blocked workspace-command egress, and blocked browser/page egress, and name the independent enforcement methods. A prompt statement is not evidence.
-
-The ordered batch command independently regenerates the frozen A, B, D, C order and launches each run once:
+After every gate passes and the dedicated agent login is verified, execute the frozen order once:
 
 ```bash
 DESIGN_CANON_B000_LIVE=1 node scripts/benchmark-batch-b000.js \
   --root .benchmark/calibration/b000 \
-  --workspace-root <isolated-opaque-root> \
-  --network-evidence <verified-network-evidence.json> \
+  --workspace-root /var/lib/dcbench/workspaces \
+  --codex /usr/local/bin/codex \
   --live true
 ```
 
-Generate JSON and Markdown calibration reports:
+The effective form is `codex --ask-for-approval never exec ...`. It requests model alias `gpt-5.6`, medium reasoning, the Standard/default tier, workspace-write, disabled workspace-command network, disabled web search, ephemeral state, ignored user config and execution rules, disabled optional integration features, and JSONL. It never passes an evidence or repository path to the measured child.
+
+The batch stops at the first terminal failure and never retries. Raw stdout/stderr are written losslessly and flushed before normalization. Spawn, timeout, budget, JSONL, source, and capture failures remain terminal evidence; a later attempt requires a newly initialized immutable attempt ID.
+
+## Reports
 
 ```bash
 node scripts/benchmark-report-b000.js \
   --runs .benchmark/calibration/b000/runs \
   --repository-commit <commit> \
-  --codex-version <version> \
+  --codex-version 0.144.4 \
   --preflight .benchmark/calibration/b000/preflight/codex-preflight.json \
   --output .benchmark/calibration/b000/report.md \
   --json-output .benchmark/calibration/b000/report.json
 ```
 
-## Evidence boundary
-
-Raw stdout is stored unchanged as `transcript/raw.jsonl`; stderr and the final assistant message are separate. Normalized events, action accounting, usage, effective arguments, source, Git diff, captures, lint, accessibility calibration, render metadata, and hashes remain under ignored `.benchmark/` output. Provider usage stays null when absent. The aggregate report labels estimates separately and never selects a subjective winner.
-
-No automatic retry exists. Existing run directories are rejected. Timeout and action-budget termination preserve partial evidence and terminate the child process tree.
+Provider usage stays null when absent. Estimates are separately labeled. The report does not select a winner.
