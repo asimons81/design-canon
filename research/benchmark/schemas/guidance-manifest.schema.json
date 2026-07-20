@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/asimons81/design-canon/research/benchmark/schemas/guidance-manifest.schema.json",
+  "title": "Design Canon Benchmark Guidance Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "protocolId",
+    "protocolVersion",
+    "profile",
+    "catalogCommit",
+    "artifacts",
+    "admission"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "protocolId": { "type": "string" },
+    "protocolVersion": { "type": "string" },
+    "profile": { "enum": ["marketing", "product-app", "editorial"] },
+    "catalogCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["A", "B", "C", "D"],
+      "properties": {
+        "A": { "$ref": "#/$defs/artifact" },
+        "B": { "$ref": "#/$defs/artifact" },
+        "C": { "$ref": "#/$defs/artifact" },
+        "D": { "$ref": "#/$defs/artifact" }
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tokenizerPinned", "tokenCountsComplete", "officialReady"],
+      "properties": {
+        "tokenizerPinned": { "type": "boolean" },
+        "tokenCountsComplete": { "type": "boolean" },
+        "officialReady": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "required": [
+        "condition",
+        "catalogCommit",
+        "profile",
+        "ruleIds",
+        "characters",
+        "utf8Bytes",
+        "sha256",
+        "tokenizer",
+        "tokenCount",
+        "path"
+      ],
+      "properties": {
+        "condition": { "enum": ["A", "B", "C", "D"] },
+        "catalogCommit": { "type": ["string", "null"] },
+        "profile": { "type": "string" },
+        "ruleIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "characters": { "type": "integer", "minimum": 0 },
+        "utf8Bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": ["string", "null"] },
+        "tokenizer": { "type": ["string", "null"] },
+        "tokenCount": { "type": ["integer", "null"], "minimum": 0 },
+        "path": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
