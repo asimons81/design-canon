@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { resolve } from 'node:path';
 import {
   CAPTURE_VIEWPORTS,
+  isPathInside,
   summarizeAccessibilitySnapshots,
   validateRunManifestForCapture
 } from '../research/benchmark/harness/capture.js';
@@ -23,6 +25,14 @@ test('run capture accepts only mutable pre-completion statuses', () => {
       /cannot be captured/
     );
   }
+});
+
+test('capture entries cannot escape the run source directory', () => {
+  const source = resolve('tmp', 'run', 'source');
+  assert.equal(isPathInside(source, resolve(source, 'index.html')), true);
+  assert.equal(isPathInside(source, resolve(source, 'nested', 'page.html')), true);
+  assert.equal(isPathInside(source, resolve(source, '..', 'manifest.json')), false);
+  assert.equal(isPathInside(source, resolve(source, '..', '..', 'other.html')), false);
 });
 
 test('calibration accessibility summaries preserve per-viewport evidence without a conformance claim', () => {
