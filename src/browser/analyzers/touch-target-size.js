@@ -257,100 +257,68 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     // Check if the center point and representative inset points
     // actually hit this element. If another painted element is on top,
     // the target is partially or fully obscured.
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
     var cx = rect.x + rect.width / 2;
     var cy = rect.y + rect.height / 2;
 
-    // Clamp center to viewport — a target whose center is off-viewport
-    // cannot be meaningfully activated at that point
-    var clampedCenter = clampPoint(cx, cy);
+    // Center hit test
+    var centerHit = document.elementsFromPoint(cx, cy);
+    var centerHitsTarget = centerHit && centerHit.length > 0 && centerHit[0] === el;
 
-    // Helper: check if an element is natively interactive
-    function isInteractiveElement(e) {
-      var tag = e.tagName.toLowerCase();
-      if (tag === 'a' || tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'summary') return true;
-      var role = e.getAttribute('role');
-      if (role) {
-        var r = role.trim().toLowerCase();
-        var interactiveRoles = ['button','link','checkbox','radio','switch','tab','menuitem','menuitemcheckbox','menuitemradio','option','slider','spinbutton','textbox','combobox','searchbox'];
-        if (interactiveRoles.indexOf(r) !== -1) return true;
-      }
-      var ti = e.getAttribute('tabindex');
-      if (ti !== null && parseInt(ti, 10) >= 0) return true;
-      return false;
-    }
-
-    // Helper: clamp a point to the viewport
-    function clampPoint(px, py) {
-      return {
-        x: Math.max(0, Math.min(px, vw - 1)),
-        y: Math.max(0, Math.min(py, vh - 1))
-      };
-    }
-
-    // Helper: check if the topmost element at a point is the target or a non-interactive descendant
-    function topmostHitsTarget(px, py) {
-      var hits = document.elementsFromPoint(px, py);
-      if (!hits || hits.length === 0) return { ok: false, blockedBy: 'empty-hit' };
-      var top = hits[0];
-      if (top === el) return { ok: true, blockedBy: null };
-      // Check if top is a descendant of el
-      var check = top;
-      while (check) {
-        if (check === el) {
-          // Top is a descendant — ok only if it's not interactive
-          if (isInteractiveElement(top)) {
-            return { ok: false, blockedBy: 'nested-interactive', nestedEl: top.tagName ? top.tagName.toLowerCase() : 'unknown' };
-          }
-          return { ok: true, blockedBy: null };
-        }
-        check = check.parentElement;
-      }
-      // Top is not the target or a descendant — blocked
-      return { ok: false, blockedBy: top.tagName ? top.tagName.toLowerCase() : 'unknown' };
-    }
-
-    // Center hit test — uses clamped center so off-viewport centers
-    // don't manufacture obscuration from empty hits
-    var centerResult = topmostHitsTarget(clampedCenter.x, clampedCenter.y);
-    var centerHitsTarget = centerResult.ok;
-    var centerBlockedBy = centerResult.blockedBy;
-    var isNestedInteractive = centerResult.blockedBy === 'nested-interactive';
-
-    // Bounded inset corners — clamp to viewport
+    // Bounded inset corners — use points slightly inside the edges
     var inset = Math.min(3, rect.width / 4, rect.height / 4);
-    var rawCorners = [
+    var corners = [
       { x: rect.x + inset, y: rect.y + inset },
       { x: rect.x + rect.width - inset, y: rect.y + inset },
       { x: rect.x + inset, y: rect.y + rect.height - inset },
       { x: rect.x + rect.width - inset, y: rect.y + rect.height - inset }
     ];
 
-    var consistentHit = true;
-    var cornerBlockedBy = null;
-    if (centerHitsTarget && !isNestedInteractive) {
-      for (var ci = 0; ci < rawCorners.length; ci++) {
-        var cp = clampPoint(rawCorners[ci].x, rawCorners[ci].y);
-        var cr = topmostHitsTarget(cp.x, cp.y);
-        if (!cr.ok) {
-          consistentHit = false;
-          cornerBlockedBy = cr.blockedBy;
-          if (cr.blockedBy === 'nested-interactive') {
-            isNestedInteractive = true;
-          }
-          break;
-        }
+    // Filter corners to only those within the viewport
+    var vpW = window.innerWidth;
+    var vpH = window.innerHeight;
+    var visibleCorners = [];
+    for (var ci = 0; ci < corners.length; ci++) {
+      var cp = corners[ci];
+      if (cp.x >= 0 && cp.x < vpW && cp.y >= 0 && cp.y < vpH) {
+        visibleCorners.push(cp);
       }
     }
 
-    // If center is still not hit but the top element is a descendant,
-    // check if it's an interactive descendant (nested-interactive case)
-    var blockedBy = centerBlockedBy;
-    if (!centerHitsTarget && !isNestedInteractive) {
-      var centerHit = document.elementsFromPoint(clampedCenter.x, clampedCenter.y);
-      if (centerHit && centerHit.length > 0) {
-        blockedBy = centerHit[0].tagName ? centerHit[0].tagName.toLowerCase() : 'unknown';
+    var consistentHit = true;
+    if (centerHitsTarget && visibleCorners.length > 0) {
+      for (var cj = 0; cj < visibleCorners.length; cj++) {
+        var ch = document.elementsFromPoint(visibleCorners[cj].x, visibleCorners[cj].y);
+        // Check if el is among the hit elements (it might not be topmost at corners)
+        var found = false;
+        if (ch) {
+          for (var ck = 0; ck < ch.length; ck++) {
+            if (ch[ck] === el) { found = true; break; }
+          }
+        }
+        if (!found) { consistentHit = false; break; }
+      }
+    } else if (!centerHitsTarget && visibleCorners.length === 0) {
+      // No corners are within viewport — can't verify obscuration
+      // Return a special flag so the analyzer can detect viewport clipping
+      consistentHit = false;
+    }
+
+    // Check for ancestor-only hits (descendants of el on top are ok)
+    var blockedBy = null;
+    if (!centerHitsTarget && centerHit && centerHit.length > 0) {
+      var topEl = centerHit[0];
+      // If the top element is a descendant of el, that's ok
+      var isDescendant = false;
+      var check = topEl;
+      while (check) {
+        if (check === el) { isDescendant = true; break; }
+        check = check.parentElement;
+      }
+      if (!isDescendant) {
+        blockedBy = topEl.tagName ? topEl.tagName.toLowerCase() : 'unknown';
+      } else {
+        // Descendant is on top — center still reaches target via descendant
+        centerHitsTarget = true;
       }
     }
 
@@ -359,8 +327,50 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       consistentHit: consistentHit,
       blockedBy: blockedBy,
       isObscured: !centerHitsTarget || !consistentHit,
-      isNestedInteractive: isNestedInteractive
+      allCornersOffViewport: visibleCorners.length === 0 && centerHitsTarget === false
     };
+  }
+
+  function isViewportClipped(rect) {
+    return rect.x < 0 || rect.y < 0 ||
+      (rect.x + rect.width) > window.innerWidth ||
+      (rect.y + rect.height) > window.innerHeight;
+  }
+
+  function isNonRectangularClipPath(el) {
+    // Check the element and all its ancestors for non-rectangular clip-path
+    var current = el;
+    while (current && current !== document.documentElement) {
+      var cs;
+      try { cs = getComputedStyle(current); } catch (e) { break; }
+      var cp = cs.clipPath;
+      if (cp && cp !== 'none') {
+        var trimmed = cp.trim();
+        // Rectangular forms: inset(), rect(), xywh(), polygon(4 rect pts)
+        if (trimmed.indexOf('inset(') === 0) { current = current.parentElement; continue; }
+        if (trimmed.indexOf('rect(') === 0) { current = current.parentElement; continue; }
+        if (trimmed.indexOf('xywh(') === 0) { current = current.parentElement; continue; }
+        if (trimmed.indexOf('margin-box') !== -1 ||
+            trimmed.indexOf('border-box') !== -1 ||
+            trimmed.indexOf('padding-box') !== -1 ||
+            trimmed.indexOf('content-box') !== -1 ||
+            trimmed.indexOf('fill-box') !== -1 ||
+            trimmed.indexOf('stroke-box') !== -1 ||
+            trimmed.indexOf('view-box') !== -1) {
+          current = current.parentElement; continue;
+        }
+        // circle(), ellipse(), path(), url(), polygon(>4 pts) → non-rectangular
+        if (trimmed.indexOf('circle(') === 0) return true;
+        if (trimmed.indexOf('ellipse(') === 0) return true;
+        if (trimmed.indexOf('path(') === 0) return true;
+        if (trimmed.indexOf('url(') === 0) return true;
+        if (trimmed.indexOf('polygon(') === 0) return true;
+        // Any other non-none value: treat as non-rectangular
+        return true;
+      }
+      current = current.parentElement;
+    }
+    return false;
   }
 
   function isUnmodifiedNativeControl(el) {
@@ -470,6 +480,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       lineHeightConstrained: isConstrainedByLineHeight(el),
       isStandaloneControl: isStandaloneControlContext(el),
       isUnmodifiedNative: isUnmodifiedNativeControl(el),
+      clipPathClass: isNonRectangularClipPath(el) ? 'nonrectangular' : 'rectangular',
+      viewportClipped: isViewportClipped(rect),
       tabindex: el.getAttribute('tabindex'),
       ariaDisabled: el.getAttribute('aria-disabled'),
       inert: el.inert === true,
@@ -528,6 +540,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       lineHeightConstrained: isConstrainedByLineHeight(rel),
       isStandaloneControl: isStandaloneControlContext(rel),
       isUnmodifiedNative: isUnmodifiedNativeControl(rel),
+      clipPathClass: isNonRectangularClipPath(rel) ? 'nonrectangular' : 'rectangular',
+      viewportClipped: isViewportClipped(rrect),
       tabindex: rel.getAttribute('tabindex'),
       ariaDisabled: rel.getAttribute('aria-disabled'),
       inert: rel.inert === true,
@@ -582,6 +596,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       lineHeightConstrained: isConstrainedByLineHeight(tel),
       isStandaloneControl: isStandaloneControlContext(tel),
       isUnmodifiedNative: isUnmodifiedNativeControl(tel),
+      clipPathClass: isNonRectangularClipPath(tel) ? 'nonrectangular' : 'rectangular',
+      viewportClipped: isViewportClipped(trect),
       tabindex: tel.getAttribute('tabindex'),
       ariaDisabled: tel.getAttribute('aria-disabled'),
       inert: tel.inert === true,
@@ -781,22 +797,38 @@ function processTargets(rawTargets, viewportDims, viewportName, colorScheme, bro
       continue;
     }
 
-    // Check overlap/obscuration via hit testing
-    if (t.hitTest && t.hitTest.isNestedInteractive) {
+    // Check for non-rectangular clip-path on target or ancestors
+    if (t.clipPathClass === 'nonrectangular') {
       t.status = 'indeterminate';
-      t.indeterminateReason = 'nested-interactive-target';
+      t.indeterminateReason = 'clipped-nonrectangular-target';
       continue;
     }
 
-    if (t.hitTest && t.hitTest.isObscured) {
+    // Check for viewport clipping — targets partially off-viewport
+    // should skip the standard obscuration check because inset corners
+    // may fall outside the viewport, producing false-positive obscuration.
+    // Viewport-clipped targets proceed to the size check using the visible
+    // intersection as the effective rect.
+    if (t.viewportClipped) {
+      // Skip the obscuration check — the target is clipped by viewport edge
+      // not obscured by another element
+    } else if (t.hitTest && t.hitTest.isObscured) {
+      // Check overlap/obscuration via hit testing (standard path)
       t.status = 'indeterminate';
-      if (t.hitTest.blockedBy && t.hitTest.blockedBy !== 'empty-hit') {
+      if (t.hitTest.blockedBy) {
         t.indeterminateReason = 'ambiguous-overlap';
       } else if (!t.hitTest.centerHitsTarget) {
         t.indeterminateReason = 'partially-obscured';
       } else {
         t.indeterminateReason = 'ambiguous-overlap';
       }
+      continue;
+    }
+
+    // Check for nested interactive targets (only when not viewport-clipped)
+    if (!t.viewportClipped && t.hitTest && !t.hitTest.centerHitsTarget && !t.hitTest.blockedBy) {
+      t.status = 'indeterminate';
+      t.indeterminateReason = 'nested-interactive-target';
       continue;
     }
 
@@ -1019,6 +1051,9 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
     requiredWidth: MIN_TARGET_WIDTH,
     requiredHeight: MIN_TARGET_HEIGHT,
     status: t.status || 'confirmed',
+    outcome: t.status === 'indeterminate' ? undefined : (t.outcome || 'violation'),
+    exception: null,
+    indeterminateReason: t.indeterminateReason || undefined,
     spacingProof: t.spacingProof || null,
     viewport: viewportName,
     viewportWidth: viewportDims.width,
@@ -1026,16 +1061,6 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
     colorScheme: colorScheme,
     browserVersion: browserVersion
   };
-
-  // Only confirmed samples carry an outcome; indeterminate samples omit it
-  if (sample.status === 'confirmed') {
-    sample.outcome = t.outcome || 'violation';
-  }
-
-  // Indeterminate samples carry their reason
-  if (sample.status === 'indeterminate' && t.indeterminateReason) {
-    sample.indeterminateReason = t.indeterminateReason;
-  }
 
   // Set exception field
   if (t.outcome === 'spacing-exception') sample.exception = 'spacing-exception';
