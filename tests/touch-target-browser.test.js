@@ -326,24 +326,105 @@ test('F020 performance: handles many targets without timeout', async () => {
 
 // ── Vertical clipping regression ──────────────────────────────────────
 
-test('F020 clipping: vertically clipped target uses visible intersection', async () => {
+test('F020 clipping: top-clipped target is indeterminate, no outcome', async () => {
   const result = await lintFixture('fixtures/touch-target/violations/clipped-top.html');
   if (!chromiumAvailable) return;
 
   const records = f020Records(result);
   assert.ok(records.length >= 1, 'Expected analysis for clipped target');
-  // The clipped target should not be confirmed at full height
-  // It may be a violation or indeterminate depending on visible area
+
+  // A vertically clipped target should be indeterminate, not confirmed
+  const confirmed = records.filter(r => r.status === 'confirmed');
+  assert.equal(confirmed.length, 0, 'Clipped target should not be confirmed');
+
+  // No findings from indeterminate targets
   const findings = f020Findings(result);
-  assert.ok(true, 'Vertical clipping fixture analyzed without error');
+  assert.equal(findings.length, 0, 'Indeterminate target should not produce findings');
+
+  // Verify no outcome on indeterminate samples
+  for (const rec of records) {
+    if (rec.samples) {
+      for (const sample of rec.samples) {
+        if (sample.status === 'indeterminate') {
+          assert.equal(sample.outcome, undefined, 'Indeterminate sample must not have outcome');
+        }
+      }
+    }
+  }
 });
 
-test('F020 clipping: bottom-clipped target uses visible intersection', async () => {
+test('F020 clipping: bottom-clipped target is indeterminate, no outcome', async () => {
   const result = await lintFixture('fixtures/touch-target/violations/clipped-bottom.html');
   if (!chromiumAvailable) return;
 
   const records = f020Records(result);
   assert.ok(records.length >= 1, 'Expected analysis for bottom-clipped target');
+
+  const confirmed = records.filter(r => r.status === 'confirmed');
+  assert.equal(confirmed.length, 0, 'Bottom-clipped target should not be confirmed');
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0, 'Indeterminate should not produce findings');
+
+  for (const rec of records) {
+    if (rec.samples) {
+      for (const sample of rec.samples) {
+        if (sample.status === 'indeterminate') {
+          assert.equal(sample.outcome, undefined, 'Indeterminate sample must not have outcome');
+        }
+      }
+    }
+  }
+});
+
+// ── Viewport-edge clipping (all four edges) ───────────────────────────
+
+test('F020 viewport-edge: bottom-clipped target is indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/violations/viewport-bottom-clip.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0, 'Viewport bottom-clipped target should not produce findings');
+
+  const records = f020Records(result);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Bottom-clipped target should be indeterminate');
+});
+
+test('F020 viewport-edge: top-clipped target is indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/violations/viewport-top-clip.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0);
+
+  const records = f020Records(result);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Top-clipped target should be indeterminate');
+});
+
+test('F020 viewport-edge: left-clipped target is indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/violations/viewport-left-clip.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0);
+
+  const records = f020Records(result);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Left-clipped target should be indeterminate');
+});
+
+test('F020 viewport-edge: right-clipped target is indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/violations/viewport-right-clip.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0);
+
+  const records = f020Records(result);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Right-clipped target should be indeterminate');
 });
 
 // ── Obscuration regression ────────────────────────────────────────────
@@ -355,6 +436,38 @@ test('F020 obscuration: opaque overlay produces indeterminate', async () => {
   // Overlaid target should be indeterminate, not a pass or violation
   const findings = f020Findings(result);
   assert.equal(findings.length, 0, 'Obscured target should not produce findings');
+
+  // Verify it's actually indeterminate (not just a passing target)
+  const records = f020Records(result);
+  assert.ok(records.length >= 1);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Obscured target should be indeterminate');
+});
+
+test('F020 obscuration: partial overlay produces indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/indeterminate/partial-obstruction.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0, 'Partially obscured target should not produce findings');
+
+  const records = f020Records(result);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Partially obscured target should be indeterminate');
+});
+
+// ── Nested interactive targets regression ─────────────────────────────
+
+test('F020 nested: role=button containing native button is indeterminate', async () => {
+  const result = await lintFixture('fixtures/touch-target/indeterminate/nested-targets.html');
+  if (!chromiumAvailable) return;
+
+  const findings = f020Findings(result);
+  assert.equal(findings.length, 0, 'Nested targets should not produce findings');
+
+  const records = f020Records(result);
+  const indeterminate = records.filter(r => r.status === 'indeterminate');
+  assert.ok(indeterminate.length >= 1, 'Nested targets should be indeterminate');
 });
 
 // ── Spacing-proof field-name regression ───────────────────────────────

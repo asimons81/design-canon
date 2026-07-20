@@ -257,16 +257,65 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     // Check if the center point and representative inset points
     // actually hit this element. If another painted element is on top,
     // the target is partially or fully obscured.
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
     var cx = rect.x + rect.width / 2;
     var cy = rect.y + rect.height / 2;
 
-    // Center hit test
-    var centerHit = document.elementsFromPoint(cx, cy);
-    var centerHitsTarget = centerHit && centerHit.length > 0 && centerHit[0] === el;
+    // Helper: check if an element is natively interactive
+    function isInteractiveElement(e) {
+      var tag = e.tagName.toLowerCase();
+      if (tag === 'a' || tag === 'button' || tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'summary') return true;
+      var role = e.getAttribute('role');
+      if (role) {
+        var r = role.trim().toLowerCase();
+        var interactiveRoles = ['button','link','checkbox','radio','switch','tab','menuitem','menuitemcheckbox','menuitemradio','option','slider','spinbutton','textbox','combobox','searchbox'];
+        if (interactiveRoles.indexOf(r) !== -1) return true;
+      }
+      var ti = e.getAttribute('tabindex');
+      if (ti !== null && parseInt(ti, 10) >= 0) return true;
+      return false;
+    }
 
-    // Bounded inset corners — use points slightly inside the edges
+    // Helper: clamp a point to the viewport
+    function clampPoint(px, py) {
+      return {
+        x: Math.max(0, Math.min(px, vw - 1)),
+        y: Math.max(0, Math.min(py, vh - 1))
+      };
+    }
+
+    // Helper: check if the topmost element at a point is the target or a non-interactive descendant
+    function topmostHitsTarget(px, py) {
+      var hits = document.elementsFromPoint(px, py);
+      if (!hits || hits.length === 0) return { ok: false, blockedBy: 'empty-hit' };
+      var top = hits[0];
+      if (top === el) return { ok: true, blockedBy: null };
+      // Check if top is a descendant of el
+      var check = top;
+      while (check) {
+        if (check === el) {
+          // Top is a descendant — ok only if it's not interactive
+          if (isInteractiveElement(top)) {
+            return { ok: false, blockedBy: 'nested-interactive', nestedEl: top.tagName ? top.tagName.toLowerCase() : 'unknown' };
+          }
+          return { ok: true, blockedBy: null };
+        }
+        check = check.parentElement;
+      }
+      // Top is not the target or a descendant — blocked
+      return { ok: false, blockedBy: top.tagName ? top.tagName.toLowerCase() : 'unknown' };
+    }
+
+    // Center hit test
+    var centerResult = topmostHitsTarget(cx, cy);
+    var centerHitsTarget = centerResult.ok;
+    var centerBlockedBy = centerResult.blockedBy;
+    var isNestedInteractive = centerResult.blockedBy === 'nested-interactive';
+
+    // Bounded inset corners — clamp to viewport
     var inset = Math.min(3, rect.width / 4, rect.height / 4);
-    var corners = [
+    var rawCorners = [
       { x: rect.x + inset, y: rect.y + inset },
       { x: rect.x + rect.width - inset, y: rect.y + inset },
       { x: rect.x + inset, y: rect.y + rect.height - inset },
@@ -274,36 +323,29 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
     ];
 
     var consistentHit = true;
-    if (centerHitsTarget) {
-      for (var ci = 0; ci < corners.length; ci++) {
-        var ch = document.elementsFromPoint(corners[ci].x, corners[ci].y);
-        // Check if el is among the hit elements (it might not be topmost at corners)
-        var found = false;
-        if (ch) {
-          for (var cj = 0; cj < ch.length; cj++) {
-            if (ch[cj] === el) { found = true; break; }
+    var cornerBlockedBy = null;
+    if (centerHitsTarget && !isNestedInteractive) {
+      for (var ci = 0; ci < rawCorners.length; ci++) {
+        var cp = clampPoint(rawCorners[ci].x, rawCorners[ci].y);
+        var cr = topmostHitsTarget(cp.x, cp.y);
+        if (!cr.ok) {
+          consistentHit = false;
+          cornerBlockedBy = cr.blockedBy;
+          if (cr.blockedBy === 'nested-interactive') {
+            isNestedInteractive = true;
           }
+          break;
         }
-        if (!found) { consistentHit = false; break; }
       }
     }
 
-    // Check for ancestor-only hits (descendants of el on top are ok)
-    var blockedBy = null;
-    if (!centerHitsTarget && centerHit && centerHit.length > 0) {
-      var topEl = centerHit[0];
-      // If the top element is a descendant of el, that's ok
-      var isDescendant = false;
-      var check = topEl;
-      while (check) {
-        if (check === el) { isDescendant = true; break; }
-        check = check.parentElement;
-      }
-      if (!isDescendant) {
-        blockedBy = topEl.tagName ? topEl.tagName.toLowerCase() : 'unknown';
-      } else {
-        // Descendant is on top — center still reaches target via descendant
-        centerHitsTarget = true;
+    // If center is still not hit but the top element is a descendant,
+    // check if it's an interactive descendant (nested-interactive case)
+    var blockedBy = centerBlockedBy;
+    if (!centerHitsTarget && !isNestedInteractive) {
+      var centerHit = document.elementsFromPoint(cx, cy);
+      if (centerHit && centerHit.length > 0) {
+        blockedBy = centerHit[0].tagName ? centerHit[0].tagName.toLowerCase() : 'unknown';
       }
     }
 
@@ -311,7 +353,8 @@ const COLLECT_TARGETS_FN = function collectTouchTargets() {
       centerHitsTarget: centerHitsTarget,
       consistentHit: consistentHit,
       blockedBy: blockedBy,
-      isObscured: !centerHitsTarget || !consistentHit
+      isObscured: !centerHitsTarget || !consistentHit,
+      isNestedInteractive: isNestedInteractive
     };
   }
 
@@ -734,22 +777,21 @@ function processTargets(rawTargets, viewportDims, viewportName, colorScheme, bro
     }
 
     // Check overlap/obscuration via hit testing
+    if (t.hitTest && t.hitTest.isNestedInteractive) {
+      t.status = 'indeterminate';
+      t.indeterminateReason = 'nested-interactive-target';
+      continue;
+    }
+
     if (t.hitTest && t.hitTest.isObscured) {
       t.status = 'indeterminate';
-      if (t.hitTest.blockedBy) {
+      if (t.hitTest.blockedBy && t.hitTest.blockedBy !== 'empty-hit') {
         t.indeterminateReason = 'ambiguous-overlap';
       } else if (!t.hitTest.centerHitsTarget) {
         t.indeterminateReason = 'partially-obscured';
       } else {
         t.indeterminateReason = 'ambiguous-overlap';
       }
-      continue;
-    }
-
-    // Check for nested interactive targets
-    if (t.hitTest && !t.hitTest.centerHitsTarget && !t.hitTest.blockedBy) {
-      t.status = 'indeterminate';
-      t.indeterminateReason = 'nested-interactive-target';
       continue;
     }
 
@@ -972,8 +1014,6 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
     requiredWidth: MIN_TARGET_WIDTH,
     requiredHeight: MIN_TARGET_HEIGHT,
     status: t.status || 'confirmed',
-    outcome: t.outcome || 'violation',
-    exception: null,
     spacingProof: t.spacingProof || null,
     viewport: viewportName,
     viewportWidth: viewportDims.width,
@@ -981,6 +1021,11 @@ function buildSample(t, viewportDims, viewportName, colorScheme, browserVersion)
     colorScheme: colorScheme,
     browserVersion: browserVersion
   };
+
+  // Only confirmed samples carry an outcome; indeterminate samples omit it
+  if (sample.status === 'confirmed') {
+    sample.outcome = t.outcome || 'violation';
+  }
 
   // Set exception field
   if (t.outcome === 'spacing-exception') sample.exception = 'spacing-exception';
