@@ -22,6 +22,22 @@ This checklist separates completed tooling from evidence that still requires mod
 - [x] Safe adapters for AGENTS.md, Claude Code, Cursor, Windsurf, Codex, and Hermes
 - [x] Three public demonstration briefs selected before output inspection
 
+## B000 calibration preflight
+
+- [x] Freeze a claim-ineligible B000 shakedown brief
+- [x] Freeze candidate GPT-5.6 Sol Standard and Codex settings
+- [x] Freeze candidate budgets and deterministic A, B, D, C order
+- [x] Define the fail-closed runner and evidence contract
+- [x] Lock Phase-1 boundaries with repository tests
+- [ ] Implement the provider-neutral execution state layer
+- [ ] Implement and test the Codex CLI adapter without paid calls
+- [ ] Prove workspace, instruction, state, and network isolation
+- [ ] Execute B000 A, B, D, and C once with no automatic retries
+- [ ] Capture and validate every B000 artifact
+- [ ] Audit measured usage, runtime, actions, failures, and cost
+- [ ] Propose official B001 budgets and runtime settings
+- [ ] Issue a go, revise, or stop decision before protocol admission
+
 ## Decisions required before an official pilot
 
 - [ ] Pin one exact model and model version
