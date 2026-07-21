@@ -8,15 +8,18 @@ import {
   buildGuidanceArtifacts, deterministicShuffle, loadCatalogFreeze, measureText,
   repositoryPath, sha256, writeJson
 } from './lib.js';
+import { verifyTreeInventoryLock } from './tree-lock.js';
 
-export const B000_CALIBRATION_PATH = 'research/benchmark/calibration/b000-codex-sol-standard-v1.json';
+export const B000_R1_CALIBRATION_PATH = 'research/benchmark/calibration/b000-codex-sol-standard-v1.json';
+export const B000_CALIBRATION_PATH = 'research/benchmark/calibration/b000-codex-sol-standard-v1-r2.json';
 export const B000_ALLOWED_FILES = Object.freeze(['index.html', 'script.js', 'styles.css']);
 export const FORBIDDEN_INSTRUCTIONS = Object.freeze([
   'AGENTS.md', 'CLAUDE.md', 'DESIGN.md', '.cursor', '.windsurf', '.mcp.json', 'skills', 'plugins'
 ]);
+const R2_ADMISSION_TOKEN = Symbol('B000 r2 initialization admission');
 
-export async function loadB000Calibration() {
-  return JSON.parse(await readFile(repositoryPath(B000_CALIBRATION_PATH), 'utf8'));
+export async function loadB000Calibration(calibrationPath = B000_CALIBRATION_PATH) {
+  return JSON.parse(await readFile(repositoryPath(calibrationPath), 'utf8'));
 }
 
 export function verifyB000Order(calibration) {
@@ -28,8 +31,10 @@ export function verifyB000Order(calibration) {
   return calibration.runs.map((run) => ({ ...run }));
 }
 
-export async function prepareB000Guidance(outputDirectory) {
-  const calibration = await loadB000Calibration();
+export async function prepareB000Guidance(outputDirectory, {
+  calibrationPath = B000_CALIBRATION_PATH
+} = {}) {
+  const calibration = await loadB000Calibration(calibrationPath);
   const freeze = await loadCatalogFreeze();
   const rebuilt = await buildGuidanceArtifacts({
     profileName: calibration.brief.profile,
@@ -52,12 +57,53 @@ export async function prepareB000Guidance(outputDirectory) {
   return { calibration, manifest };
 }
 
-export async function initializeB000({ outputRoot, guidanceDirectory }) {
+export async function assertB000R2InitializationAdmission({
+  authorization,
+  expectedRepairHead,
+  currentHead,
+  currentProtocolTree,
+  r1LockInventory
+}) {
   const calibration = await loadB000Calibration();
+  if (authorization !== true) throw new Error('A separate explicit live-r2 initialization authorization is required.');
+  if (!/^[0-9a-f]{40}$/.test(expectedRepairHead ?? '') || currentHead !== expectedRepairHead) {
+    throw new Error('Current repository HEAD does not match the reviewed repair head.');
+  }
+  if (currentProtocolTree !== calibration.protocolV1GitTree) {
+    throw new Error('Protocol v1 differs from the r2 frozen manifest.');
+  }
+  const runIds = calibration.runs.map((run) => run.runId);
+  if (
+    runIds.join(',') !== 'B000-A-r2,B000-B-r2,B000-D-r2,B000-C-r2' ||
+    runIds.some((runId) => runId.endsWith('-r1'))
+  ) {
+    throw new Error('The r2 initializer manifest contains a forbidden attempt identity.');
+  }
+  const r1Lock = await verifyTreeInventoryLock(r1LockInventory);
+  return Object.freeze({
+    [R2_ADMISSION_TOKEN]: true,
+    expectedRepairHead,
+    r1Lock
+  });
+}
+
+export async function initializeB000({
+  outputRoot,
+  guidanceDirectory,
+  admission,
+  calibrationPath = B000_CALIBRATION_PATH
+}) {
+  if (admission?.[R2_ADMISSION_TOKEN] !== true) {
+    throw new Error('r2 initialization admission was not established.');
+  }
+  const calibration = await loadB000Calibration(calibrationPath);
   const runs = verifyB000Order(calibration);
   const brief = await readFile(repositoryPath(calibration.brief.path), 'utf8');
   const guidanceManifest = JSON.parse(await readFile(join(guidanceDirectory, 'guidance-manifest.json'), 'utf8'));
-  await mkdir(outputRoot, { recursive: true });
+  if (await lstat(outputRoot).catch(() => null)) {
+    throw new Error('r2 output root already exists; immutable attempts cannot be overwritten.');
+  }
+  await mkdir(outputRoot, { recursive: false });
   const initialized = [];
   for (const run of runs) {
     const runDirectory = join(outputRoot, run.runId);
@@ -82,7 +128,7 @@ export async function initializeB000({ outputRoot, guidanceDirectory }) {
       benchmarkId: 'B000',
       runId: run.runId,
       attemptId: `${run.runId}-${randomUUID()}`,
-      runnerContractAmendment: 'research/benchmark/calibration/B000-RUNNER-CONTRACT-AMENDMENT-2.md',
+      runnerContractAmendment: calibration.runnerContractAmendment,
       condition: run.condition,
       repetition: 1,
       executionOrder: run.executionOrder,
@@ -222,7 +268,11 @@ export async function validateAndCopySource({ workspace, workspaceRoot, runDirec
     if (!info.isFile()) throw new Error(`Missing required project file: ${name}`);
     await cp(source, join(sourceDirectory, name), { errorOnExist: true, force: false });
   }
-  return validation;
+  const fileHashes = Object.fromEntries(await Promise.all(B000_ALLOWED_FILES.map(async (name) => {
+    const bytes = await readFile(join(sourceDirectory, name));
+    return [name, { bytes: bytes.length, sha256: sha256(bytes) }];
+  })));
+  return { ...validation, fileHashes };
 }
 
 export function assertNetworkIsolationEvidence(evidence) {

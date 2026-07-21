@@ -6,6 +6,8 @@ NODE_ARCHIVE="node-v${NODE_VERSION}-linux-x64.tar.xz"
 NODE_SHA256="e798599612f4bb71333a3397ab0d095fd62214e115aea45aa858a145fc72d67e"
 CODEX_VERSION="0.144.4"
 PLAYWRIGHT_VERSION="1.61.1"
+CHROMIUM_REVISION="1228"
+CHROMIUM_VERSION="149.0.7827.55"
 REPOSITORY_URL="https://github.com/asimons81/design-canon.git"
 BRANCH="implementation/b000-codex-sol-runner"
 HANDOFF_HEAD="cf58e190caf01c67e3cc8e5b85a9729d5d871e79"
@@ -47,6 +49,21 @@ printf '{"private":true,"dependencies":{"playwright":"%s"}}\n' "${PLAYWRIGHT_VER
 PLAYWRIGHT_BROWSERS_PATH=/opt/dcbench/ms-playwright \
   "${node_root}/bin/npx" --prefix "${playwright_root}" playwright install --with-deps chromium
 chmod -R a+rX /opt/dcbench/ms-playwright "${playwright_root}"
+browser_executable="/opt/dcbench/ms-playwright/chromium_headless_shell-${CHROMIUM_REVISION}/chrome-headless-shell-linux64/chrome-headless-shell"
+if [[ ! -f "${browser_executable}" || ! -r "${browser_executable}" || ! -x "${browser_executable}" ]]; then
+  echo "bootstrap-b000-wsl: pinned Chromium executable is unavailable" >&2
+  exit 1
+fi
+browser_real_path="$(realpath "${browser_executable}")"
+case "${browser_real_path}" in
+  /opt/dcbench/ms-playwright/*) ;;
+  *) echo "bootstrap-b000-wsl: Chromium escaped the pinned root" >&2; exit 1 ;;
+esac
+browser_reported_version="$("${browser_real_path}" --version | awk '{print $2}')"
+if [[ "${browser_reported_version}" != "${CHROMIUM_VERSION}" ]]; then
+  echo "bootstrap-b000-wsl: Chromium version mismatch" >&2
+  exit 1
+fi
 
 getent group dcbench-collect >/dev/null || groupadd --system dcbench-collect
 for user in dcbench-runner dcbench-agent; do
@@ -94,6 +111,10 @@ install -d -o dcbench-runner -g dcbench-runner -m 0700 "${evidence}"
   printf 'repository=%s\n' "${repo}"
   printf 'head=%s\n' "${actual_head}"
   printf 'node_archive_sha256=%s\n' "${NODE_SHA256}"
+  printf 'browser_executable=%s\n' "${browser_real_path}"
+  printf 'browser_executable_sha256=%s\n' "$(sha256sum "${browser_real_path}" | awk '{print $1}')"
+  printf 'playwright_version=%s\n' "${PLAYWRIGHT_VERSION}"
+  printf 'chromium_version=%s\n' "${browser_reported_version}"
 } > "${evidence}/bootstrap-metadata.txt"
 codex --version > "${evidence}/codex-version.txt"
 codex --help > "${evidence}/codex-help.txt"
@@ -113,3 +134,5 @@ printf 'node=%s\n' "$(node --version)"
 printf 'npm=%s\n' "$(npm --version)"
 printf 'codex=%s\n' "$(codex --version)"
 printf 'playwright=%s\n' "$(node -p "require('${playwright_root}/node_modules/playwright/package.json').version")"
+printf 'browser_executable=%s\n' "${browser_real_path}"
+printf 'chromium=%s\n' "${browser_reported_version}"

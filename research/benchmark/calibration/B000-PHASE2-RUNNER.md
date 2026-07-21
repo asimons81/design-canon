@@ -2,7 +2,7 @@
 
 This is a nonofficial, claim-ineligible calibration surface. It cannot initialize or execute B001-B015 and does not modify protocol v1.
 
-The Phase-1 command assumption is corrected transparently by [B000-RUNNER-CONTRACT-AMENDMENT-1.md](./B000-RUNNER-CONTRACT-AMENDMENT-1.md): approval policy is a global Codex option, while execution controls remain `exec` options. [B000-RUNNER-CONTRACT-AMENDMENT-2.md](./B000-RUNNER-CONTRACT-AMENDMENT-2.md) replaces the rejected `gpt-5.6` alias with the accepted canonical `gpt-5.6-sol` identifier and requires provider-free proof that runtime-created skill caches remain absent from model-visible instructions and capabilities.
+The Phase-1 command assumption is corrected transparently by [B000-RUNNER-CONTRACT-AMENDMENT-1.md](./B000-RUNNER-CONTRACT-AMENDMENT-1.md): approval policy is a global Codex option, while execution controls remain `exec` options. [B000-RUNNER-CONTRACT-AMENDMENT-2.md](./B000-RUNNER-CONTRACT-AMENDMENT-2.md) replaces the rejected `gpt-5.6` alias with the accepted canonical `gpt-5.6-sol` identifier and requires provider-free proof that runtime-created skill caches remain absent from model-visible instructions and capabilities. [B000-RUNNER-CONTRACT-AMENDMENT-3.md](./B000-RUNNER-CONTRACT-AMENDMENT-3.md) preserves the failed r1 series and limits r2 changes to capture, hashing, diff, and stop-on-first-failure infrastructure.
 
 ## Authoritative environment
 
@@ -15,7 +15,9 @@ The runner owns the checkout and evidence. The agent has a clean mode-0700 HOME 
 ```bash
 node scripts/benchmark-codex-preflight.js --output .benchmark/calibration/b000/preflight --codex /usr/local/bin/codex
 node scripts/benchmark-auth-model-preflight.js --output .benchmark/calibration/b000/auth-model-preflight --workspace-root /var/lib/dcbench/workspaces --codex /usr/local/bin/codex
-node scripts/benchmark-browser-preflight.js --output .benchmark/calibration/b000/browser-preflight
+node scripts/benchmark-browser-preflight.js \
+  --output .benchmark/calibration/b000-r2/browser-preflight \
+  --browser-executable /opt/dcbench/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
 npm test
 node scripts/verify-repository.js
 node scripts/verify-fixture-integrity.js
@@ -25,29 +27,35 @@ npm audit --omit=dev --audit-level=high
 npm pack --dry-run
 ```
 
-The Codex capability preflight records complete top-level and `exec` help independently and requires exactly 0.144.4. The separately classified authentication/model preflight makes one minimal non-measured request with the frozen runtime, a zero-action budget, no benchmark brief or guidance, and separately recorded usage. The browser preflight records Chromium, viewport and full-page screenshots, attempted HTTP/HTTPS assets, zero accepted external responses, browser lint, the calibration accessibility audit, and artifact hashes. The capability and browser preflights do not make model calls.
+The Codex capability preflight records complete top-level and `exec` help independently and requires exactly 0.144.4. The successful canonical authentication/model preflight is historical admission evidence and must not be repeated. The browser preflight requires an explicit executable, resolves its real path, requires a regular readable executable beneath `/opt/dcbench/ms-playwright`, hashes it, launches it with Playwright's `executablePath`, and records Playwright and Chromium versions. It also records viewport and full-page screenshots, attempted HTTP/HTTPS assets, zero accepted external responses, browser lint, the calibration accessibility audit, artifact hashes, and a self-hash. `PLAYWRIGHT_BROWSERS_PATH`, runner HOME, and Playwright's default cache are not browser identity controls.
 
 ## Initialize and execute
 
-Initialize exactly four immutable attempts:
+The repair phase does not initialize r2. A future authorization must identify the reviewed repair head, retain the r1 inventory lock, and explicitly open the initializer:
 
 ```bash
-node scripts/benchmark-calibration-b000-init.js --output .benchmark/calibration/b000
+DESIGN_CANON_B000_R2_INIT=1 node scripts/benchmark-calibration-b000-init.js \
+  --output .benchmark/calibration/b000-r2 \
+  --live-r2-authorization true \
+  --reviewed-repair-head <reviewed-repair-head> \
+  --r1-lock-inventory /var/lib/dcbench/evidence/b000-r1-immutability-lock-r1/r1-inventory.json
 ```
 
 After every gate passes and the dedicated agent login is verified, execute the frozen order once:
 
 ```bash
 DESIGN_CANON_B000_LIVE=1 node scripts/benchmark-batch-b000.js \
-  --root .benchmark/calibration/b000 \
+  --root .benchmark/calibration/b000-r2 \
   --workspace-root /var/lib/dcbench/workspaces \
   --codex /usr/local/bin/codex \
+  --browser-executable /opt/dcbench/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell \
+  --browser-preflight .benchmark/calibration/b000-r2/browser-preflight/browser-preflight.json \
   --live true
 ```
 
 The effective form is `codex --ask-for-approval never exec ...`. It requests canonical model ID `gpt-5.6-sol`, medium reasoning, the Standard/default tier, workspace-write, disabled workspace-command network, disabled web search, ephemeral state, ignored user config and execution rules, disabled skill instructions and optional integration features, and JSONL. It never passes an evidence or repository path to the measured child.
 
-The batch stops at the first terminal failure and never retries. Raw stdout/stderr are written losslessly and flushed before normalization. Spawn, timeout, budget, JSONL, source, and capture failures remain terminal evidence; a later attempt requires a newly initialized immutable attempt ID.
+Before A can launch, the batch verifies the frozen browser-preflight hash and executable identity, then repeats local page load, viewport/full-page screenshots, HTTP/HTTPS aborts with zero accepted responses, lint, accessibility calibration, metadata, and artifact hashing with the same binary. The batch stops at the first terminal failure and never retries. It requires both child exit zero and a complete manifest with complete capture, null invalid reason, and required artifacts. Every launch and flushed terminal decision is preserved in `batch-state.jsonl`. Raw stdout/stderr are written losslessly and flushed before normalization. Spawn, timeout, budget, JSONL, source, Git-diff, capture, and artifact-hash failures remain terminal evidence; a later attempt requires a newly initialized immutable attempt ID.
 
 ## Reports
 

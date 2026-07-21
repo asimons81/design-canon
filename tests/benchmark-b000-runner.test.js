@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  assertNetworkIsolationEvidence, createOpaqueWorkspace, initializeB000, loadB000Calibration,
+  assertB000R2InitializationAdmission, assertNetworkIsolationEvidence, createOpaqueWorkspace, initializeB000, loadB000Calibration,
   prepareB000Guidance, validateAndCopySource, validateWorkspace, verifyB000Order
 } from '../research/benchmark/harness/b000.js';
 import {
@@ -15,7 +15,7 @@ import { buildB000CalibrationReport } from '../research/benchmark/harness/calibr
 import {
   EMPTY_USAGE, executeJsonlProcess, finalizeExecutionManifest, normalizeJsonl
 } from '../research/benchmark/harness/execution-state.js';
-import { REPOSITORY_ROOT } from '../research/benchmark/harness/lib.js';
+import { REPOSITORY_ROOT, sha256, stableStringify } from '../research/benchmark/harness/lib.js';
 
 const fake = fileURLToPath(new URL('./fixtures/fake-codex.js', import.meta.url));
 const globalHelp = REQUIRED_GLOBAL_OPTIONS.join('\n');
@@ -27,11 +27,38 @@ async function temp(t, prefix = 'dc-b000-') {
   return path;
 }
 
+async function fixtureAdmission(root) {
+  const lockedRoot = join(root, 'locked-r1');
+  const lockRoot = join(root, 'lock');
+  await mkdir(lockedRoot);
+  await mkdir(lockRoot);
+  const content = Buffer.from('immutable r1 fixture\n');
+  await writeFile(join(lockedRoot, 'evidence.txt'), content);
+  const inventory = {
+    schemaVersion: 1,
+    root: lockedRoot,
+    counts: { files: 1, directories: 1 },
+    files: [{ path: 'evidence.txt', bytes: content.length, sha256: sha256(content) }]
+  };
+  const inventoryBytes = stableStringify(inventory);
+  const inventoryPath = join(lockRoot, 'r1-inventory.json');
+  await writeFile(inventoryPath, inventoryBytes);
+  await writeFile(join(lockRoot, 'LOCK-SHA256'), `${sha256(inventoryBytes)}  r1-inventory.json\n`);
+  return assertB000R2InitializationAdmission({
+    authorization: true,
+    expectedRepairHead: 'a'.repeat(40),
+    currentHead: 'a'.repeat(40),
+    currentProtocolTree: '3e2ff4d734a055c4a00e91019f5c5d225eda1630',
+    r1LockInventory: inventoryPath
+  });
+}
+
 test('acceptance 1-4: boundary, order, nonofficial initialization, and pinned command', async (t) => {
   const root = await temp(t);
+  const admission = await fixtureAdmission(root);
   const guidance = join(root, 'guidance');
   await prepareB000Guidance(guidance);
-  const runs = await initializeB000({ outputRoot: join(root, 'runs'), guidanceDirectory: guidance });
+  const runs = await initializeB000({ outputRoot: join(root, 'runs'), guidanceDirectory: guidance, admission });
   const calibration = await loadB000Calibration();
   assert.deepEqual(verifyB000Order(calibration).map((run) => run.condition), ['A', 'B', 'D', 'C']);
   assert.equal(runs.length, 4);
@@ -55,10 +82,11 @@ test('acceptance 5: unsupported flags and old versions fail closed', async (t) =
 
 test('acceptance 6-8: overwrite, parent instructions, path traversal, and symlinks are rejected', async (t) => {
   const root = await temp(t);
+  const admission = await fixtureAdmission(root);
   const guidance = join(root, 'guidance');
   await prepareB000Guidance(guidance);
-  await initializeB000({ outputRoot: join(root, 'runs'), guidanceDirectory: guidance });
-  await assert.rejects(initializeB000({ outputRoot: join(root, 'runs'), guidanceDirectory: guidance }), /exist/i);
+  await initializeB000({ outputRoot: join(root, 'runs'), guidanceDirectory: guidance, admission });
+  await assert.rejects(initializeB000({ outputRoot: join(root, 'runs'), guidanceDirectory: guidance, admission }), /exist/i);
   const instructed = await temp(t, 'dc-parent-');
   await writeFile(join(instructed, 'AGENTS.md'), 'forbidden');
   await assert.rejects(createOpaqueWorkspace({ workspaceRoot: instructed, repositoryRoot: REPOSITORY_ROOT }), /Forbidden instruction/);
@@ -148,13 +176,15 @@ test('acceptance 16: capture status cannot erase an execution failure', () => {
 test('acceptance 17: aggregate report includes every attempt and separates measured usage from estimates', async (t) => {
   const root = await temp(t);
   for (const [index, condition] of ['A', 'B', 'D', 'C'].entries()) {
-    const dir = join(root, `B000-${condition}-r1`);
+    const dir = join(root, `B000-${condition}-r2`);
     await mkdir(dir);
     await writeFile(join(dir, 'manifest.json'), JSON.stringify({
-      benchmarkId: 'B000', runId: `B000-${condition}-r1`, condition, executionOrder: index + 1,
+      calibrationId: 'b000-codex-sol-standard-v1-r2',
+      benchmarkId: 'B000', runId: `B000-${condition}-r2`, condition, executionOrder: index + 1,
       status: 'complete', runtimeMs: 1000, actionCount: 4,
       usage: { inputTokens: 10, cachedInputTokens: 1, outputTokens: 2, reasoningTokens: null },
-      captureStatus: 'complete', networkIsolation: { valid: true }, environment: {}
+      captureStatus: 'complete', invalidReason: null,
+      networkIsolation: { valid: true }, environment: {}
     }));
   }
   const report = await buildB000CalibrationReport({ runsRoot: root, repositoryCommit: 'a'.repeat(40), codexVersion: '0.144.0', preflight: { passed: true } });

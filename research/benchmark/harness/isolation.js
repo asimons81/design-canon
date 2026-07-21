@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { chmod, chown, lstat, mkdir, readFile, realpath, readdir, stat, symlink, unlink } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
-import { writeJson } from './lib.js';
+import { sha256, stableStringify, writeJson } from './lib.js';
 
 export const AGENT_USER = 'dcbench-agent';
 export const RUNNER_USER = 'dcbench-runner';
@@ -22,8 +22,22 @@ export const SAFE_AGENT_ENVIRONMENT = Object.freeze({
   PLAYWRIGHT_BROWSERS_PATH: '/opt/dcbench/ms-playwright'
 });
 
-function sha256(bytes) { return createHash('sha256').update(bytes).digest('hex'); }
-function canonicalEvidence(evidence) { const { evidenceSha256: _discard, ...content } = evidence; return JSON.stringify(content); }
+function hashBytes(bytes) { return createHash('sha256').update(bytes).digest('hex'); }
+export function canonicalIsolationEvidence(evidence) {
+  const { evidenceSha256: _discard, ...unsignedEvidence } = evidence;
+  return stableStringify(unsignedEvidence);
+}
+
+export function isolationEvidenceSha256(evidence) {
+  return sha256(canonicalIsolationEvidence(evidence));
+}
+
+export function validateIsolationEvidenceHash(evidence) {
+  if (evidence?.evidenceSha256 !== isolationEvidenceSha256(evidence)) {
+    throw new Error('Isolation evidence hash mismatch.');
+  }
+  return true;
+}
 
 export function buildAgentLaunch(executable, args) {
   const environment = Object.entries(SAFE_AGENT_ENVIRONMENT).flatMap(([name, value]) => [`${name}=${value}`]);
@@ -106,7 +120,7 @@ export async function generateIsolationEvidence({ runId, workspace, workspaceRoo
   const agent = await idFor(AGENT_USER);
   const runner = { uid: process.getuid(), gid: process.getgid() };
   const binaryPath = await realpath(codexExecutable);
-  const binarySha256 = sha256(await readFile(binaryPath));
+  const binarySha256 = hashBytes(await readFile(binaryPath));
   const linkPath = join(workspaceRealPath, '.probe-repository-link');
   await symlink(join(repositoryRealPath, 'package.json'), linkPath);
   const parentProbePath = join(resolve(workspaceRoot), `.agent-parent-write-${runId}`);
@@ -155,13 +169,16 @@ export async function generateIsolationEvidence({ runId, workspace, workspaceRoo
     sandbox: { permissionProfile: ':workspace', workspaceWrite: true, workspaceCommandNetworkDisabled: true, openAiControlPlaneExemptFromCommandSandbox: true },
     probes
   };
-  evidence.evidenceSha256 = sha256(canonicalEvidence(evidence));
-  await writeJson(join(evidenceDirectory, 'isolation-evidence.json'), evidence);
-  return evidence;
+  evidence.evidenceSha256 = isolationEvidenceSha256(evidence);
+  const evidencePath = join(evidenceDirectory, 'isolation-evidence.json');
+  await writeJson(evidencePath, evidence);
+  const persistedEvidence = JSON.parse(await readFile(evidencePath, 'utf8'));
+  validateIsolationEvidenceHash(persistedEvidence);
+  return persistedEvidence;
 }
 
 export async function assertIsolationEvidence(evidence, { runId, workspace, effectiveCommandHash, maximumAgeMs = 300000 }) {
-  if (evidence?.evidenceSha256 !== sha256(canonicalEvidence(evidence))) throw new Error('Isolation evidence hash mismatch.');
+  validateIsolationEvidenceHash(evidence);
   if (evidence.runId !== runId) throw new Error('Isolation evidence belongs to another run.');
   if (evidence.workspaceRealPath !== await realpath(workspace)) throw new Error('Isolation evidence belongs to another workspace.');
   if (evidence.repositoryHead !== await repositoryHeadFor(evidence.repositoryRealPath)) throw new Error('Isolation evidence repository HEAD mismatch.');

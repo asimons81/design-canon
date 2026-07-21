@@ -6,6 +6,7 @@
  */
 
 let cachedCapability = null;
+let cachedCapabilityKey = null;
 
 /**
  * @typedef {object} BrowserCapability
@@ -21,13 +22,15 @@ let cachedCapability = null;
  *
  * @returns {Promise<BrowserCapability>}
  */
-export async function detectBrowserCapability() {
-  if (cachedCapability) {
+export async function detectBrowserCapability({ executablePath = null } = {}) {
+  const cacheKey = executablePath ?? '[playwright-default]';
+  if (cachedCapability && cachedCapabilityKey === cacheKey) {
     return cachedCapability;
   }
 
-  const result = await probeCapability();
+  const result = await probeCapability(executablePath);
   cachedCapability = result;
+  cachedCapabilityKey = cacheKey;
   return result;
 }
 
@@ -37,9 +40,10 @@ export async function detectBrowserCapability() {
  */
 export function resetCapabilityCache() {
   cachedCapability = null;
+  cachedCapabilityKey = null;
 }
 
-async function probeCapability() {
+async function probeCapability(executablePath) {
   // Check Playwright module availability
   let playwright;
   try {
@@ -104,7 +108,10 @@ async function probeCapability() {
   // Probe Chromium version
   let browser;
   try {
-    browser = await playwright.chromium.launch({ headless: true });
+    browser = await playwright.chromium.launch({
+      headless: true,
+      ...(executablePath ? { executablePath } : {})
+    });
     const context = await browser.newContext();
     const page = await context.newPage();
     const version = await page.evaluate(() => navigator.userAgent);

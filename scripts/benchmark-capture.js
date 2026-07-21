@@ -6,11 +6,13 @@ import { parseCliArgs } from '../research/benchmark/harness/lib.js';
 async function main() {
   const options = parseCliArgs(process.argv.slice(2), {
     '--run': { required: true },
-    '--entry': { required: false, default: 'source/index.html' }
+    '--entry': { required: false, default: 'source/index.html' },
+    '--browser-executable': { required: true }
   });
   const result = await captureRun({
     runDirectory: resolve(options['--run']),
-    entry: options['--entry']
+    entry: options['--entry'],
+    browserExecutablePath: options['--browser-executable']
   });
   process.stdout.write(`${JSON.stringify({
     runId: result.manifest.runId,

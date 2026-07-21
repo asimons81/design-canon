@@ -74,10 +74,18 @@ jobs:
       - name: Install with Playwright
         run: |
           npm ci --ignore-scripts
-          npx playwright install chromium
+          sudo install -d -o "$(id -u)" -g "$(id -g)" /opt/dcbench/ms-playwright
+          PLAYWRIGHT_BROWSERS_PATH=/opt/dcbench/ms-playwright npx playwright install chromium
+          echo "DESIGN_CANON_BROWSER_EXECUTABLE=$(PLAYWRIGHT_BROWSERS_PATH=/opt/dcbench/ms-playwright node -e 'console.log(require("playwright").chromium.executablePath())')" >> "$GITHUB_ENV"
 
       - name: Run browser tests
-        run: node --test --test-reporter=spec tests/browser-lifecycle.test.js tests/browser-security-integration.test.js
+        run: node --test --test-reporter=spec tests/browser-lifecycle.test.js tests/browser-security-integration.test.js tests/benchmark-b000-browser-repair.test.js
+
+      - name: Verify B000 explicit-browser preflight
+        run: |
+          node scripts/benchmark-browser-preflight.js \
+            --output "${RUNNER_TEMP}/b000-browser-preflight" \
+            --browser-executable "${DESIGN_CANON_BROWSER_EXECUTABLE}"
 
       - name: Verify static output stability
         run: |

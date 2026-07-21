@@ -2,11 +2,13 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { captureRun } from '../research/benchmark/harness/capture.js';
+import { resolveBrowserExecutable } from '../research/benchmark/harness/browser.js';
 import { createOpaqueWorkspace, validateAndCopySource } from '../research/benchmark/harness/b000.js';
 import { buildCodexExecArgs, codexPreflight, deriveCodexCapabilities, effectiveCommandHash, redactEffectiveCommand } from '../research/benchmark/harness/codex-adapter.js';
 import { executeJsonlProcess, finalizeExecutionManifest } from '../research/benchmark/harness/execution-state.js';
 import { assertIsolationEvidence, buildAgentLaunch, generateIsolationEvidence, grantAgentWorkspaceAccess, revokeAgentWorkspaceAccess, SAFE_AGENT_ENVIRONMENT } from '../research/benchmark/harness/isolation.js';
 import { parseCliArgs, REPOSITORY_ROOT, writeJson } from '../research/benchmark/harness/lib.js';
+import { generateWorkspaceDiff } from '../research/benchmark/harness/workspace-diff.js';
 
 async function terminalFailure(manifestPath, manifest, invalidReason, error, extra = {}) {
   const completed = {
@@ -17,11 +19,17 @@ async function terminalFailure(manifestPath, manifest, invalidReason, error, ext
   return completed;
 }
 
+function preservedTerminalError(error) {
+  error.manifestPreserved = true;
+  return error;
+}
+
 async function main() {
   const options = parseCliArgs(process.argv.slice(2), {
     '--run': { required: true }, '--workspace-root': { required: true },
     '--codex': { required: false, default: '/usr/local/bin/codex' },
-    '--live': { required: false, default: 'false' }
+    '--live': { required: false, default: 'false' },
+    '--browser-executable': { required: true }
   });
   const runDirectory = resolve(options['--run']);
   const manifestPath = join(runDirectory, 'manifest.json');
@@ -40,6 +48,7 @@ async function main() {
   let siblingWorkspace = null;
   let accessGranted = false;
   try {
+    const browserIdentity = await resolveBrowserExecutable(options['--browser-executable']);
     const preflight = await codexPreflight({ executable: options['--codex'], evidenceDirectory, env: SAFE_AGENT_ENVIRONMENT });
     if (!preflight.passed) throw Object.assign(new Error('Codex runtime preflight failed closed.'), { failureClass: 'codex-preflight-failure' });
     const globalHelp = await readFile(join(evidenceDirectory, 'codex-help.txt'), 'utf8');
@@ -89,29 +98,86 @@ async function main() {
     try {
       manifest.workspaceValidation = await validateAndCopySource({ workspace, workspaceRoot, runDirectory });
     } catch (error) {
-      manifest.status = 'invalid';
-      manifest.invalidReason = `source-validation-failure: ${error.message}`;
-      manifest.captureStatus = 'not-run-source-invalid';
-      await writeJson(manifestPath, manifest);
-      return;
+      manifest = await terminalFailure(
+        manifestPath,
+        manifest,
+        `source-validation-failure: ${error.message}`,
+        error,
+        { captureStatus: 'not-run-source-invalid' }
+      );
+      throw preservedTerminalError(error);
+    }
+    let workspaceDiff;
+    try {
+      workspaceDiff = await generateWorkspaceDiff({ workspace, runDirectory });
+    } catch (error) {
+      manifest = await terminalFailure(
+        manifestPath,
+        manifest,
+        error.failureClass ?? 'workspace-diff-failure',
+        error,
+        { captureStatus: 'not-run-diff-failed' }
+      );
+      throw preservedTerminalError(error);
+    }
+    const executionStatus = manifest.status;
+    if (executionStatus !== 'complete' || manifest.invalidReason !== null) {
+      const error = new Error('Execution did not produce a complete valid terminal state.');
+      manifest = await terminalFailure(
+        manifestPath,
+        manifest,
+        manifest.invalidReason ?? 'execution-not-complete',
+        error,
+        { captureStatus: 'not-run-execution-failed', workspaceDiff }
+      );
+      throw preservedTerminalError(error);
     }
     try {
-      const priorExecutionStatus = manifest.status;
-      manifest.status = manifest.invalidReason ? 'partial' : 'running';
+      manifest.status = 'running';
       await writeJson(manifestPath, manifest);
-      const capture = await captureRun({ runDirectory });
-      const priorFailure = manifest.invalidReason;
-      manifest = { ...capture.manifest, captureStatus: 'complete', executionStatusBeforeCapture: priorExecutionStatus };
-      if (priorFailure) { manifest.status = 'partial'; manifest.invalidReason = priorFailure; }
+      const capture = await captureRun({
+        runDirectory,
+        browserExecutablePath: browserIdentity.executableRealPath,
+        sourceHashes: manifest.workspaceValidation?.fileHashes ?? null,
+        diffSha256: workspaceDiff.rawDiffSha256
+      });
+      manifest = {
+        ...capture.manifest,
+        captureStatus: 'complete',
+        executionStatusBeforeCapture: executionStatus,
+        invalidReason: null,
+        workspaceDiff
+      };
+      await writeJson(manifestPath, manifest);
     } catch (error) {
-      manifest.captureStatus = 'failed';
-      manifest.captureError = error.message;
-      if (!manifest.invalidReason) { manifest.status = 'failed'; manifest.invalidReason = 'capture-failure'; }
+      manifest = await terminalFailure(
+        manifestPath,
+        manifest,
+        error.failureClass ?? 'capture-failure',
+        error,
+        {
+          captureStatus: 'failed',
+          captureFailureReportPath: error.captureFailureReport ? 'reports/capture-failure.json' : null,
+          workspaceDiff
+        }
+      );
+      throw preservedTerminalError(error);
     }
-    await writeJson(manifestPath, manifest);
+    if (
+      manifest.status !== 'complete' ||
+      manifest.captureStatus !== 'complete' ||
+      manifest.invalidReason !== null ||
+      !manifest.artifactHashesPath
+    ) {
+      const error = new Error('Final run manifest is not complete.');
+      manifest = await terminalFailure(manifestPath, manifest, 'terminal-manifest-incomplete', error);
+      throw preservedTerminalError(error);
+    }
   } catch (error) {
-    manifest = await terminalFailure(manifestPath, manifest, error.failureClass ?? 'startup-failure', error,
-      workspace ? { opaqueWorkspaceRealPath: await import('node:fs/promises').then(({ realpath }) => realpath(workspace).catch(() => workspace)) } : {});
+    if (!error.manifestPreserved) {
+      manifest = await terminalFailure(manifestPath, manifest, error.failureClass ?? 'startup-failure', error,
+        workspace ? { opaqueWorkspaceRealPath: await import('node:fs/promises').then(({ realpath }) => realpath(workspace).catch(() => workspace)) } : {});
+    }
     throw error;
   } finally {
     if (accessGranted && workspace) await revokeAgentWorkspaceAccess(workspace).catch(() => {});

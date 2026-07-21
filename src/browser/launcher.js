@@ -36,6 +36,7 @@ const DEFAULT_OPERATION_TIMEOUT = 60_000;
  * @param {boolean} [options.javaScriptEnabled=true] - enable JS execution
  * @param {'light'|'dark'} [options.colorScheme='light'] - preferred color scheme
  * @param {string} [options.scanRoot] - normalized scan root
+ * @param {string|null} [options.executablePath] - explicit Chromium executable
  * @returns {Promise<BrowserInstance>}
  */
 export async function launchBrowser(options = {}) {
@@ -45,7 +46,8 @@ export async function launchBrowser(options = {}) {
     operationTimeout = DEFAULT_OPERATION_TIMEOUT,
     javaScriptEnabled = true,
     colorScheme = 'light',
-    scanRoot = process.cwd()
+    scanRoot = process.cwd(),
+    executablePath = null
   } = options;
 
   // Dynamic import to keep Playwright optional
@@ -65,7 +67,8 @@ export async function launchBrowser(options = {}) {
   try {
     browser = await playwright.chromium.launch({
       headless: true,
-      timeout: Math.min(30_000, operationTimeout)
+      timeout: Math.min(30_000, operationTimeout),
+      ...(executablePath ? { executablePath } : {})
     });
   } catch (err) {
     throw new Error(`Failed to launch Chromium: ${err.message}`);

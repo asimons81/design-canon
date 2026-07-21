@@ -3,7 +3,8 @@ import { mkdir, readFile, readdir, stat } from 'node:fs/promises';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { lintPath } from '../../../src/lint.js';
-import { writeJson } from './lib.js';
+import { launchPinnedChromium, resolveBrowserExecutable } from './browser.js';
+import { sha256, stableStringify, writeJson, writeJsonExclusive } from './lib.js';
 
 export const CAPTURE_VIEWPORTS = Object.freeze([
   { id: 'desktop', width: 1440, height: 900, isMobile: false },
@@ -131,6 +132,53 @@ async function hashFile(path) {
   return createHash('sha256').update(data).digest('hex');
 }
 
+async function listRelativeFiles(root) {
+  const output = [];
+  async function walk(directory) {
+    const entries = await readdir(directory, { withFileTypes: true }).catch(() => []);
+    for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) await walk(path);
+      else if (entry.isFile()) output.push(relative(root, path).replaceAll('\\', '/'));
+    }
+  }
+  await walk(root);
+  return output;
+}
+
+export async function writeCaptureFailureReport({
+  runDirectory,
+  error,
+  phase,
+  browserIdentity,
+  attemptedScreenshots = [],
+  filesBefore = [],
+  sourceHashes = null,
+  diffSha256 = null
+}) {
+  const root = resolve(runDirectory);
+  const filesAfter = await listRelativeFiles(root);
+  const report = {
+    schemaVersion: 1,
+    status: 'failed',
+    failureClass: error?.failureClass ?? 'capture-failure',
+    safeErrorMessage: error?.message ?? String(error),
+    phase,
+    browserExecutablePath: browserIdentity?.executableRealPath ?? null,
+    browserExecutableSha256: browserIdentity?.executableSha256 ?? null,
+    playwrightVersion: browserIdentity?.playwrightVersion ?? null,
+    chromiumVersion: browserIdentity?.chromiumVersion ?? null,
+    filesAlreadyCreated: filesAfter.filter((path) => !filesBefore.includes(path)),
+    attemptedScreenshots,
+    sourceHashes,
+    diffSha256,
+    generatedAt: new Date().toISOString()
+  };
+  report.reportSha256 = sha256(stableStringify(report));
+  await writeJsonExclusive(join(root, 'reports', 'capture-failure.json'), report);
+  return report;
+}
+
 async function collectArtifactHashes(root) {
   const records = {};
   async function walk(directory) {
@@ -149,8 +197,30 @@ async function collectArtifactHashes(root) {
   return records;
 }
 
-export async function captureRun({ runDirectory, entry = 'source/index.html' }) {
+export async function validateArtifactHashes(root, artifactHashesPath = 'artifact-hashes.json') {
+  const report = JSON.parse(await readFile(join(root, artifactHashesPath), 'utf8'));
+  for (const [path, expected] of Object.entries(report.artifacts ?? {})) {
+    const bytes = await readFile(join(root, path));
+    if (bytes.length !== expected.bytes || sha256(bytes) !== expected.sha256) {
+      throw new Error(`Artifact hash mismatch: ${path}`);
+    }
+  }
+  return true;
+}
+
+export async function captureRun({
+  runDirectory,
+  browserExecutablePath,
+  entry = 'source/index.html',
+  expectedChromiumVersion,
+  sourceHashes = null,
+  diffSha256 = null
+}) {
   const root = resolve(runDirectory);
+  const filesBefore = await listRelativeFiles(root);
+  let phase = 'browser-identity';
+  let browserIdentity = null;
+  const attemptedScreenshots = [];
   const manifestPath = join(root, 'manifest.json');
   const manifest = validateRunManifestForCapture(JSON.parse(await readFile(manifestPath, 'utf8')));
   const entryPath = resolve(root, entry);
@@ -160,27 +230,40 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
   }
   const entryInfo = await stat(entryPath).catch(() => null);
   if (!entryInfo?.isFile()) throw new Error(`Capture entry '${entry}' does not exist.`);
+  const forbiddenExisting = [
+    'artifact-hashes.json',
+    'render-metadata.json',
+    'reports/accessibility-calibration.json',
+    'reports/design-canon-lint.json',
+    'reports/browser-network.json',
+    'reports/capture-failure.json',
+    ...CAPTURE_VIEWPORTS.flatMap((viewport) => [
+      `screenshots/${viewport.id}-viewport.png`,
+      `screenshots/${viewport.id}-full-page.png`
+    ])
+  ];
+  const collision = forbiddenExisting.find((path) => filesBefore.includes(path));
+  if (collision) throw new Error(`Capture output already exists: ${collision}`);
 
-  let chromium;
   try {
-    ({ chromium } = await import('playwright'));
-  } catch {
-    throw new Error('Playwright is required for benchmark capture. Install it and Chromium explicitly.');
-  }
+    browserIdentity = await resolveBrowserExecutable(browserExecutablePath);
+    phase = 'browser-launch';
+    const launched = await launchPinnedChromium(browserExecutablePath, { expectedChromiumVersion });
+    const { browser } = launched;
+    browserIdentity = launched.identity;
+    const browserVersion = browserIdentity.chromiumVersion;
+    manifest.status = 'running';
+    manifest.startedAt ??= new Date().toISOString();
+    await writeJson(manifestPath, manifest);
 
-  manifest.status = 'running';
-  manifest.startedAt ??= new Date().toISOString();
-  await writeJson(manifestPath, manifest);
-
-  const browser = await chromium.launch({ headless: true });
-  const browserVersion = browser.version();
   const viewportResults = [];
   const accessibilitySnapshots = [];
   const consoleMessages = [];
   const attemptedExternalRequests = [];
   const acceptedExternalResponses = [];
-  try {
+    try {
     for (const viewport of CAPTURE_VIEWPORTS) {
+      phase = `viewport-${viewport.id}-context`;
       const context = await browser.newContext({
         viewport: { width: viewport.width, height: viewport.height },
         deviceScaleFactor: 1,
@@ -211,14 +294,19 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
       page.on('pageerror', (error) => {
         consoleMessages.push({ viewport: viewport.id, type: 'pageerror', text: error.message });
       });
+      phase = `viewport-${viewport.id}-load`;
       await page.goto(pathToFileURL(entryPath).href, { waitUntil: 'domcontentloaded', timeout: 10000 });
       await page.evaluate(() => new Promise((resolveFrame) => requestAnimationFrame(() => resolveFrame())));
 
       const viewportPath = join(root, 'screenshots', `${viewport.id}-viewport.png`);
       const fullPath = join(root, 'screenshots', `${viewport.id}-full-page.png`);
       await mkdir(join(root, 'screenshots'), { recursive: true });
+      attemptedScreenshots.push(relative(root, viewportPath).replaceAll('\\', '/'));
+      phase = `viewport-${viewport.id}-screenshot`;
       await page.screenshot({ path: viewportPath, fullPage: false });
+      attemptedScreenshots.push(relative(root, fullPath).replaceAll('\\', '/'));
       await page.screenshot({ path: fullPath, fullPage: true });
+      phase = `viewport-${viewport.id}-accessibility`;
       const audit = await page.evaluate(auditDocumentInPage);
       accessibilitySnapshots.push({ viewport: viewport.id, ...audit });
       viewportResults.push({
@@ -231,42 +319,66 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
       });
       await context.close();
     }
-  } finally {
+    }
+    finally {
     await browser.close();
-  }
+    }
+    phase = 'browser-network-report';
+    const browserNetworkReport = {
+      schemaVersion: 1,
+      policy: 'local-file-only',
+      attemptedExternalRequests,
+      acceptedExternalResponses,
+      externalResponsesAccepted: acceptedExternalResponses.length,
+      passed: acceptedExternalResponses.length === 0
+    };
+    const browserNetworkPath = join(root, 'reports', 'browser-network.json');
+    await writeJsonExclusive(browserNetworkPath, browserNetworkReport);
+    if (!browserNetworkReport.passed) throw new Error('Capture accepted an external browser response.');
 
+  phase = 'accessibility-report';
   const accessibilityReport = summarizeAccessibilitySnapshots(accessibilitySnapshots);
   accessibilityReport.consoleMessages = consoleMessages;
   const accessibilityPath = join(root, 'reports', 'accessibility-calibration.json');
   await mkdir(join(root, 'reports'), { recursive: true });
   await writeJson(accessibilityPath, accessibilityReport);
 
-  const lintReport = await lintPath({ path: sourceRoot, profile: manifest.profile, mode: 'browser' });
+  phase = 'design-canon-lint';
+  const lintReport = await lintPath({
+    path: sourceRoot,
+    profile: manifest.profile,
+    mode: 'browser',
+    browserExecutablePath: browserIdentity.executableRealPath
+  });
   const lintPathName = join(root, 'reports', 'design-canon-lint.json');
   await writeJson(lintPathName, lintReport);
 
+  phase = 'render-metadata';
   const renderMetadata = {
     schemaVersion: 1,
     entry: relative(root, entryPath).replaceAll('\\', '/'),
     captureTool: 'playwright',
     browser: browserVersion,
+    browserExecutable: browserIdentity,
     networkPolicy: 'local-file-only',
     reducedMotion: 'reduce',
     colorScheme: 'light',
     consoleMessages,
     attemptedExternalRequests,
     acceptedExternalResponses,
-    externalNetworkBlocked: attemptedExternalRequests.length > 0 && acceptedExternalResponses.length === 0,
+    externalNetworkBlocked: acceptedExternalResponses.length === 0,
     viewportResults
   };
   await writeJson(join(root, 'render-metadata.json'), renderMetadata);
 
+  phase = 'artifact-hashing';
   const hashes = await collectArtifactHashes(root);
-  await writeJson(join(root, 'artifact-hashes.json'), {
+  await writeJsonExclusive(join(root, 'artifact-hashes.json'), {
     schemaVersion: 1,
     excludes: ['manifest.json', 'artifact-hashes.json'],
     artifacts: hashes
   });
+  await validateArtifactHashes(root);
 
   manifest.status = 'complete';
   manifest.completedAt = new Date().toISOString();
@@ -276,6 +388,9 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
     architecture: process.arch,
     nodeVersion: process.version,
     browser: browserVersion,
+    browserExecutablePath: browserIdentity.executableRealPath,
+    browserExecutableSha256: browserIdentity.executableSha256,
+    playwrightVersion: browserIdentity.playwrightVersion,
     captureTool: 'playwright',
     accessibilityTool: accessibilityReport.scanner
   };
@@ -283,7 +398,28 @@ export async function captureRun({ runDirectory, entry = 'source/index.html' }) 
   manifest.viewportResults = viewportResults;
   manifest.lintReportPath = relative(root, lintPathName).replaceAll('\\', '/');
   manifest.accessibilityReportPath = relative(root, accessibilityPath).replaceAll('\\', '/');
+  manifest.browserNetworkReportPath = relative(root, browserNetworkPath).replaceAll('\\', '/');
   manifest.artifactHashesPath = 'artifact-hashes.json';
   await writeJson(manifestPath, manifest);
-  return { manifest, renderMetadata, accessibilityReport, lintReport };
+  return { manifest, renderMetadata, accessibilityReport, lintReport, browserIdentity };
+  } catch (error) {
+    if (!error.failureClass) {
+      error.failureClass = phase === 'artifact-hashing'
+        ? 'artifact-hash-failure'
+        : 'capture-failure';
+    }
+    if (!error.captureFailureReport) {
+      error.captureFailureReport = await writeCaptureFailureReport({
+        runDirectory: root,
+        error,
+        phase,
+        browserIdentity,
+        attemptedScreenshots,
+        filesBefore,
+        sourceHashes,
+        diffSha256
+      }).catch(() => null);
+    }
+    throw error;
+  }
 }

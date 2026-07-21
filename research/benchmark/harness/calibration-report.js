@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { writeJson } from './lib.js';
+import { loadB000Calibration, verifyB000Order } from './b000.js';
 
 function command(executable, args = []) {
   return new Promise((resolveCommand) => execFile(executable, args, { windowsHide: true }, (error, stdout, stderr) =>
@@ -14,11 +15,16 @@ function sumKnown(values) {
 }
 
 export async function buildB000CalibrationReport({ runsRoot, repositoryCommit, codexVersion, preflight }) {
+  const calibration = await loadB000Calibration();
+  const expectedRunIds = verifyB000Order(calibration).map((run) => run.runId);
   const attempts = [];
   for (const entry of (await readdir(runsRoot, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory()) continue;
     const manifest = JSON.parse(await readFile(join(runsRoot, entry.name, 'manifest.json'), 'utf8'));
-    if (manifest.benchmarkId === 'B000') attempts.push(manifest);
+    if (
+      manifest.benchmarkId === 'B000' &&
+      manifest.calibrationId === calibration.calibrationId
+    ) attempts.push(manifest);
   }
   attempts.sort((a, b) => a.executionOrder - b.executionOrder);
   const usageFields = ['inputTokens', 'cachedInputTokens', 'outputTokens', 'reasoningTokens'];
@@ -32,11 +38,17 @@ export async function buildB000CalibrationReport({ runsRoot, repositoryCommit, c
     actionBudget: actionValues.length ? Math.ceil(Math.max(...actionValues) * 1.25) : null,
     basis: 'B000 observed maxima with 50% time and 25% action headroom; review before protocol admission.'
   };
-  const completed = attempts.length === 4 && attempts.every((attempt) => attempt.status === 'complete');
+  const observedRunIds = attempts.map((attempt) => attempt.runId);
+  const orderValid = JSON.stringify(observedRunIds) === JSON.stringify(expectedRunIds);
+  const completed = orderValid && attempts.every((attempt) =>
+    attempt.status === 'complete' &&
+    attempt.captureStatus === 'complete' &&
+    attempt.invalidReason === null
+  );
   const isolationValid = attempts.length === 4 && attempts.every((attempt) => attempt.networkIsolation?.valid === true);
   const report = {
     schemaVersion: 1,
-    calibrationId: 'b000-codex-sol-standard-v1',
+    calibrationId: calibration.calibrationId,
     official: false,
     claimEligible: false,
     repositoryCommit,
@@ -52,7 +64,7 @@ export async function buildB000CalibrationReport({ runsRoot, repositoryCommit, c
       chromiumVersion: attempts.find((attempt) => attempt.environment?.browser)?.environment.browser ?? null
     },
     runtime: { requestedModel: 'gpt-5.6-sol', modelDisplayName: 'GPT-5.6 Sol', reasoningEffort: 'medium', preflight },
-    frozenExecutionOrder: ['B000-A-r1', 'B000-B-r1', 'B000-D-r1', 'B000-C-r1'],
+    frozenExecutionOrder: expectedRunIds,
     attempts,
     totalProviderUsage,
     observedCost: null,
@@ -68,6 +80,7 @@ export async function buildB000CalibrationReport({ runsRoot, repositoryCommit, c
       ...(totalProviderUsage.inputTokens === null ? ['Provider usage is incomplete.'] : []),
       'Observed provider cost, credits, and quota are unavailable unless exposed by Codex events.',
       ...(!completed ? ['Not all four attempts completed.'] : []),
+      ...(!orderValid ? ['The immutable r2 attempt set or execution order is incomplete.'] : []),
       ...(!isolationValid ? ['Network isolation is incomplete or unverified.'] : [])
     ],
     recommendation: preflight?.passed === false ? 'STOP' : completed && isolationValid ? 'GO' : attempts.length === 0 ? 'STOP' : 'REVISE',

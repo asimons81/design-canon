@@ -20,6 +20,11 @@ export async function writeJson(path, value) {
   await writeFile(path, stableStringify(value), 'utf8');
 }
 
+export async function writeJsonExclusive(path, value) {
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, stableStringify(value), { encoding: 'utf8', flag: 'wx' });
+}
+
 export function stableStringify(value) {
   function normalize(input) {
     if (Array.isArray(input)) return input.map(normalize);
