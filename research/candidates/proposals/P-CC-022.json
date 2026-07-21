@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-022",
+  "proposedRuleId": "profile.avatar-first-default",
+  "title": "Do not default to avatar-first profile cards",
+  "category": "hierarchy",
+  "relevantSurfaces": [
+    "product-app",
+    "social"
+  ],
+  "summary": "AI-generated profile cards universally prioritize a circular avatar with online-status dot as the primary visual, with name, role, and action buttons (Message, Follow, Connect) below \u2014 a template drawn from social media regardless of context.",
+  "instruction": "Design profile cards based on what the viewer needs to know first. For professional directories, prioritize skills and context over appearance. For social platforms, the avatar may be appropriate. For enterprise tools, consider compact identity without profile cards.",
+  "rationale": "The social-media profile card template prioritizes appearance and relationship actions over professional context. When applied universally, it presumes social connections before users have context to decide and wastes space on decorative avatars in contexts where identity is already known.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Large circular avatar as the primary card element",
+    "Online status dot (green circle) overlaid bottom-right of avatar",
+    "Name in bold, role/title in subdued text below",
+    "Row of outlined action buttons (Message, Follow, Connect)",
+    "Same profile format for social, enterprise, and team contexts"
+  ],
+  "controls": [
+    "Text-only profile card for professional contexts where identity is known",
+    "Skills-and-context-first layout with smaller or no avatar",
+    "Compact identity bar instead of a full profile card for secondary contexts",
+    "Profile details revealed progressively rather than in a dense card"
+  ],
+  "borderlineCases": [
+    "Social platforms where profile discovery is the core interaction"
+  ],
+  "contextualExceptions": [
+    "Team directory pages where quick-contact is the primary task"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A card containing a circular image, a prominent name heading, a secondary role text, and a row of action buttons.",
+  "matcherProposal": "Detect card elements containing: a circular image element, a heading-level name, a subdued role/title paragraph, and a button row.",
+  "detectorLimitations": [
+    "Cannot determine if the avatar-first format is appropriate for the context"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Social platforms where the avatar is the correct primary element",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a contextual suggestion based on the apparent use case of the app or page.",
+  "fixturePlans": {
+    "violation": "Profile card: circular avatar with green status dot, name, 'Software Engineer', Message/Follow/Connect buttons.",
+    "control": "Professional card: name, title, skills list, company logo (small), compact format without avatar or action buttons.",
+    "borderline": "Social platform profile card where avatar-first is the expected convention."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

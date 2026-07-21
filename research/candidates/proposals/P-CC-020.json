@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-020",
+  "proposedRuleId": "modals.centered-everything",
+  "title": "Do not default to centered modals for every overlay interaction",
+  "category": "layout",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated interfaces default to a centered modal card with dark backdrop for every overlay interaction \u2014 confirmations, details, forms, settings \u2014 regardless of whether context preservation would be better served by a side panel, inline expansion, or toast.",
+  "instruction": "Choose the overlay format based on the user's task, not the modal default. Use side panels for detail views where context with the parent page matters, inline expansions for lightweight reveals, and toasts for transient confirmations. Reserve centeral modals for confirmations and flows requiring exclusive focus.",
+  "rationale": "The centered modal is a heavy interaction pattern that obscures context, blocks the underlying page, and forces an additional dismissal step. Applying it universally reduces the pattern's meaning when genuine confirmation is needed.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Every overlay interaction uses the same centered card with dark backdrop",
+    "Close X icon positioned top-right without label",
+    "Title row even when content is self-explanatory",
+    "Primary/secondary action buttons bottom-right aligned",
+    "Backdrop opacity consistently ~50% black regardless of modal content"
+  ],
+  "controls": [
+    "Side slide-in panel for detail views that reference parent content",
+    "Inline expansion or accordion for supplementary information",
+    "Confirmation inline within the triggering element",
+    "Non-modal dialog for quick actions that don't need exclusive focus"
+  ],
+  "borderlineCases": [
+    "Destructive actions requiring confirmation before proceeding"
+  ],
+  "contextualExceptions": [
+    "Complex forms that genuinely need exclusive user focus"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A centered card element with a dark semi-transparent overlay covering the page background, containing a close button and action buttons.",
+  "matcherProposal": "Detect a positioned overlay with a semi-transparent background containing a centered rounded card with a close button and action buttons at the bottom.",
+  "detectorLimitations": [
+    "Cannot assess if the modal is the appropriate pattern for the specific interaction"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Confirmations and flows that genuinely need exclusive focus",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag with context about alternative overlay patterns that might better preserve user context.",
+  "fixturePlans": {
+    "violation": "Centered modal for viewing item details: dark backdrop, close X, title, content, action buttons bottom-right.",
+    "control": "Side slide-in panel for viewing item details: keeps parent page visible, preserves scroll position.",
+    "borderline": "Delete confirmation modal where the exclusive focus is intentional and necessary."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules. Name parallels layout.centered-everything but addresses modal overlays specifically."
+}

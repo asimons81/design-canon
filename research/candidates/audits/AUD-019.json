@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-019",
+  "component": "analytics-cards",
+  "recurringPattern": "Grid of metric cards each containing a small trend icon (up green arrow / down red arrow), a large number, a short label, and a miniature sparkline chart. Cards have identical sizing with rounded corners and subtle shadows.",
+  "designHarm": "The uniform card format hides metric priority — every number looks equally important. The green-up/red-down color coding creates emotional reactions before users read the metric context. Sparkline charts in every card add visual noise when most users only need the current value and a comparison. The pattern encourages dashboard designers to show 12+ metrics when only 3-4 drive decisions.",
+  "legitimateExceptions": ["Executive dashboards where many metrics need at-a-glance monitoring", "Real-time monitoring for operations teams"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 4-analytics-card row with sparklines", "Focused analytics view with one primary metric and supporting data", "Text-only metric display without sparklines or trend arrows"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-019"],
+  "originalObservations": [
+    "AI-generated analytics cards always have identical dimensions regardless of metric value length or importance.",
+    "The trend arrows and percentage changes appear on every card even when the change is negligible.",
+    "Sparkline charts use the brand's primary color for the line with a subtle gradient fill underneath."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-034",
+  "proposedRuleId": "empty-states.blank-slate",
+  "title": "Design empty states with guidance, not blank containers",
+  "category": "empty-states",
+  "relevantSurfaces": ["product-app", "dashboards", "mobile-interfaces"],
+  "summary": "Generated applications leave data-dependent screens blank when there is no data — showing empty tables, blank cards, or 'No data' messages — without guiding the user on how to populate the view or what action to take next.",
+  "instruction": "Every view that depends on user-generated or filterable data must have a designed empty state with: (a) an explanation of why the view is empty, (b) a clear next action (create, import, adjust filters, connect account), and (c) either an illustration or an example of what the populated view would look like. Do not render blank containers or generic 'No data found' messages.",
+  "rationale": "Empty states are a critical onboarding moment. A blank page or generic message creates a cold start problem — the user does not know what the feature is for, how to populate it, or whether the emptiness is a bug. A well-designed empty state is estimated to improve feature adoption by 20-40%.",
+  "claimType": "general-knowledge",
+  "violations": [
+    "A project dashboard that shows a blank page with only a header 'Projects' and an empty table shell — no guidance, no CTA, no illustration.",
+    "A search results page showing 'No results found' in 12px gray text centered on an otherwise blank page with no suggestion to broaden the search or browse categories.",
+    "An inbox or messaging screen with a completely empty list, nothing else — no prompt to start a conversation, no sample content, no onboarding tip."
+  ],
+  "controls": [
+    "A project dashboard empty state with an illustration of a project card, the text 'Create your first project to get started', and a prominent 'New Project' button.",
+    "A search results page with 'No results for xyz' in the heading, followed by suggestions like 'Try broader terms', 'Browse categories', 'Clear filters' — each as a clickable action.",
+    "An inbox empty state with an illustration of a mailbox, a message 'No messages yet', and a 'Compose your first message' button linking to the compose view."
+  ],
+  "borderlineCases": [
+    "A real-time monitoring dashboard that shows 'No active alerts' as a positive state — the emptiness is the desired state, and the message is reassuring rather than unhelpful."
+  ],
+  "contextualExceptions": [
+    "Data-dense monitoring tools where the empty state is genuinely informational (e.g., 'No errors in the last 24 hours') and the message itself is the value.",
+    "APIs or developer tool interfaces where raw data is the expected output and empty JSON responses are appropriate.",
+    "Widgets in a constructed dashboard where the widget container handles empty states at a higher level."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A viewport containing only container shells (empty tables, blank cards, list outlines) with no call-to-action button and no contextual guidance text exceeding 20 characters",
+  "matcherProposal": "Identify data-dependent containers: tables with 0 rows, lists with 0 items, cards that are blank, or elements with data-empty attribute set to true. Check for: (a) actionable button or link element, (b) explanatory text exceeding 20 characters, (c) image or SVG illustration. Flag if both (a) and at least one of (b) or (c) are absent.",
+  "detectorLimitations": [
+    "Cannot detect empty states that are populated via JavaScript after an initial loading state — the empty state may only appear after the loading completes.",
+    "Cannot distinguish between loading state (data pending) and empty state (no data exists) without runtime state inspection.",
+    "Illustrations embedded as background images or inline SVGs are hard to distinguish from decorative elements."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A dashboard designed as an observation-only tool where the user does not add data — the empty state is actually a read-only informational display.",
+    "A log viewer that shows 'No logs match the current filter' — the user provided the filter, and the emptiness is the expected response to their query."
+  ],
+  "mitigationStrategy": "Exclude containers that are explicitly read-only or filter-result areas. Only flag on data-source views where the user can create or populate content. Support a data-empty-state-designed attribute for intentional empty states.",
+  "fixturePlans": {
+    "violation": "A project management app showing an empty table shell with column headers 'Name', 'Status', 'Last updated' but zero rows and no CTA or guidance text.",
+    "control": "The same page showing an illustration of a project board, the text 'Create your first project to get started', and a blue 'New Project' button.",
+    "borderline": "A monitoring dashboard showing 'No incidents reported in the last 7 days' with a green checkmark icon — the emptiness is the desired state."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "First empty-states proposal. No overlap with existing rules."
+}

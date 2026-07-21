@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-021",
+  "proposedRuleId": "notifications.toast-fatigue",
+  "title": "Do not use toast notifications for every system message",
+  "category": "layout",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated interfaces universally use the four-color toast notification (green/red/blue/yellow) appearing top-right with auto-dismiss for every system message, from trivial saves to critical errors.",
+  "instruction": "Match notification persistence and prominence to message urgency. Reserve toasts for passive, non-critical confirmations. Use persistent banners or inline states for messages requiring user action. Do not show success toasts for operations the user can see succeeded (inline saves, applied filters).",
+  "rationale": "The universal toast notification trains users to ignore all notifications. Success toasts on every saved-change operation create notification fatigue. The 3-second auto-dismiss fails readers who need more time, and the top-right position competes with browser-native notifications.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Four-color toast system: green success, red error, blue info, yellow warning",
+    "Auto-dismiss at approximately 3 seconds regardless of message length",
+    "Success toast for every save, update, or create operation",
+    "Top-right slide-in animation with 300ms ease-out",
+    "Dismiss X button on every toast even when auto-dismissing"
+  ],
+  "controls": [
+    "Inline success state replacing the trigger element (e.g., button text changes to 'Saved')",
+    "Persistent banner at top of page for messages requiring user action",
+    "Subtle inline confirmation without a toast overlay",
+    "No confirmation at all for operations the user initiated and can see the result of"
+  ],
+  "borderlineCases": [
+    "Messages that need to reach the user regardless of page context"
+  ],
+  "contextualExceptions": [
+    "Real-time collaboration notifications that must appear on any page"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A small positioned rectangle (top-right or top-center) appearing temporarily with slide-in animation, containing an icon, short text, and optional close button.",
+  "matcherProposal": "Detect positioned elements with slide-in animations, colored backgrounds (green/red/blue/yellow), containing an icon and text, that auto-dismiss.",
+  "detectorLimitations": [
+    "Cannot determine if the notification urgency matches the toast format"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Applications where every user action genuinely needs confirmation feedback",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag success toasts on operations that have visible inline effects more aggressively than error or warning toasts.",
+  "fixturePlans": {
+    "violation": "Green success toast 'Profile saved!' appearing after every profile form save, auto-dismissing 3 seconds.",
+    "control": "Save button text changes to 'Saved!' briefly, no toast overlay, color returns to normal after 2 seconds.",
+    "borderline": "Critical error toast for payment failure that persists until dismissed."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

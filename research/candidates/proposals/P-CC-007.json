@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-007",
+  "proposedRuleId": "forms.stacked-helper-text-default",
+  "title": "Do not put helper text on every form field",
+  "category": "layout",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated forms universally place helper text below every input field and stack fields vertically with uniform spacing, regardless of form length or whether each field actually needs explanation.",
+  "instruction": "Add helper text only where the user genuinely needs guidance. Use label as the primary instruction. Consider inline labels, floating labels, or side labels for short or familiar fields. Adjust vertical density to the form's context.",
+  "rationale": "Helper text on every field adds visual noise, increases form height, and distracts from fields that genuinely need explanation. Users skip persistent helper text after the first few fields, making it ineffective for the fields that need it most.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Helper text under every input field even when the label is self-explanatory ('Full Name' \u2192 'Enter your full name')",
+    "Uniform vertical spacing regardless of field type or relationship",
+    "Placeholder text inside inputs that repeats the label",
+    "8px or 12px border-radius on every input",
+    "Subtle inner shadow on every input field"
+  ],
+  "controls": [
+    "Helper text only on complex fields (format requirements, privacy notes)",
+    "Floating labels that serve as both label and placeholder",
+    "Inline validation messages replacing static helper text",
+    "Multi-column layouts for related short fields"
+  ],
+  "borderlineCases": [
+    "Complex legal or medical forms where every field genuinely needs explanation"
+  ],
+  "contextualExceptions": [
+    "Accessibility requirements that mandate explicit label-instruction separation"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Consecutive stacked form fields where each input is followed by a small-font text element within close proximity.",
+  "matcherProposal": "Detect repeated patterns of label-input-helpertext structures stacked vertically with identical spacing.",
+  "detectorLimitations": [
+    "Cannot determine if helper text is genuinely helpful or redundant"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "high",
+  "falsePositiveScenarios": [
+    "Well-designed forms where each field genuinely needs separate guidance",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a suggestion with a note to review each helper text for value. Remove if it restates the label.",
+  "fixturePlans": {
+    "violation": "Stacked form with helper text under all 8 fields, rounded inputs with inner shadows, placeholder text matching labels.",
+    "control": "Compact form with floating labels, helper text only on password and phone fields, inline validation.",
+    "borderline": "Medical intake form where each field has distinct instructions."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules. Related to editorial.reading-measure in spirit of respecting user attention."
+}

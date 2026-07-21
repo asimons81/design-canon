@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-011",
+  "component": "testimonials",
+  "recurringPattern": "Carousel or grid of testimonial cards with a circular headshot, quote in italic or large quotation marks, person's name/title below, and star ratings. Cards use white background on a tinted section background. Carousel variant includes dot indicators and left/right arrows.",
+  "designHarm": "The testimonial carousel reduces trust signals to decorative filler — users have learned to ignore auto-rotating quotes. The identical card format implies testimonials are stock imagery, not genuine endorsements. Star ratings appear even for B2B enterprise products where star reviews are not the norm.",
+  "legitimateExceptions": ["Consumer product pages with verified user reviews that need aggregate display", "Case study sections where long-form quotes need compact card previews"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard testimonial carousel with headshots and stars", "Full case study layout with video and metrics instead of quote cards", "Simple quote list without avatars or ratings"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-011"],
+  "originalObservations": [
+    "AI consistently generates circular headshots with identical sizing even when the number of testimonials varies widely.",
+    "Quotation marks are always large, decorative, and in an accent color.",
+    "The carousel auto-plays in generated prototypes despite known usability issues with auto-rotating testimonials."
+  ]
+}

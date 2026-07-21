@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-023",
+  "proposedRuleId": "progress.linear-bar-default",
+  "title": "Do not default to thin linear progress bars",
+  "category": "layout",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated progress indicators universally default to a thin (4-8px) linear bar with brand-color fill on a gray track, with smooth transition animation, regardless of the progress context or user need for granularity.",
+  "instruction": "Choose progress representation based on what the user needs to know: determinate vs indeterminate, step count vs percentage, linear vs circular. Match bar prominence to the operation's importance. Reserve smooth animations for operations where continuous progress is measurable.",
+  "rationale": "The horizontal progress bar is applied uniformly to all progression metaphors \u2014 multi-step forms, uploads, activations \u2014 though each has different user needs. The smooth animation adds visual delight but delays perceived completion. Bar prominence never varies with operation importance.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Linear bar 4-8px tall, brand-color fill on light gray track",
+    "Smooth width transition animation on every bar regardless of discrete vs continuous progress",
+    "Same bar format for upload progress, form completion, and system processing",
+    "Indeterminate animated stripes for operations that can't measure progress",
+    "Percentage or fraction text only when explicitly requested"
+  ],
+  "controls": [
+    "Step indicator with numbered stages for multi-step processes",
+    "Determinate bar with percentage and estimated time for long operations",
+    "Circular progress for standalone operations that need compact feedback",
+    "Non-linear progress for indeterminate operations (pulse instead of stripes)"
+  ],
+  "borderlineCases": [
+    "File upload/download where byte-level progress is measurable and meaningful"
+  ],
+  "contextualExceptions": [
+    "Multi-wizard forms where step number out of total is the primary question"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A thin horizontal rectangle with a colored fill that changes width over time, on a light gray background track.",
+  "matcherProposal": "Detect elements with progressbar role or ARIA attributes, narrow height (4-12px), with a colored fill element against a track background.",
+  "detectorLimitations": [
+    "Cannot distinguish between appropriate progress bar use and defaulting"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "high",
+  "falsePositiveScenarios": [
+    "Standard progress indicators that are appropriate for the context",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a low-severity suggestion, focusing on cases where progress information could be more helpful.",
+  "fixturePlans": {
+    "violation": "Thin 6px linear progress bar with brand blue fill, smooth animation, no percentage, for a multi-step form.",
+    "control": "Step indicator with numbered circles, current step highlighted, completed steps with checkmarks.",
+    "borderline": "File upload progress bar where the linear bar with percentage is the expected standard."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to loading-states audit (AUD-014) but addresses progress bars in operational contexts, not initial page loading."
+}

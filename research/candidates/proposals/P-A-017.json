@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-017",
+  "proposedRuleId": "error-state.specific-recovery",
+  "title": "Error messages must explain what happened and how to fix it",
+  "category": "error-states",
+  "relevantSurfaces": [
+    "product-app",
+    "forms"
+  ],
+  "summary": "AI-generated error states use vague messages like 'Something went wrong' without context, cause, or recovery steps.",
+  "instruction": "Every error message must include: what happened (the specific failure), why it happened (the likely cause), and what the user can do next (recovery action). Avoid generic error language that provides no actionable information.",
+  "rationale": "Vague error messages frustrate users and increase support load. A user who sees 'Something went wrong' cannot determine whether to retry, contact support, or change their input. Specific error messages restore user autonomy.",
+  "claimType": "observation",
+  "violations": [
+    "A form submission failure showing 'Error: Something went wrong' with no distinction between validation failure, network error, or server rejection.",
+    "An API error toast showing 'An unexpected error occurred' with a dismiss button but no retry or details."
+  ],
+  "controls": [
+    "A form error saying 'Your session expired. Please refresh the page and try again.' followed by a Refresh button.",
+    "An upload error saying 'Image must be under 5MB. Your file was 8MB.' with a link to compress the image."
+  ],
+  "borderlineCases": [
+    "Some security-related errors (e.g., authentication failures) should intentionally be vague to avoid revealing system structure - but should still provide recovery guidance."
+  ],
+  "contextualExceptions": [
+    "Catastrophic system failures where the system cannot determine what went wrong.",
+    "Security errors where specific information could aid attackers.",
+    "Errors in user-generated content where the system has no context about the failure."
+  ],
+  "detectorFeasibility": "visual-only",
+  "detectorSignal": "Error UI containing phrases like 'something went wrong', 'an error occurred', 'unexpected error' without specific context",
+  "matcherProposal": "Pattern match error display elements against known generic error templates. Check for presence of specific context (variable/field name, error code, specific recovery instruction) near the error element. Flag generic errors without context.",
+  "detectorLimitations": [
+    "Some errors are genuinely unrecoverable and have no additional context.",
+    "Error messages may be loaded from a backend API response and not present in frontend source.",
+    "Cannot determine if the developer has intentionally chosen vague messaging for security reasons."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A 404 page that says 'Page not found' which is appropriately specific about what happened (the page was not found) and may include recovery (search, home link).",
+    "A maintenance page that says 'We'll be back soon' which is intentional communication."
+  ],
+  "mitigationStrategy": "Require at least 2 of: specific error type, recovery action, or reference ID. Flag only generic messages with none of these elements.",
+  "fixturePlans": {
+    "violation": "An error toast saying 'Something went wrong' with an X button and no other details.",
+    "control": "An error message saying 'Connection lost. Your changes have been saved locally. Reconnect to sync.' with a Reconnect button.",
+    "borderline": "A 403 page saying 'Access denied. Contact your administrator for access.' - specific about the type but limited recovery info."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation. Common UX pattern for error communication."
+  ],
+  "overlapNotes": "Distinct from existing rules. No error-state rule exists in the catalog."
+}

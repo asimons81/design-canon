@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-013",
+  "proposedRuleId": "hierarchy.visual-weight-flattened",
+  "title": "Reject interfaces where everything has the same visual weight",
+  "category": "hierarchy",
+  "relevantSurfaces": ["product-app", "dashboards", "marketing", "marketing-surfaces"],
+  "summary": "Generated UI often applies uniform font weight, color luminance, border width, and element size to all content, producing a 'flat noise' page where no element commands attention and the user cannot distinguish primary from secondary information.",
+  "instruction": "Every view must have at least two clearly distinguishable tiers of visual weight. Use at least two of these differentiators: font weight (400 vs 700), color luminance (neutral vs brand), size (body vs heading), or background treatment (filled vs outlined). If every element on the page uses the same font weight, color intensity, and container style, the hierarchy is flat.",
+  "rationale": "Flat visual weight forces the user to read everything to find what matters. This increases cognitive load and slows task completion. Even a two-tier hierarchy (this is important / this is supporting) dramatically improves scannability.",
+  "claimType": "general-knowledge",
+  "violations": [
+    "A dashboard where every metric card uses the same 16px/400-weight/gray-700 text, same 1px border, same white background — the page is a uniform grid of equal numbers.",
+    "A settings page where every section heading, label, hint text, and value uses the same 14px/400-weight/#374151 color — nothing stands out as a section header.",
+    "A marketing page where all text (headlines, subheadlines, body, CTAs) uses the same font weight 400 and the same color (#1F2937), differentiated only by font-size — the weight is flat."
+  ],
+  "controls": [
+    "A dashboard with metric values at 24px/700-weight, metric labels at 14px/400-weight/gray-500, and sparkline cards with a subtle brand-color top border — three tiers.",
+    "A settings page with section headings at 18px/600-weight, labels at 14px/500-weight, and values at 14px/400-weight/gray-600 — hierarchy by weight and color.",
+    "A marketing page with hero headline at 48px/800-weight, subheadline at 20px/400-weight/gray-500, and CTAs in filled brand buttons — weight, size, and container differentiate."
+  ],
+  "borderlineCases": [
+    "A minimalist brand that intentionally uses a single weight (e.g., 400 everywhere) with hierarchy expressed solely through size and spacing — functionally different but same weight."
+  ],
+  "contextualExceptions": [
+    "Data-dense tables where uniform visual weight is the standard (stock tickers, monitoring dashboards) — hierarchy comes from column headers, row striping, and sort indicators instead.",
+    "Reading-focused interfaces (e-books, long-form articles) where uniform weight throughout the body copy is intentional."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "All text elements on a page using the same font-weight and saturation/luminance range (within 15% of each other)",
+  "matcherProposal": "Collect all text nodes' computed font-weight and color (converted to HSL). Compute the variance of font-weight values and color 's' + 'l' values. If font-weight values are all within 100 of each other AND all 'l' values are within 20% of each other, flag for flat hierarchy.",
+  "detectorLimitations": [
+    "Cannot detect hierarchy that relies on imagery, icon size, or spatial position rather than typographic weight.",
+    "A page with good hierarchy but all reset to the same font weight by a global CSS rule may be falsely flagged.",
+    "Cannot distinguish intentional minimalist design from accidental flatness without design-direction annotations."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A deliberate minimalist design where all text uses weight 400 but size ranges from 12px to 72px — hierarchy by size is effective but the weight is flat.",
+    "A brand with a strict single-weight typographic system that relies entirely on color and spacing for hierarchy."
+  ],
+  "mitigationStrategy": "Only flag when weight variation is < 100 AND size variation is < 14px AND no background-container differentiation is present. Allow suppression via data-flat-hierarchy-intentional attribute.",
+  "fixturePlans": {
+    "violation": "A SaaS dashboard where every text element (page title, metric value, metric label, table header, table cell) uses font-weight: 400 and color: #374151 — zero weight differentiation.",
+    "control": "A SaaS dashboard with page title at 24px/700-weight, metric values at 24px/600-weight/#1E3A5F, metric labels at 13px/500-weight/#6B7280, table headers at 12px/600-weight uppercase.",
+    "borderline": "A minimalist wiki where all body text, headings, and captions use weight 400 but at sizes ranging from 12px to 48px, with headings in a different color."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Distinct from marketing.single-primary-action (which focuses on one CTA per section). This addresses general visual-weight flattening across all elements. No overlap."
+}

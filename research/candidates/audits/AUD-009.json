@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-009",
+  "component": "forms",
+  "recurringPattern": "Stacked vertical form with labels above inputs, rounded input fields with placeholder text, a helper line below each field, and a full-width primary submit button at the bottom. Often includes a progress indicator if multi-step.",
+  "designHarm": "The label-above-input pattern is correct for accessibility, but AI-generates it universally without considering context — inline labels, floating labels, or side labels may be better for short or known-value forms. Every input gets a conspicuous helper text line even when unhelpful ('Enter your name'). The stacked layout wastes vertical space on simple forms.",
+  "legitimateExceptions": ["Complex forms where each field genuinely needs explanation (medical, legal, financial)", "Mobile-first forms where vertical stacking is the only viable layout"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard stacked form with labels-above and helper text", "Compact form with floating labels and inline validation", "Multi-column form that respects field relationships"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-009"],
+  "originalObservations": [
+    "AI-generated forms always stack vertically with the same field spacing, regardless of form length or complexity.",
+    "Helper text appears under every field even when the label is self-explanatory.",
+    "Input fields consistently use 8px or 12px border-radius and a subtle inner shadow."
+  ]
+}

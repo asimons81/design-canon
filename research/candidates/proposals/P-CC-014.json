@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-014",
+  "proposedRuleId": "mobile-nav.five-tab-default",
+  "title": "Do not default to five bottom tabs",
+  "category": "layout",
+  "relevantSurfaces": [
+    "mobile"
+  ],
+  "summary": "AI-generated mobile navigation universally defaults to a five-tab bottom bar with icon+label and a hamburger menu, regardless of the app's actual navigation architecture.",
+  "instruction": "Choose mobile navigation based on the app's information architecture, not the five-tab template. Consider gesture-based navigation, top tabs, context-revealing navigation, or fewer bottom tabs. Reserve the five-tab bar for apps with five genuine primary destinations.",
+  "rationale": "The five-tab bottom bar is a default pattern applied to apps regardless of architecture. It forces fit for apps with 3 or fewer primary destinations, creates a 'More' dumping ground, and competes with platform gesture navigation on modern phones.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Exactly five bottom tabs with icon + label on every screen",
+    "Tabs always include Home, Search, Activity/Notifications, Profile, and More/Settings",
+    "Active tab uses brand primary color fill on outlined icons",
+    "Hamburger menu in top-left corner coexisting with bottom tabs",
+    "Same tab structure regardless of app purpose (productivity, social, utility)"
+  ],
+  "controls": [
+    "Three- or four-tab bar matching the actual number of primary destinations",
+    "Gesture-driven navigation without persistent bottom bar",
+    "Top tab navigation for content-category apps",
+    "Single-screen app where navigation is embedded in the content"
+  ],
+  "borderlineCases": [
+    "Content-consumption apps with five genuine primary destinations"
+  ],
+  "contextualExceptions": [
+    "Platform design guidelines that recommend bottom tabs (iOS/Android conventions)"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A persistent bottom bar containing 5 evenly-spaced icon+label items, where one uses a filled icon style.",
+  "matcherProposal": "Detect a bottom-positioned navigation bar with 5 child items containing both an icon and a text label.",
+  "detectorLimitations": [
+    "Cannot distinguish essential 5-tab architectures from defaulted ones"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Apps with five genuine navigation destinations",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag when the app structure suggests fewer primary destinations would be more appropriate.",
+  "fixturePlans": {
+    "violation": "Mobile app with 5 bottom tabs (Home, Search, Activity, Profile, More), hamburger menu, filled active tab icon.",
+    "control": "App with 3 bottom tabs matching 3 primary destinations, no hamburger menu.",
+    "borderline": "Social app with 5 genuine primary sections matching the five-tab pattern."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-003",
+  "proposedRuleId": "color.accessible-combinations",
+  "title": "Require accessible text-on-surface combinations",
+  "category": "color",
+  "relevantSurfaces": ["*"],
+  "summary": "Models routinely place colored text on colored backgrounds using only hue harmony heuristics without checking WCAG contrast ratios, producing illegible combinations that look well-matched to designers but fail for users with low vision.",
+  "instruction": "Every text-background color pair in the rendered output must meet WCAG AA (4.5:1 for body, 3:1 for large text) when measured against the actual background, not just white. Do not rely on the model's aesthetic sense alone; verify or compute contrast at generation time.",
+  "rationale": "Color-harmony algorithms prioritize visual pleasantness over readability. A teal heading on a light-teal card may look cohesive but measures only 2.1:1, failing even the large-text threshold. This disproportionately affects users with contrast sensitivity and is invisible to the designer's eye on high-end monitors.",
+  "claimType": "research-backed",
+  "violations": [
+    "A success banner uses green text on a light-green background (#2E7D32 on #C8E6C9, ratio ~2.8:1) for a confirmation message.",
+    "A feature card uses a purple heading (#7B1FA2) on a lavender card (#E1BEE7, ratio ~1.9:1) styled to match the brand palette.",
+    "Navigation links in a footer use gray (#757575) on a dark-gray background (#424242, ratio ~2.2:1) and are unreadable to users with moderate vision loss."
+  ],
+  "controls": [
+    "A form input uses a dark label (#1A1A1A) on a white background (21:1) for maximum readability, with colored accents relegated to non-text elements.",
+    "A status badge uses white text (#FFFFFF) on a branded green background (#1B5E20, ratio ~7.8:1) with a minimum 4.5:1 guarantee for all content.",
+    "A dark-mode card uses a 3:1 minimum for headlines (large text) and 4.5:1 for body copy, implemented via a CSS clamp function that darkens the text color when background luminance drops below a threshold."
+  ],
+  "borderlineCases": [
+    "Large marketing hero text (48px bold, 72px display) at 3:1 ratio appears acceptable per WCAG AA, but readability may still suffer on low-quality projectors."
+  ],
+  "contextualExceptions": [
+    "Decorative text that is not intended to be read (e.g., watermark patterns, background typography with opacity < 0.15, artistic treatments).",
+    "Temporary interactive states where contrast drops momentarily (focused vs unfocused) as long as the stable state passes AA."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Any colored text node whose computed background is not white and whose WCAG contrast ratio is below 4.5:1",
+  "matcherProposal": "Parse all text elements and their computed backgrounds (including inherited and stacked backgrounds). For each pair, compute relative luminance per WCAG 2.1 formula and flag if below the relevant threshold. Support composited backgrounds (backgrounds with alpha, gradients approximated by sampling the midpoint, and image backgrounds where contrast cannot be computed).",
+  "detectorLimitations": [
+    "Cannot measure contrast over background images or gradients where underlying content varies.",
+    "Cannot compute runtime color changes from hover, focus, or animation.",
+    "Image/text composites require a visual check, not a computed check."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Text with a semi-transparent overlay that computes below threshold but is visually designed as a decorative watermark.",
+    "Large text at 3:1 on a branded gradient that sits just above the threshold — borderline acceptable per WCAG."
+  ],
+  "mitigationStrategy": "Exclude elements with opacity < 0.15 or aria-hidden=true. Allow explicit suppression with 'contrast-suppressed' attribute for intentional decorative text.",
+  "fixturePlans": {
+    "violation": "A pricing page with green 'Save 20%' text on a light-green badge (#2E7D32 on #C8E6C9) and gray feature descriptions (#757575 on #F5F5F5, ratio ~2.4:1).",
+    "control": "The same pricing page with badge text darkened to #1B5E20 on #C8E6C9 (4.6:1) and feature descriptions using #333333 on #F5F5F5 (10.5:1).",
+    "borderline": "A hero section with 72px display text in brand color on a full-width gradient background — contrast varies along the gradient span."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Contrast ratio thresholds sourced from publicly published WCAG 2.1 documentation."
+  ],
+  "overlapNotes": "Related to a11y.visible-focus but addresses static text contrast rather than interactive focus indicators. No overlap with existing rules."
+}

@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-022",
+  "proposedRuleId": "forms.labels-outside-inputs",
+  "title": "Keep form labels outside and above input fields",
+  "category": "forms",
+  "relevantSurfaces": ["product-app", "marketing", "dashboards"],
+  "summary": "Models frequently place placeholder text inside inputs as the primary label, removing visible labels to save space, which hides the field purpose once the user starts typing and fails accessibility requirements for persistent labels.",
+  "instruction": "Every form input must have an associated persistent label that remains visible when the field is filled. Do not rely on placeholder text alone. The label should be positioned outside the input boundary (above or beside), not inside as a floating placeholder. If space constraints demand compact labels, use a floating-label pattern where the label animates above the input value on focus but remains readable at all times.",
+  "rationale": "Placeholder-only labels disappear when the user types, forcing them to clear the field to remember what it was for. This doubles completion time, causes errors, and violates WCAG 2.1 SC 1.3.1 and SC 3.3.2. Users with cognitive disabilities are disproportionately affected.",
+  "claimType": "research-backed",
+  "violations": [
+    "A signup form where Email, Password, and Name fields use placeholder text only: 'Enter your email', 'Create a password', 'Full name' — no visible labels persist.",
+    "A search form with placeholder 'Search products…' as the only label, no aria-label, no visible label element — screen readers must rely on placeholder alone.",
+    "A checkout page with card number, expiry, and CVV fields using placeholder-only format hints with no visible, persistent labels."
+  ],
+  "controls": [
+    "A signup form with visible labels above each input (Email, Password, Full name) in a smaller, muted font at 14px, with placeholders as supplementary hints only.",
+    "A search form with a visible label 'Search' (visually hidden for sighted users but present for screen readers) plus a visible icon and placeholder text.",
+    "A checkout form using a floating-label pattern where labels are initially inside the input, float up on focus, and remain visible above the filled value at all times."
+  ],
+  "borderlineCases": [
+    "A single-field form (e.g., newsletter email input) with a prominent icon and placeholder 'Your email' — the purpose is clear from context and icon, but a persistent label is still recommended."
+  ],
+  "contextualExceptions": [
+    "Inline forms where the submit button text functions as the label (e.g., 'Search' button next to an unlabeled input with role=search, the button labels the form).",
+    "Well-known forms with universal patterns (login: username + password) where icon-based identification is conventional and an aria-label is provided."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Input elements without a corresponding label element, aria-label, or aria-labelledby, and where the placeholder is the only descriptor",
+  "matcherProposal": "Collect all input, textarea, and select elements. For each, check: (a) associated <label> via for/id, (b) parent <label> wrapping the input, (c) aria-label or aria-labelledby attribute, (d) title attribute. Flag any input where none of these exist AND the placeholder attribute is present but empty or absent.",
+  "detectorLimitations": [
+    "Cannot detect floating-label patterns where label is visually inside the input via CSS — the label element exists in the DOM but appears visually inside the input boundary.",
+    "Custom form controls (div-based inputs, React-select, etc.) may use different attribution patterns that standard label checks miss.",
+    "Placeholder-only patterns where a secondary hint exists outside the form (e.g., instructions above the field) may provide sufficient context."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A compact filter form where labels are hidden but each input has an aria-label describing its purpose (e.g., 'Minimum price', 'Maximum price' on a price range form).",
+    "A search form where the button text 'Search Products' combined with a visible icon functions as an implicit label recognized by users."
+  ],
+  "mitigationStrategy": "Except inputs with aria-label or aria-labelledby. Accept inputs inside a <form> with <legend> or <fieldset> that describes the group. Flag only when no textual label is programmatically associated with the input, regardless of placeholder.",
+  "fixturePlans": {
+    "violation": "A signup form with three inputs whose only labels are placeholders: 'Email address', 'Password', 'Full name' — no label elements, no aria-labels.",
+    "control": "A signup form with visible <label> elements above each input (Email, Password, Full name) in 14px/500-weight/gray-700, plus placeholder hints in lighter gray.",
+    "borderline": "A search form with a single input, a magnifying glass icon inside the input, a visually hidden <label> with text 'Search', and placeholder text 'Search products…'."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Form label usability research based on publicly published W3C and NN/g research."
+  ],
+  "overlapNotes": "First proposal in the forms category. No overlap with existing rules."
+}

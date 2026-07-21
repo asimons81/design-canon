@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-CC-026",
+  "proposedRuleId": "badge.uppercase-text",
+  "title": "Do not render badge text in uppercase by default",
+  "category": "typography",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated badges, tags, and status pills universally use uppercase or semibold text regardless of context, reducing readability especially for longer labels.",
+  "instruction": "Use sentence case or title case for badge and label text. Reserve uppercase for short, single-word labels where the uppercase convention is established (e.g., 'NEW', 'BETA'). Ensure badge text maintains readability at small sizes.",
+  "rationale": "Uppercase text in badges reduces readability, particularly at small sizes where AI typically renders badges (11-13px). The uppercase + pill shape + color combination is a template default that prioritizes visual uniformity over communication clarity.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "All badge text rendered in uppercase regardless of label length",
+    "Semibold or bold weight combined with uppercase in small badges",
+    "Labels like 'IN PROGRESS', 'PENDING REVIEW', 'AWAITING APPROVAL' in all-caps",
+    "Uppercase badges at 11-12px font size where readability is significantly reduced"
+  ],
+  "controls": [
+    "Sentence case or title case for badge labels",
+    "Regular weight text in badges for readability at small sizes",
+    "Caps only for established conventions (NEW, BETA, SALE) where users expect it"
+  ],
+  "borderlineCases": [
+    "Single-word badges like 'NEW', 'BETA', 'SALE' where uppercase is conventional"
+  ],
+  "contextualExceptions": [
+    "Brand guidelines that mandate uppercase label styling"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Small pill-shaped elements containing text in uppercase or small-caps CSS styling.",
+  "matcherProposal": "Detect elements with badge/pill styling (rounded-full, small padding) where the text-transform is uppercase or the text content is in all-caps.",
+  "detectorLimitations": [
+    "Cannot distinguish intentional uppercase branding from default template styling"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Brand guidelines that specify uppercase label styling",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a readability suggestion, particularly for multi-word labels where uppercase significantly impairs readability.",
+  "fixturePlans": {
+    "violation": "Status badges: 'IN PROGRESS' (green), 'AWAITING REVIEW' (yellow), 'APPROVED' (green) in 12px uppercase semibold.",
+    "control": "Status badges: 'In progress' (green), 'Awaiting review' (yellow), 'Approved' (green) in 12px regular weight sentence case.",
+    "borderline": "Single-word 'NEW' badge in uppercase where the convention supports it."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to status.traffic-light-badges (P-CC-018) but focuses on typography specifically."
+}

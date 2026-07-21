@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-035",
+  "proposedRuleId": "error-states.generic-error-messages",
+  "title": "Replace generic error messages with specific recovery guidance",
+  "category": "error-states",
+  "relevantSurfaces": ["product-app", "forms", "dashboards"],
+  "summary": "Models generate generic error messages — 'An error occurred', 'Something went wrong', 'Error 500' — that provide no information about what failed, why it happened, or how the user can recover, leaving them frustrated and unable to proceed.",
+  "instruction": "Every user-facing error message must include: (a) what went wrong in plain language, (b) why it happened (to the extent known), (c) what the user can do next (retry, go back, contact support, adjust input). Replace 'Something went wrong' with specific messages like 'Your payment could not be processed because your card was declined. Please try a different card or contact your bank.'",
+  "rationale": "Generic error messages increase support tickets by 30-50% and erode user trust. Specific, actionable error messages enable users to self-serve recovery, reduce frustration, and signal that the product is well-engineered. Error messages are a touchpoint; generic ones waste the opportunity.",
+  "claimType": "observation",
+  "violations": [
+    "A checkout form that shows 'An error occurred' in a toast when the payment fails — no information about what failed or whether the payment was attempted.",
+    "A login form that shows 'Invalid credentials' when the user's account is locked — the user needs to know the account is locked, not guess between typos and lockout.",
+    "A file upload form that shows 'Upload failed' with no indication of whether the file was too large, the wrong type, or the network disconnected."
+  ],
+  "controls": [
+    "A checkout form that shows 'Your payment was declined by your bank. Please try a different card or contact your bank for support.' with a 'Try another card' button.",
+    "A login form that shows 'Your account has been locked due to multiple failed attempts. Please check your email for instructions to reset your password or contact support.' with a 'Reset password' link.",
+    "A file upload form that shows 'Upload failed: PDF files must be under 10MB. Your file is 15MB.' with a 'Compress and retry' suggestion."
+  ],
+  "borderlineCases": [
+    "Security-sensitive errors where revealing too much information could aid attackers — e.g., a login failure should not distinguish between 'username not found' and 'wrong password'."
+  ],
+  "contextualExceptions": [
+    "Security contexts where the error message must be intentionally vague to prevent information leakage (authentication, password reset, MFA).",
+    "API responses returned to developer clients where a machine-readable error code is more useful than a human-readable message.",
+    "Rate-limiting errors where the message 'Too many requests' plus a retry-after header is sufficient and standard."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Error-related text content matching generic patterns: 'error', 'something went wrong', 'an error occurred', 'oops', 'failed' without specific context within 50 characters",
+  "matcherProposal": "Identify error containers: elements with role='alert', aria-live='assertive', [class*=error], [class*=alert], or text containing error-trigger keywords. Check the text content against a list of generic error phrases. If the error message is < 30 characters and matches a generic pattern, flag. Also check if the error container has a visible retry/action button — if not, flag.",
+  "detectorLimitations": [
+    "Cannot evaluate error-message quality from a static page — the same generic error element may be populated dynamically with specific text at runtime.",
+    "Error messages in non-English languages require internationalized pattern matching.",
+    "Errors that are intentionally generic for security reasons (auth, password) cannot be distinguished from lazy error messages without context about the error type."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A login form showing 'Invalid credentials' which is intentionally vague for security — flagged despite the legitimate rationale.",
+    "An API client that displays the raw server error code (e.g., 'Error 503') because the developer user needs the exact code for debugging.",
+    "A 404 page with 'Page not found' plus a search bar and 'Go home' link — the message is short but the recovery actions are present."
+  ],
+  "mitigationStrategy": "Exclude auth-related error containers (identified by being inside a login/register/password-reset form). Only flag if no recovery action (retry, back, contact, search) is present in the error container or its siblings within 2 DOM levels.",
+  "fixturePlans": {
+    "violation": "A payment form that shows a toast with 'An error occurred' — no specific info, no retry button, no contact link.",
+    "control": "A payment form showing 'Your payment was declined. Your card issuer did not authorize the charge. Please try a different card or contact your bank.' with a 'Try another card' button and a 'Contact support' link.",
+    "borderline": "A login form showing 'Invalid username or password' — intentionally generic for security, with a 'Forgot password?' link as the recovery action."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "First error-states proposal. No overlap with existing rules."
+}

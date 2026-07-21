@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-016",
+  "proposedRuleId": "navigation.hamburger-on-desktop",
+  "title": "Do not hide navigation behind hamburger on desktop viewports",
+  "category": "navigation",
+  "relevantSurfaces": [
+    "marketing",
+    "product-app",
+    "editorial"
+  ],
+  "summary": "AI-generated interfaces default to hamburger-menu navigation on desktop, sacrificing discoverability for visual minimalism.",
+  "instruction": "Show primary navigation links visibly in the header on viewports wider than 768px. Reserve hamburger menus for narrow viewports where horizontal space is constrained. Navigation should be immediately scannable.",
+  "rationale": "Hamburger menus reduce navigation discoverability by hiding links behind a click. Users are less likely to explore navigation they cannot see. On desktop viewports where horizontal space exists, visible navigation improves engagement and task completion.",
+  "claimType": "observation",
+  "violations": [
+    "A marketing page at 1440px viewport width with a hamburger menu icon as the only navigation control, hiding Home, Products, Pricing, About, and Contact.",
+    "A SaaS dashboard at 1920px with a hamburger menu for primary section navigation (Dashboard, Reports, Settings, Users) when all 4 items would fit in the header."
+  ],
+  "controls": [
+    "A marketing page with visible navigation links in the header at desktop width, collapsing to hamburger only below 768px.",
+    "A dashboard with a persistent left sidebar showing all section names at desktop, collapsing to icon-only at narrower widths."
+  ],
+  "borderlineCases": [
+    "Apps with more than 7 primary navigation items may need to prioritize or use a combination of visible top-level and hamburger for secondary items."
+  ],
+  "contextualExceptions": [
+    "Content-forward pages where the entire viewport is dedicated to the reading experience and navigation is genuinely secondary.",
+    "Minimalist portfolio or artistic sites where hidden navigation is an intentional aesthetic choice documented in the design direction."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Hamburger menu icon (three-line SVG or unicode character) used as the primary navigation element on desktop-width viewports",
+  "matcherProposal": "Detect hamburger icon patterns (three horizontal lines: \u2630, SVG with 3 rects, or CSS bars). Check breakpoint where navigation becomes visible. If hamburger is the only navigation at breakpoints >768px AND navigation links exist in the codebase, flag.",
+  "detectorLimitations": [
+    "Hamburger icon can be styled differently across frameworks.",
+    "Some navigation systems use JavaScript to toggle visibility and may not appear in static CSS media queries.",
+    "Cannot detect user preference for hidden navigation (some users prefer minimal headers)."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A web app with only 1-2 pages where a hamburger containing just Home and About is legitimate.",
+    "An app shell that loads navigation dynamically.",
+    "A mobile-first PWA where even desktop viewports use mobile patterns intentionally."
+  ],
+  "mitigationStrategy": "Require at least 3 navigation items to flag. Check breakpoint in responsive CSS. Allow suppression for documented minimal-design directions.",
+  "fixturePlans": {
+    "violation": "A 1440px landing page with hamburger icon, 6 nav links hidden behind it, no other navigation visible.",
+    "control": "Same landing page with visible nav links at 1440px (Home, Products, Pricing, About, Contact), hamburger appears below 768px.",
+    "borderline": "A portfolio site with hamburger at all widths, but only 2 nav items (Work, About) and the design direction documents the minimal approach."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation. Usability research on hamburger menus (NN Group)."
+  ],
+  "overlapNotes": "Distinct from existing rules. No navigation-specific rule exists in the catalog."
+}

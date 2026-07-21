@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-019",
+  "proposedRuleId": "search.ask-anything-default",
+  "title": "Do not default to 'Ask anything...' search placeholders",
+  "category": "layout",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated search interfaces consistently use 'Ask anything...' or 'Search anything...' placeholder text with quick action chips below, regardless of the app's search domain or user expectations.",
+  "instruction": "Use search placeholder text that reflects the actual content being searched ('Search emails...', 'Find team members...', 'Filter by name...'). Reserve 'Ask anything...' for AI-chat interfaces where free-form querying is the core interaction.",
+  "rationale": "The 'Ask anything...' placeholder reflects the AI industry's search-as-chat default, not user expectations for most search contexts. Quick action chips below the search bar occupy space with untargeted suggestions before the user has typed anything.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "'Ask anything...', 'Search anything...', 'What are you looking for?' as placeholder text",
+    "Quick action chips below search bar suggesting common queries",
+    "Magnifying glass icon positioned left within the input",
+    "Category-separated results in dropdown overlays",
+    "Same search UI regardless of search domain (files, people, messages, products)"
+  ],
+  "controls": [
+    "Domain-specific placeholder ('Search invoices...', 'Find projects...')",
+    "Search without quick action chips below the input",
+    "Search bar embedded in context instead of a universal full-width element",
+    "Voice or natural language search only where appropriate"
+  ],
+  "borderlineCases": [
+    "AI-native products where chat-based search is the intended interaction model"
+  ],
+  "contextualExceptions": [
+    "Universal search across many data types where 'anything' is accurate"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A search input with generic 'anything' placeholder text, optionally with quick action chips below.",
+  "matcherProposal": "Detect input elements with placeholder text matching patterns like 'ask anything', 'search anything', 'what are you looking for'.",
+  "detectorLimitations": [
+    "Cannot assess whether the generic placeholder is appropriate for the search context"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Actual AI chat interfaces where 'Ask anything' is the correct prompt",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a suggestion to replace with domain-specific placeholder text.",
+  "fixturePlans": {
+    "violation": "Search bar with 'Ask anything...' placeholder, 4 quick action chips below, magnifying glass icon.",
+    "control": "Search bar with 'Search projects...' placeholder, no quick action chips, contextual results.",
+    "borderline": "AI assistant interface where 'Ask anything...' is the accurate prompt."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

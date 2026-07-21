@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CP-046",
+  "proposedRuleId": "ai-copy.productivity-10x",
+  "title": "'10x' productivity improvement without baseline",
+  "category": "ai-copy",
+  "relevantSurfaces": [
+    "marketing",
+    "landing-pages"
+  ],
+  "summary": "Exaggerated multiplier claims ('10x faster', '10x productivity') without defining the baseline or measurement methodology.",
+  "instruction": "Replace generic ''10x' productivity improvement without baseline' messaging with specific, context-aware language that names outcomes, mechanisms, or audiences.",
+  "rationale": "Generic copy patterns like ''10x' productivity improvement without baseline' fail to differentiate, build trust, or communicate value. Users scan for specific claims they can evaluate.",
+  "claimType": "observation",
+  "violations": [
+    "Generic usage: ''10x' productivity improvement without baseline' used as primary messaging without supporting specifics.",
+    "A landing page where ''10x' productivity improvement without baseline' is the only value communication."
+  ],
+  "controls": [
+    "Provide a ratio with context: 'Teams using our tool report 3x faster code reviews (from 4 hours to 80 minutes avg)' - specific baseline and measurement.",
+    "Specific alternative that names the mechanism, audience, or outcome instead of the generic phrase."
+  ],
+  "borderlineCases": [
+    "The term used in a context where it has category-specific meaning rather than generic marketing usage.",
+    "A/B test results showing the generic phrase outperforming specific alternatives (documented preference)."
+  ],
+  "contextualExceptions": [
+    "Quoted customer language in testimonials.",
+    "Licensing/category names (e.g., 'Enterprise' as a plan name).",
+    "Deliberate stylistic/nostalgic usage with self-awareness.",
+    "Domain-specific technical meanings that differ from marketing usage."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Detection of ''10x' productivity improvement without baseline' pattern in marketing copy sections without supporting specificity nearby.",
+  "matcherProposal": "Match the phrase pattern. Check surrounding 300 characters for evidence signals: proper nouns, metrics, domain terminology, named entities. Flag if generic phrase has no evidence within the same section.",
+  "detectorLimitations": [
+    "Cannot distinguish parody, satire, or deliberate stylistic choices.",
+    "Customer quotes embedded in testimonials should be excluded.",
+    "Some domain-specific uses are legitimate and require a context allowlist."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A parody landing page intentionally using generic copy for effect.",
+    "A minimalist brand that uses generic copy as a deliberate style choice.",
+    "Documented A/B test results showing generic outperforming specific."
+  ],
+  "mitigationStrategy": "Require evidence of product-specific context within the same section. Exclude testimonial blocks, quote elements, and navigation-level copy.",
+  "replacementStrategy": "Provide a ratio with context: 'Teams using our tool report 3x faster code reviews (from 4 hours to 80 minutes avg)' - specific baseline and measurement.",
+  "fixturePlans": {
+    "violation": "A marketing page using ''10x' productivity improvement without baseline' as the primary headline or CTA with no product-specific details nearby.",
+    "control": "Same page using specific language that names the audience, mechanism, or outcome.",
+    "borderline": "A page using the term in a context where it has legitimate domain meaning or is part of a documented brand style."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI-generated marketing copy patterns across public landing pages and SaaS websites."
+  ],
+  "overlapNotes": "Distinct from copy.generic-hero rule. This expands coverage to additional generic copy categories including innovation language, filler transitions, fake social proof, productivity promises, future-of language, and repetitive CTAs."
+}

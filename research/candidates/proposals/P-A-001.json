@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-001",
+  "proposedRuleId": "color.contrast-rainbow-palette",
+  "title": "Reject rainbow palettes that ignore contrast",
+  "category": "color",
+  "relevantSurfaces": ["marketing", "product-app", "dashboards"],
+  "summary": "When a palette spans the full hue wheel (red-orange-yellow-green-blue-purple) in a single view, adjacent colors often fail WCAG contrast against both each other and overlaid text, producing visual noise rather than meaning.",
+  "instruction": "Do not use a full-hue-cycle rainbow palette for data, UI elements, or decorative surfaces unless each adjacent pair meets WCAG AA for the content layer above it. Restrict palette hues to at most one-third of the wheel for any single view, or use sequential/luminance-based palettes that preserve readability.",
+  "rationale": "Rainbow palettes distribute contrast unevenly: yellow-green adjacent pairs typically score below 1.5:1, while adjacent red-purple can exceed 3:1 locally. This forces users to rely on position alone to differentiate items, and creates inaccessible text contrast when labels are placed over mid-luminance hues.",
+  "claimType": "research-backed",
+  "violations": [
+    "A chart legend uses red, orange, yellow, green, blue, and purple as category fills, and category labels in white text are illegible against the yellow and green swatches.",
+    "A dashboard status bar uses a continuous green-to-red rainbow gradient as a fill, then places black text at the midpoint where luminance is closest to the text color.",
+    "Thumbnail cards in a product grid cycle through six hues with no luminance consideration, causing some cards to visually pop while others recede, breaking reading flow."
+  ],
+  "controls": [
+    "A data dashboard uses a single-hue sequential palette (light blue to dark blue) for a geographic heatmap, with white labels on the dark end and dark labels on the light end via automatic luminance switching.",
+    "A product marketing page uses a three-color analogous palette (blue-teal-green) with consistent luminance so text overlays work uniformly across all accent surfaces.",
+    "A chart library restricts categorical series to two hues with varying luminance steps, producing five distinguishable levels that all pass AA against a white background."
+  ],
+  "borderlineCases": [
+    "A children's education app uses a full rainbow for playful decorative icons, but each icon is isolated and contains no overlaid text. The hue range is justified by the product's educational purpose."
+  ],
+  "contextualExceptions": [
+    "Data-visualization tools that offer rainbow palettes as an explicit user choice and include contrast warnings or auto-switch text color per swatch.",
+    "Products targeting colour-vision testing or colour education where the full spectrum is the instructional material."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Three or more CSS color declarations spanning hue intervals > 60 degrees apart in a single viewport",
+  "matcherProposal": "Parse all CSS color declarations; group by approximate hue bin (0-30, 30-60, ..., 330-360). If three or more non-adjacent bins are populated in the same view, flag for review. Advanced: compute pairwise WCAG contrast ratios between adjacent color chips in any ordered list (e.g. legend items, gradient stops) and flag if any pair falls below 2:1.",
+  "detectorLimitations": [
+    "Cannot distinguish decorative from semantic color usage without element role annotations.",
+    "Cannot detect palettes constructed via CSS custom properties that are computed at runtime.",
+    "Hue-bin grouping is approximate; adjacent hues near bin boundaries may be misclassified."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A brand's established color system has six hues with careful luminance balancing — the detector flags it despite adequate contrast management.",
+    "An intentionally maximalist design direction (e.g., a music festival site) uses a broad palette as a deliberate aesthetic choice, documented in the design direction."
+  ],
+  "mitigationStrategy": "Flag only when adjacent hue bins are populated AND pairwise contrast falls below 2:1; suppress when a design-direction rule explicitly calls for a broad palette.",
+  "fixturePlans": {
+    "violation": "A marketing landing page with six category cards each using a different hue (red, orange, yellow, green, blue, violet) with white text overlays where the yellow and green cards fail AA contrast against the text.",
+    "control": "A data dashboard with a single-hue sequential blue palette (four steps from #E3F2FD to #1565C0) with white labels on the two darkest steps and dark labels on the two lightest.",
+    "borderline": "A children's app that uses six pastel hues as isolated icon backgrounds (no text overlay) where each icon is separated by 48px of whitespace."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Contrast ratios verified through public WCAG documentation."
+  ],
+  "overlapNotes": "Distinct from color.purple-gradient-default which targets decorative purple/indigo gradients. This proposal addresses full-hue-cycle rainbow palettes and adjacent-hue contrast failures. Uses publicly available WCAG contrast ratio knowledge."
+}

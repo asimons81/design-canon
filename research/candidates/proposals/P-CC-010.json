@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-010",
+  "proposedRuleId": "footers.four-column-default",
+  "title": "Do not default to the four-column footer",
+  "category": "layout",
+  "relevantSurfaces": [
+    "marketing",
+    "editorial"
+  ],
+  "summary": "AI-generated footers universally use four columns with Product, Resources, Company, Legal headings, a social icon row, and a copyright bar \u2014 regardless of the site's actual link density.",
+  "instruction": "Scale the footer to the site's actual information needs. Consider a single-column copyright-only footer, a two-column layout, or a sitemap-style footer for content-heavy sites. Reserve multi-column footers for sites with 12+ genuine destination links.",
+  "rationale": "The four-column footer is an AI template pattern that wastes vertical space and adds cognitive load. Users rarely scan footer links, so the link-dense footer provides poor return on visual real estate. Screen readers must navigate all links, compounding accessibility cost.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Exactly four columns regardless of actual link count",
+    "Column headings: Product, Resources, Company, Legal (or close variants)",
+    "Circular social media icon buttons in a horizontal row",
+    "Copyright bar with thin separator containing \u00a9 symbol and company name",
+    "Same footer link structure regardless of brand or industry"
+  ],
+  "controls": [
+    "Minimal footer with copyright and essential legal links only",
+    "Two-column footer for moderate link density",
+    "Sitemap-style footer for content-rich editorial sites",
+    "Footer integrated into the page design as a content element rather than a template block"
+  ],
+  "borderlineCases": [
+    "Large corporate sites with legal mandates to list many links"
+  ],
+  "contextualExceptions": [
+    "Documentation sites where footer serves as secondary navigation"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A bottom-of-page section with 3-5 columns of text links, social media icons, and a copyright notice.",
+  "matcherProposal": "Detect a page-bottom section containing multiple columned link lists with headings (Product, Resources, etc.) and social media icon links.",
+  "detectorLimitations": [
+    "Cannot assess if link density justifies the column layout"
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "high",
+  "falsePositiveScenarios": [
+    "Large corporate sites with actual legal requirements for extensive footers",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a low-priority suggestion, noting the pattern frequency in AI-generated sites.",
+  "fixturePlans": {
+    "violation": "Four-column footer with Product, Resources, Company, Legal columns, social icons, copyright bar.",
+    "control": "Minimal footer: copyright line only, no social icons, no link columns.",
+    "borderline": "E-commerce footer with genuine need for multiple link categories."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

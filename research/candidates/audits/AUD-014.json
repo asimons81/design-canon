@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-014",
+  "component": "loading-states",
+  "recurringPattern": "A spinning circle or pulse animation (often with the brand's primary color), sometimes paired with a skeleton screen that mirrors the final layout using gray rectangular blocks with a shimmer animation.",
+  "designHarm": "The generic spinner communicates nothing about progress or expected duration. The shimmer skeleton screen, while visually polished, often uses incorrect proportions that misrepresent the actual content layout. Both patterns prioritize aesthetic polish over useful feedback — users don't know if the wait will be 2 seconds or 20 seconds.",
+  "legitimateExceptions": ["Critical-path operations where estimated time is genuinely unpredictable (file uploads, AI processing)", "Brand-consistent loading moments where the spinner is part of the visual language"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Generic spinner with brand color", "Meaningful loading state with progress steps and estimated time", "Skeleton screen with deliberate content-aware proportions"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-014"],
+  "originalObservations": [
+    "AI-generated loading states use spinner or skeleton as a binary choice with no hybrid or progressive approach.",
+    "Skeleton screens always have the shimmer animation going left-to-right with identical timing parameters.",
+    "The spinner is always centered both horizontally and vertically, regardless of where content will load."
+  ]
+}

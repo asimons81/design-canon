@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-025",
+  "proposedRuleId": "tables.horizontal-scroll-avoidance",
+  "title": "Avoid horizontal scrolling in data tables via column strategy",
+  "category": "tables",
+  "relevantSurfaces": ["dashboards", "product-app", "mobile-interfaces"],
+  "summary": "Models produce wide data tables that force horizontal scrolling for all viewports, either by rendering all columns at full width or by using a dense grid that extends beyond the container — table layout is treated as a generic grid rather than a responsive data-display challenge.",
+  "instruction": "Data tables with more columns than fit in a single viewport must implement at least one responsive strategy: (a) column toggling (user selects which columns to show), (b) priority-based column hiding (least important columns collapse on smaller screens), (c) horizontal scroll within a contained wrapper with sticky first column, or (d) card/alternate view at breakpoints. Do not render a table wider than its container.",
+  "rationale": "Horizontal scrolling on a per-row basis is the most disruptive navigation pattern in data tables — users lose column-header context, must scroll back and forth to compare values, and frequently misalign rows with columns. Sticky first-column + horizontal scroll reduces this friction but is still suboptimal compared to column reduction.",
+  "claimType": "observation",
+  "violations": [
+    "A dashboard table with 12 columns all at 150px min-width, forcing horizontal scroll on a 1200px container on a 1366px monitor.",
+    "A user management table with columns for name, email, role, status, last login, created, actions, department, phone, location, manager, and ID — no column toggle available.",
+    "A product inventory table on mobile showing all columns at 80px each, producing text truncation and horizontal scroll."
+  ],
+  "controls": [
+    "A dashboard table with 12 columns where the first column (product name) is sticky, the user can toggle visible columns via a dropdown, and the table container has overflow-x: auto with visible scrollbar.",
+    "A user management table showing only name, email, role, status by default on a standard viewport, with a 'Columns' button offering to show additional fields.",
+    "A mobile data table that switches to a stacked card view (one row per card, label on left, value on right) at < 768px, eliminating horizontal scroll entirely."
+  ],
+  "borderlineCases": [
+    "A financial monitoring table where all columns are relevant and equally important, and the table is constrained to a scrollable panel with the first two columns (ticker, price) sticky — acceptable but still suboptimal."
+  ],
+  "contextualExceptions": [
+    "File managers, git diffs, and code-review tools where wide tables are the content, users expect scrolling, and horizontal navigation is part of the interaction model.",
+    "Admin-only interfaces intended for use on large monitors (1920px+) where the table width is assumed to fit the available viewport."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Table element whose computed width exceeds its nearest scrolling container (or viewport), or table with >8 columns without responsive handling",
+  "matcherProposal": "Identify all table elements (or [role=grid], [role=table]). Measure table width vs container width. If table width > container width by more than 20px AND there is no overflow-x: auto/scroll on the container, flag. Additionally, if table has >8 <col> or <th> elements (columns) and lacks a 'column toggle' button within 3 DOM siblings, flag.",
+  "detectorLimitations": [
+    "Cannot detect column-width strategies that are applied via JavaScript on load (e.g., DataTables auto-width).",
+    "Tables with dynamically loaded columns (AJAX) may render only partially at capture time.",
+    "Cards/alternate views that replace the table at breakpoints are not detectable from a single viewport capture."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A table with 10 columns but each column is narrow (< 60px) and the total fits within 800px — no scrolling issue despite many columns.",
+    "A table inside a resizable panel where the user controls the available width — the container grows with the panel.",
+    "A wide table that is intentionally scrollable and has sticky headers and first column, documented as the intended UX."
+  ],
+  "mitigationStrategy": "Only flag when table exceeds container width AND container has no sticky-column or column-toggle affordance. Exclude tables inside code-diff or file-manager contexts.",
+  "fixturePlans": {
+    "violation": "A dashboard table with 10 columns (avg 150px each = 1500px total) inside a 1000px container with no overflow-x property, no sticky column, and no column toggle.",
+    "control": "A dashboard table with 10 columns where columns 3-10 are toggleable via a 'Columns' dropdown (default: 4 visible), first column is sticky with left: 0, and the container has overflow-x: auto.",
+    "borderline": "A financial table with 8 equally important columns (130px each = 1040px) inside a 900px container with sticky first column (ticker) and overflow-x: auto — functional but suboptimal."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "First proposal in the tables category. No overlap with existing rules."
+}

@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CC-009",
+  "proposedRuleId": "testimonials.carousel-default",
+  "title": "Do not default to testimonial carousels",
+  "category": "motion",
+  "relevantSurfaces": [
+    "marketing"
+  ],
+  "summary": "AI-generated testimonial sections consistently use a horizontal carousel of quote cards with circular headshots, star ratings, dot indicators, and auto-rotation \u2014 a pattern users have learned to ignore.",
+  "instruction": "Avoid auto-rotating testimonial carousels. Present social proof in a format that users can control: static grid, featured case study, full quote list, or video testimonial. If a carousel is used, disable auto-rotation.",
+  "rationale": "Testimonial carousels suffer from banner-blindness \u2014 users have learned to ignore auto-rotating content. The identical card format suggests stock imagery rather than genuine endorsements. Star ratings appear even for contexts where they are not the appropriate trust signal.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Horizontal carousel with left/right arrow buttons and dot indicators",
+    "Auto-rotation (every 4-5 seconds) without user interaction",
+    "Circular headshots with identical sizing across all testimonials",
+    "Large decorative quotation marks in accent color",
+    "Star ratings on every card even for B2B enterprise testimonials"
+  ],
+  "controls": [
+    "Static grid of testimonial quotes with no rotation",
+    "Featured case study format with video or metrics",
+    "Simple quote list without avatars or decorative elements",
+    "One prominent testimonial instead of a collection"
+  ],
+  "borderlineCases": [
+    "Consumer product pages with verified user reviews needing aggregate display"
+  ],
+  "contextualExceptions": [
+    "Sites where carousel interaction is the expected design language"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A set of horizontally arranged quote cards with navigation arrows and dot indicators, containing quotation marks and headshot images.",
+  "matcherProposal": "Detect a horizontal scrolling container with multiple child cards containing quote marks (or blockquote elements), navigation arrows, and dot indicators.",
+  "detectorLimitations": [
+    "Cannot determine if testimonials are authentic or generated",
+    "Cannot assess whether carousel is necessary for space constraints"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "High-traffic consumer sites with sufficient testimonial volume to justify carousel",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag with auto-rotation as a stronger signal than static carousel. Suggest static grid as alternative.",
+  "fixturePlans": {
+    "violation": "Auto-rotating testimonial carousel with headshots, star ratings, decorative quotes, and dot indicators.",
+    "control": "Static 2-column grid of quote cards with name, title, and company \u2014 no rotation, no stars, no decorative quotes.",
+    "borderline": "Consumer review widget with star ratings where users expect the carousel format."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Partly covered by motion.transition-all when auto-rotation uses transition animations."
+}

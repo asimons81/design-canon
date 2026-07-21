@@ -1,0 +1,20 @@
+{
+  "auditId": "AUD-025",
+  "component": "progress-indicators",
+  "recurringPattern": "Linear progress bar (thin horizontal line, brand color fill on gray track) or a circular determinate ring showing percentage. Often used in multi-step forms, file uploads, and loading states. The bar always animates smoothly even for instantaneous operations.",
+  "designHarm": "The horizontal progress bar is used universally for all progression metaphors — multi-step forms, upload progress, subscription activation — though each has different user expectations about duration and completion. Indeterminate bars (animated stripes/dots) appear for operations that can't measure progress, providing false reassurance. The smooth animation adds visual delight but delays the user's perception of completion.",
+  "legitimateExceptions": ["File upload/download where byte-level progress is measurable and meaningful", "Multi-wizard forms where step number out of total is the primary user question"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard linear progress bar with percentage", "Step indicator with numbered stages instead of bar", "Non-linear progression display for indeterminate operations"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-025"],
+  "originalObservations": [
+    "AI-generated progress bars consistently use the brand's primary color as the fill on a light gray track.",
+    "The bar height is always 4-8px regardless of the context or importance of the progress.",
+    "Smooth transition animations (width transitions) are applied to every bar even when the progress is computed in discrete steps.",
+    "Indeterminate progress uses an animated striped/dotted pattern identical to CSS loading patterns."
+  ]
+}

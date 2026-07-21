@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-013",
+  "proposedRuleId": "error.decorative-first",
+  "title": "Prioritize error recovery over decoration",
+  "category": "layout",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated error pages prioritize decorative elements (large error codes, whimsical illustrations) over recovery guidance, delaying the user's ability to resolve the problem.",
+  "instruction": "Design error states to guide the user toward recovery first. Replace large error codes with plain-language explanations of what happened and what to do next. Use illustrations only when they support (not replace) recovery information.",
+  "rationale": "The decoration-first error page pattern prioritizes visual design over user needs. Large HTTP status codes are developer-oriented, not user-oriented. The whimsical illustration creates a tone mismatch for serious errors (payment failure, account lockout), eroding user trust.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "HTTP status code displayed in large type (72px+) as the primary visual element",
+    "Whimsical or abstract 'broken' illustration (disconnected plug, broken robot, empty box)",
+    "Apologetic tone ('Oops!', 'Something went wrong') without specific guidance",
+    "'Go back home' as the only recovery action, regardless of error type",
+    "Same error page format for 401, 403, 404, 500, and timeout errors"
+  ],
+  "controls": [
+    "Recovery-first error page: what happened, why it happened, what to do next",
+    "Context-specific recovery options (retry, contact support, return to saved work)",
+    "Error communicated inline within the affected component instead of full-page takeover",
+    "Tone matching the error severity (serious for 500, light for 404)"
+  ],
+  "borderlineCases": [
+    "404 pages on content sites where the primary goal is keeping users on-site"
+  ],
+  "contextualExceptions": [
+    "Consumer apps where a lighthearted error tone matches brand personality"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A large numeric code (3-4 digits) centered on a page with an illustration and a single 'Go back' or 'Home' link.",
+  "matcherProposal": "Detect pages where a 3-digit number larger than all surrounding text is the primary visual element, accompanied by an illustration and a single recovery link.",
+  "detectorLimitations": [
+    "Cannot distinguish intentional recovery design from decorativs pattern"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Deliberately branded error pages with known recovery paths",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a warning when the error code is the dominant visual element and recovery is a single secondary action.",
+  "fixturePlans": {
+    "violation": "404 page with 120px '404', disconnected-plug illustration, 'Oops! Page not found', 'Go back home' button.",
+    "control": "Context-aware error: 'The page you were looking for (Pricing) was moved. Here are similar pages.' with search and navigation links.",
+    "borderline": "404 page on a portfolio site where whimsical illustration is the brand."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

@@ -1,0 +1,20 @@
+{
+  "auditId": "AUD-020",
+  "component": "status-systems",
+  "recurringPattern": "Colored dot or pill badge (green=active/success, yellow=pending/warning, red=error/failed, gray=inactive/offline) with a short label. Often used in table columns, detail pages, and notification lists. Badges have rounded-full shape and uppercase or semibold text.",
+  "designHarm": "The traffic-light color mapping is assumed universally but fails for accessibility (red-green colorblindness affects ~8% of users) and cultural context (red means 'good' in some Asian markets). The badge-over-text pattern prioritizes color recognition over clear communication — users must decode the hue, then read the label. When every status gets a badge, status transforms from signal to noise.",
+  "legitimateExceptions": ["System monitoring dashboards where second-resolution status recognition is critical", "Deployment pipelines where the standard red/yellow/green mapping is an industry convention"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard traffic-light status badges", "Status system with icon+text instead of color dots", "Status communicated through layout position and context instead of badges"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-020"],
+  "originalObservations": [
+    "AI-generated status systems always use the green-yellow-red-gray color mapping without considering accessibility needs.",
+    "Status badges always use pill/rounded-full styling even when other UI elements use squared corners.",
+    "The label text is always uppercase or semibold within the badge, reducing readability.",
+    "No alternative indicators (icons, patterns, text labels) accompany the color dots."
+  ]
+}

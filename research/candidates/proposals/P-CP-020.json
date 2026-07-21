@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CP-020",
+  "proposedRuleId": "ai-copy.trust-safe-secure",
+  "title": "'Safe and secure' tautology",
+  "category": "ai-copy",
+  "relevantSurfaces": [
+    "marketing",
+    "landing-pages"
+  ],
+  "summary": "'Safe and secure' pair together where they're either redundant or both too vague to convey specific protection guarantees.",
+  "instruction": "Replace 'Safe and secure' pair together where th with specific, verifiable language.",
+  "rationale": "Generic copy patterns erode trust and fail to differentiate the product. The term ''Safe and secure' tautology' is used reflexively without adding information value.",
+  "claimType": "observation",
+  "violations": [
+    "Generic usage: 'Safe and secure' pair together where they're either redundant or both too vague to convey specific protection guarantees.",
+    "'Your data is safe and secure with us' on a privacy page.",
+    "'Safe and secure payments' with no encryption or fraud protection details."
+  ],
+  "controls": [
+    "Describe the specific protection: 'Your data is encrypted at rest (AES-256) and in transit (TLS 1.3)' not 'Your data is safe and secure'.",
+    "A bank marketing 'FDIC-insured, fraud-protected, and encrypted' - specific protections named.",
+    "A children's app stating 'COPPA compliant, parental controls, no data collection' - specific safety measures."
+  ],
+  "borderlineCases": [
+    "'Safe' in a workplace safety context ('OSHA-compliant safety equipment') - literal domain usage."
+  ],
+  "contextualExceptions": [
+    "Literal technical definitions of the term in domain-specific contexts.",
+    "Quoted user testimonials that use the phrase (do not edit customer quotes).",
+    "Creative or literary contexts where the term is used deliberately with self-awareness."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "The specific phrase pattern in marketing copy without supporting specificity nearby",
+  "matcherProposal": "Pattern match the key phrase. Check surrounding 200 characters for product-specific evidence (metrics, domain terms, proper nouns). Flag if generic phrase exists without supporting specificity.",
+  "detectorLimitations": [
+    "Cannot distinguish parody or deliberate stylistic choices.",
+    "Quoted customer testimonials should not be flagged.",
+    "Domain-specific literal usage requires context detection."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Literal domain-specific usage where the term has a technical meaning.",
+    "Parody or satirical marketing.",
+    "Customer quotes embedded in testimonial sections."
+  ],
+  "mitigationStrategy": "Require evidence of product-specific context within the same sentence or adjacent element. Exclude quoted content and code examples.",
+  "replacementStrategy": "Describe the specific protection: 'Your data is encrypted at rest (AES-256) and in transit (TLS 1.3)' not 'Your data is safe and secure'.",
+  "fixturePlans": {
+    "violation": "A SaaS landing page hero using ''Safe and secure' tautology' as the primary headline with no supporting specificity.",
+    "control": "Same page using specific, evidence-backed language that names the outcome, mechanism, or audience.",
+    "borderline": "A page using the term in a context where it has legitimate domain-specific meaning."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI-generated copy patterns across public landing pages."
+  ],
+  "overlapNotes": "Distinct from copy.generic-hero which covers different phrase patterns. This proposal expands coverage to additional generic copy categories."
+}

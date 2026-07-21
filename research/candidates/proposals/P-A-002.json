@@ -1,0 +1,54 @@
+{
+  "proposalId": "P-A-002",
+  "proposedRuleId": "color.neutral-scale-slop",
+  "title": "Require intended neutral scale instead of generic grays",
+  "category": "color",
+  "relevantSurfaces": ["*"],
+  "summary": "Models often default to a handful of generic gray hex values (#F5F5F5, #E0E0E0, #9E9E9E, #616161, #212121) that drift in warmth inconsistently — some leaning blue, some yellow — creating an accidental muddy undertone across the surface stack.",
+  "instruction": "Define a deliberate neutral scale where each step has a consistent undertone (warm, cool, or true neutral) and the steps are perceptually even. Do not mix gray values from different undertone families on the same surface, and avoid default hex values from generic Tailwind/Material palettes without evaluating their undertone against the brand.",
+  "rationale": "Generic gray palettes from utility frameworks combine warm and cool neutrals arbitrarily. When laid side by side, the inconsistent undertones produce a unintentional color cast that reads as muddy or unfinished, especially on backgrounds, dividers, and surface layers.",
+  "claimType": "observation",
+  "violations": [
+    "A settings page uses #F5F5F5 (cool/warm neutral) for the page background, #E0E0E0 (cool gray) for card backgrounds, and #9E9E9E (cool gray) for disabled text, creating a flat blue-gray cast.",
+    "A sidebar uses #374151 (cool gray-700 from Tailwind) for the background while the main area uses #F9FAFB (warm gray-50), causing a visible temperature shift at the seam.",
+    "An input field uses #F3F4F6 (cool neutral) as background fill while the page backdrop is #FAFAFA (warm neutral), creating an accidental pastel effect."
+  ],
+  "controls": [
+    "A product interface uses a warm neutral scale (#FAF9F7, #F0EDE6, #D4CFC4, #8A8478, #3D3830) with every step blending consistently toward a beige undertone.",
+    "A dark-mode dashboard uses a cool neutral scale (#1A1D23, #2D313A, #40454F, #6B7280, #D1D5DB) where each step shares the same blue-gray base hue.",
+    "A brand system specifies 'neutral' as a tinted white with 0.5% cyan, and every neutral token is derived programmatically from that base tint."
+  ],
+  "borderlineCases": [
+    "A monochrome art portfolio intentionally uses mismatched grays as an aesthetic statement, documented in the design direction."
+  ],
+  "contextualExceptions": [
+    "Photography or art portfolio sites where neutral backgrounds intentionally vary to complement featured images.",
+    "Systems that derive gray steps from a primary brand color, shifting undertone by design (e.g., a blue-tinted neutral system tied to the brand)."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Two or more gray hex values with different undertone temperatures detected within the same surface group",
+  "matcherProposal": "Collect all gray-like hex values (R ≈ G ≈ B within ±5). Classify each by approximate temperature: red/green mismatch direction identifies warm (R>G, R>B slightly) vs cool (B>R, B>G). Flag if both warm and cool neutrals appear in a single viewport or within 3 CSS levels of nesting as surface parents.",
+  "detectorLimitations": [
+    "Cannot detect temperature intent — a warm-neutral card on a cool-neutral page may be deliberate section contrast.",
+    "CSS custom properties or runtime color computation bypasses static hex analysis.",
+    "Undertone classification is approximate; near-neutral values near the boundary produce ambiguous classification."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A deliberately dual-tone system uses warm container backgrounds inside a cool page to create visual hierarchy — this is intentional, not sloppy.",
+    "A photo gallery page varies neutral undertones per section to harmonize with different image color palettes."
+  ],
+  "mitigationStrategy": "Lower severity to warning. Only flag when warm and cool neutrals appear at the same stacking level (e.g., two sibling cards), not across parent-child section boundaries.",
+  "fixturePlans": {
+    "violation": "A dashboard page where card backgrounds use #FAFAFA (warm) while the sidebar uses #F3F4F6 (cool), and divider lines alternate between #E5E7EB (cool) and #E5E7DB (warm approximation) without pattern.",
+    "control": "A three-tier surface stack using a warm neutral scale: page bg #F7F5F0, card bg #EDEAE2, elevated card bg #E2DED4, all sharing a consistent beige undertone.",
+    "borderline": "A landing page that uses cool neutral backgrounds in the hero section and warm neutrals in the testimonial section, with the temperature shift acting as a section separator."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Observation based on comparing Tailwind, Material Design, and custom-neutral-scale implementations."
+  ],
+  "overlapNotes": "Extends the token-system concept from tokens.establish-system into the specific failure of generic neutral scales. No overlap with existing rules."
+}

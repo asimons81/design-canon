@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-037",
+  "proposedRuleId": "data-integrity.optimistic-ui-slop",
+  "title": "Show confirmation before destructive data operations",
+  "category": "data-integrity",
+  "relevantSurfaces": ["product-app", "tables", "forms"],
+  "summary": "Generated interfaces execute destructive actions — delete, archive, remove, ban, clear — immediately without confirmation, undo option, or visual acknowledgment, putting user data one accidental click away from loss.",
+  "instruction": "Every destructive action (delete, archive, remove, clear, reset, ban, terminate) must be preceded by a confirmation dialog that states the action, the item name, and the consequence. Critical actions (permanent delete, data wipe, account termination) require typed confirmation (e.g., type DELETE). Non-critical but destructive actions must offer an undo mechanism (toast with undo button) for at least 5 seconds.",
+  "rationale": "Undo and confirmation are the primary safeguards against accidental data loss. Without confirmation, a single misclick can destroy weeks of work. Gmail undo-send feature demonstrated that users make mistakes within the 5-second window 30% of the time. Confirmation dialogs reduce accidental deletions by an estimated 70-90%.",
+  "claimType": "research-backed",
+  "violations": [
+    "A file manager where clicking a Delete icon removes the file immediately with no confirmation dialog and no undo toast.",
+    "A user management dashboard where a single click on an X button deletes a user account permanently with no confirmation dialog and no undo.",
+    "A form builder where clicking Clear All immediately resets all fields without confirmation and with no undo option."
+  ],
+  "controls": [
+    "A file manager where clicking Delete opens a dialog: Delete report.pdf? This action can be undone for 30 days. with Cancel and Move to Trash buttons.",
+    "A user management dashboard where clicking Deactivate shows a dialog: Deactivate user john@example.com? They will be unable to log in. with Cancel and Confirm Deactivation styled as destructive red.",
+    "A form where clicking Clear All shows a confirmation toast stating All fields cleared with an Undo button that persists for 5 seconds."
+  ],
+  "borderlineCases": [
+    "A 'Remove from list' action on a non-critical item (e.g., dismissing a notification) where an undo toast is sufficient and a dialog would be overkill."
+  ],
+  "contextualExceptions": [
+    "Power-user interfaces where bulk operations execute without confirmation and a separate undo panel is available (e.g., Gmail archive, Trello deletion with undo banner).",
+    "APIs and developer tools where the command-line or API call itself is the explicit confirmation of intent.",
+    "Temporary state changes (hiding an element, collapsing a section) that are not data-destructive."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Buttons or links with text matching destructive action patterns (delete, remove, clear, erase, archive, ban, terminate) that are not preceded by a modal or dialog element within 2 DOM levels",
+  "matcherProposal": "Identify interactive elements whose text content matches action verbs: delete, remove, clear, erase, archive, ban, terminate, destroy, purge, reset (to default). For each, check the next 2 DOM levels for: (a) a sibling dialog or modal with confirmation text, or (b) a subsequent toast container with an undo action. Flag if none detected.",
+  "detectorLimitations": [
+    "Cannot detect confirmation implemented through JavaScript event handlers (confirm(), custom confirm dialog) without runtime code analysis.",
+    "Destructive actions triggered by drag-and-drop, keyboard shortcuts, or context menus are invisible to static button-text analysis.",
+    "Undo-toast mechanisms that appear only after the action executes cannot be detected pre-emptively."
+  ],
+  "impact": "critical",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "A Clear filters button that resets search filters (not data) without confirmation — matches the heuristic pattern but is not data-destructive.",
+    "A Remove from cart action in an e-commerce interface — technically removes an item but is undoable via Add again without special infrastructure.",
+    "An action that triggers a server-side soft delete (recoverable) with a built-in undo window not visible client-side."
+  ],
+  "mitigationStrategy": "Only flag actions that involve data entities (files, users, records, posts, messages, accounts) where the class or surrounding context indicates a data object. Exclude UI-state toggles, filter clears, and cart removals.",
+  "fixturePlans": {
+    "violation": "A file manager page where each file row has a red Delete icon that immediately removes the file with no confirmation dialog, no toast, and no undo option.",
+    "control": "A file manager where clicking Delete opens a modal: Move quarterly-report.pdf to Trash? You can restore it within 30 days. with Cancel (ghost) and Move to Trash buttons.",
+    "borderline": "A Gmail-style interface where clicking the archive icon immediately archives the conversation, but an undo banner appears at the top for 7 seconds — no dialog, but undo is available."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Undo and confirmation effectiveness statistics based on publicly available UX research."
+  ],
+  "overlapNotes": "First data-integrity proposal. No overlap with existing rules."
+}

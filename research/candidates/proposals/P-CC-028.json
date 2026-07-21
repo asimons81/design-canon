@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-028",
+  "proposedRuleId": "token.shadow-layering-multiplier",
+  "title": "Do not apply elevation tokens to every surface",
+  "category": "depth",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "Beyond the existing shadow-soup rule, AI-generated interfaces stack multiple depth layers simultaneously \u2014 cards with shadows inside a sidebar with a shadow, on a page with a top-bar shadow \u2014 creating a visual cacophony of competing elevations.",
+  "instruction": "Establish a limited elevation system. Only the focused or highest-priority surface should carry elevation at any time. Background panels, the main content area, and nav bars should rest at level 0. Reserve level 1 for cards, level 2 for dropdowns/modals, level 3 for toasts.",
+  "rationale": "When every surface has elevation, no surface has elevation. Users cannot distinguish the front layer from the background when cards, sidebars, headers, and modals all carry competing shadows or blur effects.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Sidebar with shadow, header with shadow, cards with shadows, modal with shadow \u2014 all visible simultaneously",
+    "More than 3 visible elevation levels on a single screen",
+    "Shadow values that don't correspond to a defined token system",
+    "Surfaces that should be flat (background panels, content areas) rendered with elevation",
+    "Blur/gaussian background on overlays stacking on top of elevated panels"
+  ],
+  "controls": [
+    "Limited elevation system with 3-4 defined token levels",
+    "Most surfaces at elevation 0 (flat) with no shadow or background separation",
+    "Single elevated surface per viewport region",
+    "Elevation used only to communicate interaction state or information priority"
+  ],
+  "borderlineCases": [
+    "Complex data dashboards where multiple data panels each need distinction"
+  ],
+  "contextualExceptions": [
+    "Design systems that intentionally use multi-layer depth as a visual language"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Multiple overlapping UI panels where 3+ distinct shadow or blur effects are visible within the same viewport.",
+  "matcherProposal": "Detect 3+ distinct box-shadow or backdrop-filter values across visible UI containers within a single viewport capture.",
+  "detectorLimitations": [
+    "Cannot assess whether the layering is intentional and hierarchical"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Complex but intentional elevation systems where each layer has a defined role",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag when 4+ elements with distinct shadow/blur values are visible on the same screen.",
+  "fixturePlans": {
+    "violation": "Dashboard with elevated sidebar (shadow), elevated header (shadow), 6 elevated cards (shadow), and an elevated modal (shadow). All visible simultaneously.",
+    "control": "Dashboard with flat sidebar, flat header, cards at elevation 1 (subtle shadow), modal at elevation 2 (stronger shadow). Maximum 2 visible elevation levels.",
+    "borderline": "Design tool palette where layering is the functional metaphor."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Extends depth.shadow-soup by addressing elevation layering multiplier, not just individual large shadows."
+}

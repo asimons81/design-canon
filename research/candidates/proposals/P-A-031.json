@@ -1,0 +1,55 @@
+{
+  "proposalId": "P-A-031",
+  "proposedRuleId": "mobile-interfaces.tap-target-density",
+  "title": "Ensure touch targets meet minimum sizing guidance",
+  "category": "mobile-interfaces",
+  "relevantSurfaces": ["mobile-interfaces", "product-app", "forms"],
+  "summary": "Models generate mobile UIs with touch targets below 44x44px — especially icon buttons, links in dense text, and small form controls — making the interface frustrating to use on touch devices and failing to accommodate users with larger fingers or motor impairments.",
+  "instruction": "Every interactive touch target on mobile viewports (< 768px) must have a minimum rendered size of 44x44px (or 48x48px for critical actions like submit, confirm, delete). The target includes padding. If the visible element is smaller than 44px, the clickable area must be extended via transparent padding, border, or ::before/::after pseudo-elements to meet the minimum.",
+  "rationale": "Apple HIG, Material Design, and WCAG all converge on 44-48px minimum touch targets. Below this threshold, adjacent-target mis-taps increase exponentially — 32px targets have ~50% error rate on thumb-based interaction. This is the single most impactful mobile usability fix.",
+  "claimType": "research-backed",
+  "violations": [
+    "A mobile navigation bar with 32x32px icon buttons (home, search, cart, profile) and 4px gaps between them — the gap is smaller than a fingertip.",
+    "A mobile article page with inline text links at 16px font-size — the link's tap target is approximately 16x16px (the text bounding box), well below 44px.",
+    "A mobile form with checkbox labels at 14px font-size where the label text is the only tap target — the label is ~14px tall by the text width."
+  ],
+  "controls": [
+    "A mobile navigation bar with 48x48px touch targets (24px icons + 12px padding on each side), with 8px minimum gaps between adjacent targets.",
+    "A mobile article with text links having a transparent 44px tap area via padding: 12px 4px on the inline link, creating a 44px-tall hit zone while keeping the visual link compact.",
+    "A mobile form with checkbox labels at 14px but wrapped in a 48px-tall label container (padding: 14px 0), ensuring the hit target meets minimums."
+  ],
+  "borderlineCases": [
+    "Small interactive elements on desktop-only interfaces that are never served to mobile users — 44px minimum applies only to mobile viewports."
+  ],
+  "contextualExceptions": [
+    "Non-interactive decorative elements styled as buttons should be excluded (verified by role attribute).",
+    "User-configurable interfaces where the user sets their own touch-target preference.",
+    "Nested interactive elements where the parent provides the 44px+ hit area (e.g., a card-level tap that contains a smaller icon button)."
+  ],
+  "detectorFeasibility": "definitive",
+  "detectorSignal": "Interactive element with computed width or height below 44px at a mobile viewport width",
+  "matcherProposal": "Render at 375px viewport. Identify all interactive elements (a, button, input, select, textarea, [role=button], [role=link], [tabindex] >= 0). Compute rendered width and height (including padding, excluding negative margins). Flag any element where width < 44px OR height < 44px. Exclude elements with aria-hidden=true.",
+  "detectorLimitations": [
+    "Cannot detect touch targets that are expanded via CSS pseudo-elements (::before, ::after) — these contribute to the hit area but do not affect computed element dimensions.",
+    "Interactive elements inside scrollable overflow containers may have different effective dimensions than computed.",
+    "Responsive designs that stretch interactive elements at specific breakpoints but collapse them at intermediate widths may require multi-breakpoint testing."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A mobile interface where JavaScript click handlers on small elements are wrapped within a larger parent click handler — the parent provides the real touch target.",
+    "An icon button with visible 32px icon but 48px padding on each side — computed element may still report 32px if padding is transparent/backgroundless; the real touch area is larger."
+  ],
+  "mitigationStrategy": "Use pointer-events bounding-box check: measure the actual hit-tested area (element offset + padding + border + explicit hit-area expansion pseudo-elements). Fall back to computed-size check with a known false-positive rate.",
+  "fixturePlans": {
+    "violation": "A mobile bottom navigation with 5 icon-only buttons at 32x32px with 2px gaps — all targets below 44px, gap allows double-taps.",
+    "control": "A mobile bottom navigation with 48x48px touch targets (28px icons + 10px padding), 8px gaps between targets, and active states extending 44px minimum.",
+    "borderline": "A mobile card where tapping the card itself navigates (card-level touch target > 44px) but the card contains a 32px 'heart' favorite icon — the card-level handler provides the 44px target, so the icon is acceptable."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Touch target research cross-referenced with Apple HIG, Material Design, and WCAG 2.5.5 publicly published standards."
+  ],
+  "overlapNotes": "First mobile-interfaces proposal. No overlap with existing rules."
+}

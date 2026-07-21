@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-033",
+  "proposedRuleId": "loading-states.spinner-only",
+  "title": "Show skeleton or progress indicators, not just spinners",
+  "category": "loading-states",
+  "relevantSurfaces": ["product-app", "dashboards", "mobile-interfaces"],
+  "summary": "Models default to a single spinning indicator for all loading states regardless of the content type or load duration, providing no information about what is loading, how much is left, or whether the app has frozen.",
+  "instruction": "Use content-aware loading indicators: skeleton screens for layout or card content (mimicking the eventual content shape), progress bars for operations with known duration (file uploads, exports), and spinners only for unknown-duration background actions (API calls). Never show a blank page with only a centered spinner for area-specific content.",
+  "rationale": "Spinners provide no information about what is loading or how much progress has been made. Skeleton screens reduce perceived load time by up to 30% by giving the brain a spatial structure to anticipate. Progress bars reassure users that the system is working. A blank page with a spinner induces anxiety and may trigger page refreshes.",
+  "claimType": "research-backed",
+  "violations": [
+    "A dashboard that shows a full-page centered spinner on every navigation, replacing the entire content area — no skeleton, no progress, no content preview.",
+    "A product listing page that shows 3 spinner dots while data loads, then suddenly renders 20 cards — no visual continuity, the layout shifts on every load.",
+    "A file upload interface with a spinner that has no progress percentage or bar — the user has no sense of remaining time for a large file."
+  ],
+  "controls": [
+    "A dashboard that shows skeleton cards (gray rectangles matching the card layout) while data loads — the user sees the layout structure immediately.",
+    "A product listing page that shows skeleton cards with the same dimensions as the eventual product cards — no layout shift, content appears progressively.",
+    "A file upload interface with a progress bar showing bytes transferred / total bytes, percentage, and estimated time remaining."
+  ],
+  "borderlineCases": [
+    "A quick API call (< 500ms) that shows a spinner inside a small container (e.g., a refresh button spinner) — acceptable because the duration is brief and the context is known."
+  ],
+  "contextualExceptions": [
+    "Full-page navigation between routes in SPAs where a transition animation serves the same function as a skeleton — the entire page is replaced.",
+    "Native mobile apps where platform conventions (iOS activity indicator) may override the skeleton preference for short loads.",
+    "Systems that already show stale content with a subtle loading indicator — the user retains the context while new data loads."
+  ],
+  "detectorFeasibility": "visual-only",
+  "detectorSignal": "A centered spinner or indeterminate progress indicator that occupies >50% of the viewport without surrounding skeleton structure",
+  "matcherProposal": "Identify loading indicators: elements with role='progressbar' and aria-valuenow='false' (indeterminate), or CSS spinning animations (rotate animation on a circular element). Check if the loading indicator is centered in the viewport without surrounding placeholder content (skeleton rectangles, card shapes). Flag if no skeleton structure is detected within 200ms of page paint.",
+  "detectorLimitations": [
+    "Cannot distinguish initial page load from subsequent data fetches — an SPA may show a spinner on the first load (acceptable) and skeletons on subsequent loads.",
+    "Skeleton screens rendered via JavaScript may not be visible in the initial DOM tree — detection requires waiting for app hydration.",
+    "Framework-specific loading wrappers (React Suspense, Vue Transition) may render spinners through a mechanism that the detector cannot distinguish from skeleton content."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "An initial page shell for a PWA where the entire app must download — the spinner is behind a splash screen, making skeletons irrelevant.",
+    "A minimal API-status page where the only content is a single status value — a skeleton for a single value looks the same as a centered spinner.",
+    "A quick-refresh action on a single metric card — the card stays visible with a small spinner overlay, not a full-page spinner."
+  ],
+  "mitigationStrategy": "Only flag when: (a) the loading indicator is the only visible content in >80% of the viewport, (b) there is no visible stale content behind it, (c) there are no skeleton-like placeholder shapes. Exclude initial app shell and splash screens.",
+  "fixturePlans": {
+    "violation": "A data dashboard that shows a full-page centered spinning circle on every route change — the entire 1200x800px area is replaced by a 40px spinner.",
+    "control": "The same dashboard showing skeleton rectangles (header area, 4 card outlines, a chart area) that match the layout structure — content appears to fill the skeletons.",
+    "borderline": "A single-value metric card showing a small spinner replacing the value while it refreshes — the card frame, label, and icon are still visible."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections.",
+    "Skeleton-screen perceived-performance research based on publicly published UX studies."
+  ],
+  "overlapNotes": "First loading-states proposal. No overlap with existing rules."
+}

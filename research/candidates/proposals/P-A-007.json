@@ -1,0 +1,52 @@
+{
+  "proposalId": "P-A-007",
+  "proposedRuleId": "radii.inconsistent",
+  "title": "Use a consistent corner radius system",
+  "category": "radii",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated interfaces apply different border-radius values to similar component types, making the shape language feel arbitrary.",
+  "instruction": "Define 2-3 border-radius tokens mapped to component roles (e.g., sharp for data display, rounded for interactive, pill for badges). Apply the same radius to all components of the same type.",
+  "rationale": "When cards, inputs, buttons, and modals all have different radii (8px, 6px, 4px, 12px), the shape language becomes noise. Users unconsciously associate roundedness with approachability and sharpness with precision - inconsistency creates mixed signals.",
+  "claimType": "observation",
+  "violations": [
+    "A form where inputs have 4px radius, buttons have 8px, the form container has 12px, and error alerts have 6px - four different radii within one logical section.",
+    "A card grid where each card has a different radius because the AI applied radius values inconsistently during generation."
+  ],
+  "controls": [
+    "A component set with two radii: 4px for all inputs, cards, and panels (functional surface), 8px for all buttons and interactive elements.",
+    "An editorial layout using 0px radius on all containers with 2px radius only on pull-quote borders."
+  ],
+  "borderlineCases": [
+    "A hero section may use a larger radius on the main container (e.g., 24px) while interior components use smaller radii. This is acceptable if it follows a defined token system."
+  ],
+  "contextualExceptions": [
+    "Single-radius designs where every component uses the same radius are not affected.",
+    "Design systems where radius is inherited from a parent component."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "More than 3 distinct border-radius values applied to similar component types",
+  "matcherProposal": "Group CSS elements by component type heuristic (div.card, section, form input, button). Collect border-radius values. If the same component type uses 3+ different radii, flag. Also flag if the project uses 5+ total distinct radii without a clear scale pattern.",
+  "detectorLimitations": [
+    "Responsive radius changes (larger radius on mobile, smaller on desktop) may produce multiple values per component.",
+    "Border-radius shorthand with 2-4 values creates different radii per corner intentionally."
+  ],
+  "impact": "low",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A component library with defined radius tokens but only using 2 of them in practice - the unused tokens should not trigger detection.",
+    "Border-radius: 9999px (pill) on badges alongside 8px on buttons is intentional 2-radius system."
+  ],
+  "mitigationStrategy": "Count radii per component type, not globally. A project with 5 total radii that are consistently mapped to 5 component roles (card=8px, input=4px, button=8px, badge=pill, modal=12px) is fine.",
+  "fixturePlans": {
+    "violation": "A page where all cards use different radii: 6px, 8px, 10px, 12px, 16px across 5 cards in the same grid.",
+    "control": "A page where cards=8px, buttons=8px, inputs=4px, badges=9999px (3 distinct roles with consistent values per role).",
+    "borderline": "A page where the hero card has 24px radius (intentional hero treatment) while section cards are 8px - two-value system."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation. Consistent radius is standard design system practice."
+  ],
+  "overlapNotes": "Related to radius.everything-pill (which flags universal pill rounding). This is about radius inconsistency rather than radius magnitude. Complementary - one targets excessive rounding, the other targets inconsistent rounding."
+}

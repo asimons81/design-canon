@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-018",
+  "proposedRuleId": "status.traffic-light-badges",
+  "title": "Do not rely solely on color for status indicators",
+  "category": "accessibility",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated status systems universally use the traffic-light color mapping (green=success, yellow=pending, red=error, gray=inactive) with pill-shaped badges and uppercase text, without accessible alternatives.",
+  "instruction": "Use text labels, icons, or patterns alongside color to communicate status. Ensure status is distinguishable in grayscale and for users with color vision deficiencies. Reserve the green/red binary for time-critical signals only.",
+  "rationale": "The traffic-light color mapping fails for the ~8% of users with red-green colorblindness and varies in cultural meaning across markets. When color is the only differentiator, the affordance breaks for screen reader users and anyone viewing in high-contrast or grayscale mode.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Green/red/yellow dot or pill as the only status differentiator",
+    "Pill/rounded-full shape for all badges regardless of platform shape language",
+    "Uppercase or semibold text within the badge reducing readability",
+    "No additional indicator (icon, pattern, text) alongside the color dot",
+    "Default color mapping: green=active, yellow=pending/warning, red=error, gray=inactive"
+  ],
+  "controls": [
+    "Icon + text + color combined for status communication",
+    "Color with sufficient non-color differentiator (shape, position, pattern)",
+    "Text-only status without colored badge",
+    "Status communicated through layout or group position instead of per-item badges"
+  ],
+  "borderlineCases": [
+    "System monitoring dashboards where second-resolution status recognition is critical"
+  ],
+  "contextualExceptions": [
+    "Deployment pipelines where red/yellow/green is an industry standard convention"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Small pill or dot-shaped elements using the colors green, red, yellow, or gray adjacent to text labels describing status.",
+  "matcherProposal": "Detect small rounded elements (pill or dot) colored with status-typical colors (green, red, amber, gray) positioned next to text labels or in table cells.",
+  "detectorLimitations": [
+    "Cannot determine if sufficient non-color differentiation exists alongside the color indicator"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Status badges that already include icons or text alongside color",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as an error when color-only indicators are detected without accompanying text or icon differentiation.",
+  "fixturePlans": {
+    "violation": "Status table column with green dot (active), gray dot (offline), red dot (error), no text labels, no icons.",
+    "control": "Status with colored dot + descriptive icon + text label (checkmark+Active, cross+Error, clock+Pending).",
+    "borderline": "CI pipeline with red/yellow/green convention where the labels are already descriptive."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to a11y.visible-focus in the broader a11y category but focuses on color-only status indicators."
+}

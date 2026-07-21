@@ -1,0 +1,46 @@
+{
+  "proposalId": "P-CC-001",
+  "proposedRuleId": "pricing.default-three-column",
+  "title": "Do not default to three-column pricing tables",
+  "category": "layout",
+  "relevantSurfaces": ["marketing", "product-app"],
+  "summary": "AI consistently generates a three-column pricing table with a highlighted 'Popular' middle tier, checkmark features, and annual/monthly toggle, regardless of whether the product has three pricing tiers.",
+  "instruction": "Choose a pricing presentation that matches the actual pricing model. Consider single-column feature matrices, usage-based scales, custom enterprise pricing, or sliding cost calculators before defaulting to three columns.",
+  "rationale": "The three-column table with 'Popular' badge is a template pattern, not a design decision. It imposes a three-tier structure that may not fit the product and trains users to ignore the 'Popular' signal.",
+  "claimType": "observation",
+  "sourceRefs": ["SRC-CC-001"],
+  "violations": [
+    "Three identical columns with the middle one highlighted as 'Popular'",
+    "Feature checkmarks in the same monotone color on every row",
+    "Annual/monthly toggle above the table as a pill switch",
+    "'Get Started' CTAs in every column with identical styling",
+    "Pricing that could describe any SaaS product with no product-specific framing"
+  ],
+  "controls": [
+    "Pricing shown as a single-column feature matrix with a call to contact sales for custom pricing",
+    "Usage-based calculator that shows price based on user inputs",
+    "Two-tier structure when the product genuinely has a free and a pro tier",
+    "Custom enterprise section distinct from standard pricing"
+  ],
+  "borderlineCases": [
+    "Actual three-tier products where the middle tier genuinely serves most customers",
+    "Developer tools offering free/team/enterprise as a genuine industry convention"
+  ],
+  "contextualExceptions": ["Template-driven starter sites where pricing is not the primary differentiator"],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Three columnar containers each containing a price, a heading, and a feature list within close proximity on the page, combined with a highlighted middle column.",
+  "matcherProposal": "Identify pricing-section landmarks or columns containing currency symbols, feature checkmarks (✓ or check-circle SVG), and at least three side-by-side card elements with a distinguished middle card.",
+  "detectorLimitations": ["Cannot distinguish genuine three-tier pricing from the template pattern", "Custom pricing pages that genuinely need three columns"],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": ["Products with actual three pricing tiers that fit the column layout", "Enterprise SaaS landing pages following industry convention"],
+  "mitigationStrategy": "Flag as warning with context about pricing model fit rather than as error.",
+  "fixturePlans": {
+    "violation": "Three-column pricing with 'Popular' middle badge, green checkmarks, monthly/annual toggle, and identical CTAs.",
+    "control": "Single-column feature matrix with two pricing options side-by-side in a non-column layout.",
+    "borderline": "Three-column pricing for a product that genuinely has three distinct plans with different target users."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": ["Developed without access to proprietary prompt collections."],
+  "overlapNotes": "Not covered by existing rules. Related to layout.centered-everything but addresses the specific pricing table template."
+}

@@ -1,0 +1,18 @@
+{
+  "auditId": "AUD-004",
+  "component": "dashboards",
+  "recurringPattern": "Left sidebar, top header bar with user avatar, and a grid of stat cards (4 small numbered metrics) above a full-width table or chart, all using heavy glassmorphism or layered shadows.",
+  "designHarm": "Dashboard density without information prioritization. Every metric gets the same card treatment, making it impossible to distinguish KRs from vanity metrics. The glass effect adds visual noise without communicating data state.",
+  "legitimateExceptions": ["Internal monitoring dashboards where all metrics are of equal operational importance", "Demo dashboards for design systems that need to show all available card variants"],
+  "coveredByExistingRule": true,
+  "existingRuleIds": ["depth.shadow-soup", "product-app.density-by-task"],
+  "suggestsBroaderCandidate": false,
+  "suggestsNarrowerCandidate": true,
+  "possibleFixtures": ["Standard 4-stat-card dashboard with glassmorphism", "Dashboard with explicit data hierarchy: one primary KPI card, secondary metrics in compact form"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-004"],
+  "originalObservations": [
+    "AI-generated dashboards always lead with 4 stat cards in a row, regardless of data actual importance.",
+    "The sidebar consistently uses a dark or glassmorphic background with monochrome icons."
+  ]
+}

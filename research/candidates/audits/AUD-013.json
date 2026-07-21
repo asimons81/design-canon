@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-013",
+  "component": "empty-states",
+  "recurringPattern": "Centered illustration (simple line art or geometric shapes) above a bold 'No data yet' or 'Nothing here' headline, a subdued subtext explaining the empty state, and a primary 'Get started' or 'Add your first X' CTA button.",
+  "designHarm": "The one-size-fits-all empty state misses the opportunity to guide users meaningfully. The cute illustration and generic messaging treat emptiness as an error rather than an invitation. Users in a workflow context need to know what happened and what to do next, not see decoration first.",
+  "legitimateExceptions": ["Consumer apps where onboarding should feel light and playful", "Splash-style empty states for first-run experiences"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard empty state with illustration + CTA", "Task-oriented empty state with precise next-step instructions and no illustration", "Empty state that shows sample/preview data instead of blankness"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-013"],
+  "originalObservations": [
+    "AI-generated empty states consistently use line-art illustrations even for enterprise or data-heavy contexts.",
+    "The headline is always a variant of 'Nothing here yet' with a friendly tone regardless of brand voice.",
+    "The CTA button is always primary filled style positioned directly below the subtext."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CP-005",
+  "proposedRuleId": "ai-copy.hero-revolutionize",
+  "title": "'Revolutionize' hyperbole",
+  "category": "ai-copy",
+  "relevantSurfaces": [
+    "marketing",
+    "landing-pages"
+  ],
+  "summary": "Calling every product a 'revolution' devalues the word. If everything is revolutionary, nothing is. Most products improve incrementally on existing categories.",
+  "instruction": "Replace Calling every product a 'revolution' dev with specific, verifiable language.",
+  "rationale": "Generic copy patterns erode trust and fail to differentiate the product. The term ''Revolutionize' hyperbole' is used reflexively without adding information value.",
+  "claimType": "observation",
+  "violations": [
+    "Generic usage: Calling every product a 'revolution' devalues the word. If everything is revolutionary, nothing is. Most products improve incrementally on existing categories.",
+    "'Revolutionize the way you build software' for a CI/CD tool that's a managed GitHub Actions alternative.",
+    "'Revolutionize your content strategy' for a social media scheduler."
+  ],
+  "controls": [
+    "Describe the specific improvement: 'The first spreadsheet designed for product managers' not 'Revolutionize your workflow.'",
+    "'The industrial revolution of 3D printing' in a historical context - 'revolution' as literal historical reference.",
+    "'A revolutionary approach to battery chemistry: solid state' in a scientific paper abstract."
+  ],
+  "borderlineCases": [
+    "A product that genuinely created a new category (e.g., the iPhone 'revolutionized mobile phones' is arguable but has supporting evidence)."
+  ],
+  "contextualExceptions": [
+    "Literal technical definitions of the term in domain-specific contexts.",
+    "Quoted user testimonials that use the phrase (do not edit customer quotes).",
+    "Creative or literary contexts where the term is used deliberately with self-awareness."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "The specific phrase pattern in marketing copy without supporting specificity nearby",
+  "matcherProposal": "Pattern match the key phrase. Check surrounding 200 characters for product-specific evidence (metrics, domain terms, proper nouns). Flag if generic phrase exists without supporting specificity.",
+  "detectorLimitations": [
+    "Cannot distinguish parody or deliberate stylistic choices.",
+    "Quoted customer testimonials should not be flagged.",
+    "Domain-specific literal usage requires context detection."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Literal domain-specific usage where the term has a technical meaning.",
+    "Parody or satirical marketing.",
+    "Customer quotes embedded in testimonial sections."
+  ],
+  "mitigationStrategy": "Require evidence of product-specific context within the same sentence or adjacent element. Exclude quoted content and code examples.",
+  "replacementStrategy": "Describe the specific improvement: 'The first spreadsheet designed for product managers' not 'Revolutionize your workflow.'",
+  "fixturePlans": {
+    "violation": "A SaaS landing page hero using ''Revolutionize' hyperbole' as the primary headline with no supporting specificity.",
+    "control": "Same page using specific, evidence-backed language that names the outcome, mechanism, or audience.",
+    "borderline": "A page using the term in a context where it has legitimate domain-specific meaning."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI-generated copy patterns across public landing pages."
+  ],
+  "overlapNotes": "Distinct from copy.generic-hero which covers different phrase patterns. This proposal expands coverage to additional generic copy categories."
+}

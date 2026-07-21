@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-032",
+  "proposedRuleId": "mobile-interfaces.edge-safe-areas",
+  "title": "Respect viewport safe areas on mobile",
+  "category": "mobile-interfaces",
+  "relevantSurfaces": ["mobile-interfaces", "product-app"],
+  "summary": "Models generate mobile UIs that place interactive elements behind the notch, Dynamic Island, rounded corners, or home indicator of modern phones, because safe-area inset variables are not applied to padding and margins.",
+  "instruction": "On mobile viewports, apply env(safe-area-inset-*) values as padding or margin on fixed-positioned elements (headers, footers, bottom nav, floating CTAs) to prevent content from rendering behind the device's notch, rounded corners, or home indicator. Test on at least one notched-device emulation.",
+  "rationale": "A bottom navigation bar rendered behind the iPhone's home indicator produces accidental taps (trying to tap the nav but triggering home), reduced legibility (content behind the notch), and poor first impressions. env(safe-area-inset) has been available since iOS 11 and is the standard mitigation.",
+  "claimType": "general-knowledge",
+  "violations": [
+    "A mobile bottom navigation bar with position: fixed; bottom: 0 with no padding-bottom: env(safe-area-inset-bottom) — on iPhone 14, the nav icons sit behind the home indicator.",
+    "A mobile header with position: fixed; top: 0 and no padding-top: env(safe-area-inset-top) — the header content is behind the notch.",
+    "A mobile FAB (floating action button) positioned at bottom: 16px; right: 16px without safe-area-inset adjustments — on rounded-corner devices, the button clips into the corner radius."
+  ],
+  "controls": [
+    "A mobile bottom nav with padding-bottom: calc(8px + env(safe-area-inset-bottom)) — safe area respected regardless of device posture.",
+    "A mobile header with padding-top: env(safe-area-inset-top) and the header background extending behind the notch — content is below the notch.",
+    "A mobile FAB with bottom: calc(16px + env(safe-area-inset-bottom)) and right: calc(16px + env(safe-area-inset-right)) — safe on all device shapes."
+  ],
+  "borderlineCases": [
+    "A web app that does not use any fixed or sticky positioning — all content is in the normal document flow, which naturally avoids safe-area issues."
+  ],
+  "contextualExceptions": [
+    "Desktop-only applications that are never served to mobile viewports (check via user-agent or responsive meta tag).",
+    "Fullscreen media (video, camera, game) where safe areas are intentionally ignored for immersive viewing."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Fixed or sticky-positioned elements at the viewport edge without env(safe-area-inset-*) in their positioning CSS",
+  "matcherProposal": "Identify elements with position: fixed or position: sticky. Check if bottom: 0, top: 0, left: 0, or right: 0 is set. If an edge position is 0 and the element does not use env(safe-area-inset-bottom/top/left/right) in its padding, margin, or offset properties, flag.",
+  "detectorLimitations": [
+    "Cannot detect safe-area handling applied via JavaScript dynamic calculation (e.g., reading the CSS env() in a ResizeObserver).",
+    "Cannot test on actual notched devices — only heuristic detection of the CSS variable usage.",
+    "Device posture changes (landscape vs portrait, split-screen) may invalidate the applied env() values."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A mobile interface where no element uses fixed/sticky positioning — safe areas automatically handled by the browser viewport renderer.",
+    "A design where the fixed element is visually behind the notch intentionally (full-bleed hero header) and content padding is applied via JavaScript for more precise control."
+  ],
+  "mitigationStrategy": "Only flag when position: fixed/sticky is used with bottom: 0 or top: 0 AND the element lacks any env(safe-area-inset-*) usage. Check both CSS declarations and inline styles. Provide safe-area usage as a lint suggestion.",
+  "fixturePlans": {
+    "violation": "A mobile site with a fixed bottom nav bar at bottom: 0; padding-bottom: 8px — no env(safe-area-inset-bottom), nav icons sit behind the home indicator on iPhone 14.",
+    "control": "The same site with padding-bottom: calc(8px + env(safe-area-inset-bottom)) — nav icons clear the home indicator.",
+    "borderline": "A mobile site with no fixed or sticky elements — content flows naturally and the browser's viewport renderer handles safe areas."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Second mobile-interfaces proposal, distinct from P-A-031 (touch target sizing). No overlap with existing rules."
+}

@@ -1,0 +1,18 @@
+{
+  "auditId": "AUD-001",
+  "component": "hero",
+  "recurringPattern": "Stacked centered hero with gradient-background headline, pill-shaped CTA button, and floating mockup device frame (laptop/mobile) angled from bottom-right.",
+  "designHarm": "Monotonous page entry; every AI-generated marketing page opens the same way, burying differentiation. Users develop banner-blindness for this exact composition.",
+  "legitimateExceptions": ["Landing pages for template-driven SaaS where the hero is intentionally a known pattern to reduce cognitive friction", "Product demo sites where the device frame is the actual product (screenshot inside)"],
+  "coveredByExistingRule": true,
+  "existingRuleIds": ["layout.centered-everything", "copy.generic-hero", "marketing.single-primary-action", "radius.everything-pill"],
+  "suggestsBroaderCandidate": false,
+  "suggestsNarrowerCandidate": true,
+  "possibleFixtures": ["Centered AI-hero with gradient headline and angled laptop mockup", "Hero that breaks the pattern with asymmetric layout and no device frame"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-001"],
+  "originalObservations": [
+    "Observed across 12+ AI-generated landing page examples: always a centered headline using a gradient, a single pill CTA, and a floating laptop/phone mockup angled ~15 degrees.",
+    "The device frame typically contains a blurred UI screenshot or a generic dashboard image."
+  ]
+}

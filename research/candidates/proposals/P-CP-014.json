@@ -1,0 +1,59 @@
+{
+  "proposalId": "P-CP-014",
+  "proposedRuleId": "ai-copy.feature-robust",
+  "title": "'Robust' without failure mode specification",
+  "category": "ai-copy",
+  "relevantSurfaces": [
+    "marketing",
+    "landing-pages"
+  ],
+  "summary": "Calling features 'robust' without defining what they're robust against. Robust error handling? Robust feature set? Robust security? Vague engineering superlative.",
+  "instruction": "Replace Calling features 'robust' without defini with specific, verifiable language.",
+  "rationale": "Generic copy patterns erode trust and fail to differentiate the product. The term ''Robust' without failure mode specification' is used reflexively without adding information value.",
+  "claimType": "observation",
+  "violations": [
+    "Generic usage: Calling features 'robust' without defining what they're robust against. Robust error handling? Robust feature set? Robust security? Vague engineering superlative.",
+    "'Robust security features' without specifying encryption, compliance, or audit details.",
+    "'Robust API' without mentioning rate limits, uptime, or documentation quality."
+  ],
+  "controls": [
+    "Specify what the feature withstands: 'Handles 10,000 concurrent users with <200ms latency' not 'Robust infrastructure'.",
+    "'Robust against XSS and CSRF attacks' in a security context - specific threats named.",
+    "'Robust to outliers' in a statistical model description - specific failure mode addressed."
+  ],
+  "borderlineCases": [
+    "'Robust' in wine tasting notes ('a robust red with notes of blackberry') - metaphorical but specific to the domain."
+  ],
+  "contextualExceptions": [
+    "Literal technical definitions of the term in domain-specific contexts.",
+    "Quoted user testimonials that use the phrase (do not edit customer quotes).",
+    "Creative or literary contexts where the term is used deliberately with self-awareness."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "The specific phrase pattern in marketing copy without supporting specificity nearby",
+  "matcherProposal": "Pattern match the key phrase. Check surrounding 200 characters for product-specific evidence (metrics, domain terms, proper nouns). Flag if generic phrase exists without supporting specificity.",
+  "detectorLimitations": [
+    "Cannot distinguish parody or deliberate stylistic choices.",
+    "Quoted customer testimonials should not be flagged.",
+    "Domain-specific literal usage requires context detection."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Literal domain-specific usage where the term has a technical meaning.",
+    "Parody or satirical marketing.",
+    "Customer quotes embedded in testimonial sections."
+  ],
+  "mitigationStrategy": "Require evidence of product-specific context within the same sentence or adjacent element. Exclude quoted content and code examples.",
+  "replacementStrategy": "Specify what the feature withstands: 'Handles 10,000 concurrent users with <200ms latency' not 'Robust infrastructure'.",
+  "fixturePlans": {
+    "violation": "A SaaS landing page hero using ''Robust' without failure mode specification' as the primary headline with no supporting specificity.",
+    "control": "Same page using specific, evidence-backed language that names the outcome, mechanism, or audience.",
+    "borderline": "A page using the term in a context where it has legitimate domain-specific meaning."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation of recurring AI-generated copy patterns across public landing pages."
+  ],
+  "overlapNotes": "Distinct from copy.generic-hero which covers different phrase patterns. This proposal expands coverage to additional generic copy categories."
+}

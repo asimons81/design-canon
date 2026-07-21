@@ -1,0 +1,56 @@
+{
+  "proposalId": "P-A-009",
+  "proposedRuleId": "responsive.no-breakpoints",
+  "title": "Define responsive breakpoints before layout",
+  "category": "responsive",
+  "relevantSurfaces": [
+    "marketing",
+    "product-app",
+    "editorial"
+  ],
+  "summary": "AI-generated interfaces often lack responsive breakpoints, producing single-viewport layouts that break on mobile or stretch endlessly on wide screens.",
+  "instruction": "Define at least one narrow-viewport breakpoint before implementing layout. Test every major layout section at the widest and narrowest target viewports. Use fluid typography and relative units.",
+  "rationale": "A layout that only works at the AI's default viewport width (typically 1280-1440px) will overflow, stack poorly, or become unreadable on mobile devices. Responsive design is not optional for web interfaces.",
+  "claimType": "observation",
+  "violations": [
+    "A marketing page with fixed-width containers (1200px), font sizes in px, and no media queries that overflows horizontally on mobile.",
+    "An article layout with fixed sidebar (300px) and content (800px) that forces horizontal scrolling on viewports under 1100px."
+  ],
+  "controls": [
+    "A marketing page using max-width: 1200px with width: 100% on containers, fluid type (clamp()), and three breakpoints (mobile 375px, tablet 768px, desktop 1024px+).",
+    "An editorial layout using a single-column stack on mobile and two-column grid on desktop via CSS Grid auto-fit."
+  ],
+  "borderlineCases": [
+    "A dashboard designed for a specific kiosk display with a known fixed resolution may intentionally omit responsive breakpoints, but should document this."
+  ],
+  "contextualExceptions": [
+    "Internal tool accessed only on company-issued devices with known viewport.",
+    "Native app-like PWA with locked orientation.",
+    "Presentation/slide decks rendered at fixed aspect ratio."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Fixed-width containers, pixel-based font and spacing with zero @media rules",
+  "matcherProposal": "Parse CSS for @media rules. If none found AND CSS contains fixed-width declarations (width > 500px or max-width with px value) AND uses px font sizes, flag as potentially non-responsive. Also scan for viewport meta tag presence.",
+  "detectorLimitations": [
+    "JavaScript-based responsive layouts (ResizeObserver, container queries) may not appear in static CSS analysis.",
+    "CSS Grid auto-fill/auto-fit can create responsive layouts without media queries.",
+    "Server-side responsive delivery may serve different CSS per device."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A single-page app that handles responsiveness entirely through CSS Grid auto-fit with no media queries needed.",
+    "An email template where fixed-width is intentional for email client compatibility."
+  ],
+  "mitigationStrategy": "Check for both CSS @media and JavaScript resize handlers. Check for viewport meta tag absence as additional signal. CSS Grid auto-fit without media queries is acceptable if content restacks correctly.",
+  "fixturePlans": {
+    "violation": "A landing page with width: 1200px, font-size: 18px, no @media rules, no viewport meta tag.",
+    "control": "A landing page with max-width: 1200px, width: 100%, font-size: clamp(16px, 1.125rem, 18px), three @media breakpoints, viewport meta tag.",
+    "borderline": "A dashboard using CSS Grid auto-fit with minmax(250px, 1fr) that restacks responsively without media queries."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Standard responsive web design practice. WCAG 1.4.10 Reflow."
+  ],
+  "overlapNotes": "Distinct from existing rules. No responsive-specific rule exists in core.json."
+}

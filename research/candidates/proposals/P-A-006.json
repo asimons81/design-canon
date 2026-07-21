@@ -1,0 +1,53 @@
+{
+  "proposalId": "P-A-006",
+  "proposedRuleId": "depth.inconsistent-elevation",
+  "title": "Use consistent elevation levels",
+  "category": "depth",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated interfaces often apply shadows at different intensities without a clear elevation system, making depth feel arbitrary rather than hierarchical.",
+  "instruction": "Define 2-4 elevation levels and assign them to specific component roles. Do not vary shadow size, opacity, or blur beyond these defined levels. Most surfaces should be flat (level 0).",
+  "rationale": "Shadows communicate what users can interact with and what's above the surface. When every element has a different shadow, depth loses meaning and the interface feels visually chaotic. Consistent elevation builds a mental model of the interface's spatial structure.",
+  "claimType": "observation",
+  "violations": [
+    "A card has a 10px blur shadow, a floating button uses 8px, a modal uses 24px, a tooltip uses 6px, and a dropdown uses 12px - five different elevations with no system.",
+    "An alert banner has a heavier shadow than the modal it overlays, inverting the expected depth hierarchy."
+  ],
+  "controls": [
+    "A design with three elevations: level 0 (flat - all cards, panels, surfaces), level 1 (4px blur - interactive elements on hover), level 2 (12px blur - modals and drawers).",
+    "A marketing page using zero shadows on all surfaces, with depth communicated purely through color and size contrast."
+  ],
+  "borderlineCases": [
+    "A component library may need 4-5 elevations for different interactive states (rest, hover, active, focus, drag). The key is that these map to state, not random values."
+  ],
+  "contextualExceptions": [
+    "Custom OS-level chrome (title bar overlays, system dialogs).",
+    "3D or spatial interfaces where depth is literal."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "CSS box-shadow declarations with more than 3 distinct blur-radius values across the codebase",
+  "matcherProposal": "Parse all box-shadow declarations. Extract blur radius (second value in standard syntax). Group by blur value. Flag if more than 4 distinct blur groups exist. Exclude inset shadows and multiple-shadow declarations that create compound effects.",
+  "detectorLimitations": [
+    "Multiple comma-separated shadows on one element may create a single elevation effect from multiple blur values.",
+    "Tailwind-style utility shadows (shadow-sm, shadow-md, shadow-lg) have defined blur values that should be counted as their semantic level.",
+    "Filter: drop-shadow() is a different CSS mechanism."
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "A button design that uses multiple shadows for a single effect (e.g., ambient + directional shadow = one elevation level).",
+    "A design system with 5 defined elevation tokens may still only use 2-3 in practice."
+  ],
+  "mitigationStrategy": "Count distinct elevation levels (semantic groupings of blur values within 15% tolerance), not raw blur values. Flag only when codebase has 5+ distinct groups.",
+  "fixturePlans": {
+    "violation": "A page using shadows with blur values: 4px, 8px, 10px, 16px, 20px, 24px across different components.",
+    "control": "A page using shadows only as: 0px (flat surfaces), 6px (elevated cards), 16px (modals).",
+    "borderline": "A page using shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl from Tailwind where some are composition shadows - count semantic levels not raw values."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Original observation. Elevation systems documented in Material Design and HIG."
+  ],
+  "overlapNotes": "Related to depth.shadow-soup (which flags combining multiple depth techniques). This is about inconsistent elevation values within the same depth language. Complementary - shadow-soup flags mixing techniques, this flags inconsistent application of one technique."
+}

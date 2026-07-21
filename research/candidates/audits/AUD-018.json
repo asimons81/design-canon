@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-018",
+  "component": "command-palettes",
+  "recurringPattern": "Overlay centered dialog with a search input at top, a list of actions below with shortcut-key labels, category headings (e.g., 'Navigation', 'Actions', 'Pages'), and a footer showing 'Type a command or search...' placeholder. Dark overlay backdrop, rounded corners, subtle shadow.",
+  "designHarm": "The command palette pattern is borrowed from VS Code/Superhuman and applied universally without considering whether the app has enough commands to justify it. The category→action hierarchy assumes users think in categories, but power users prefer fuzzy matching. Every app gets the same keyboard shortcut disclosure (⌘K) regardless of platform conventions.",
+  "legitimateExceptions": ["Power-user tools with 50+ commands that are hard to find in menus", "Developer tools where keyboard-driven workflows are the norm"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard command palette with category groups", "Command palette without categories, pure fuzzy search", "App with intentional search-only instead of command palette"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-018"],
+  "originalObservations": [
+    "AI adds a command palette to every generated app regardless of whether it has a command-worthy action surface.",
+    "The palette always opens with ⌘K (macOS) / Ctrl+K (Windows) and this shortcut is always displayed in the input placeholder.",
+    "Action items always show keyboard shortcut hints to the right with the same pill-shaped badge styling."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-021",
+  "component": "search-interface",
+  "recurringPattern": "Full-width search bar with a magnifying glass icon left, placeholder text like 'Search...' or 'Ask anything...', often with recent searches or quick action chips below, and a dropdown/overlay showing results with category separators.",
+  "designHarm": "The 'Ask anything...' placeholder reflects the AI industry's search-as-chat default, not user expectation. The quick-action chips below the search bar (common in AI-generated UI) offer suggestions before the user has typed anything, occupying valuable above-fold space with untargeted options. Result overlays with category headers mimic macOS Spotlight in contexts that don't have organized data categories.",
+  "legitimateExceptions": ["Universal search across many data types (files, messages, contacts) where categories help disambiguate", "Customer support portals where quick actions are genuinely helpful shortcuts"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard search bar with category results", "Minimal search with text-only results and no quick actions", "Search-with-chat hybrid for AI-native products"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-021"],
+  "originalObservations": [
+    "AI-generated search interfaces consistently use 'Ask anything...' as placeholder text regardless of the app's domain.",
+    "Quick action chips appear below the search bar even for data that doesn't have common quick actions.",
+    "The search icon is always a standard magnifying glass, positioned left within the input."
+  ]
+}

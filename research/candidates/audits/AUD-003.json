@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-003",
+  "component": "feature-grids",
+  "recurringPattern": "3x2 or 3x3 grid of feature cards each containing an icon in a colored circle/square, a bold short headline, and two lines of body copy, all with identical border-radius and subtle shadows.",
+  "designHarm": "Features become wallpaper; the uniform card grid treats every feature as equally important with no visual hierarchy. Users cannot distinguish the primary value proposition from secondary niceties.",
+  "legitimateExceptions": ["Presentation sites where every feature is genuinely co-equal", "Documentation overview sections that need scannable category tiles"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 3x2 icon-card feature grid", "Feature grid with intentionally varied card sizes to signal hierarchy", "Alternate layout using staggered rows or feature-list format"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-003"],
+  "originalObservations": [
+    "AI-generated feature sections consistently default to a uniform-card grid regardless of the number or priority of features.",
+    "The icon containers are always the same size and shape (usually a 48px circle with a 24px icon inside).",
+    "Card copy is always bold headline + exactly two lines of body text."
+  ]
+}

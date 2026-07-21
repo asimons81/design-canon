@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-A-020",
+  "proposedRuleId": "mobile.touch-targets",
+  "title": "Touch targets must meet minimum size requirements",
+  "category": "mobile-interfaces",
+  "relevantSurfaces": [
+    "mobile-interfaces",
+    "product-app"
+  ],
+  "summary": "AI-generated mobile interfaces often have touch targets smaller than the recommended minimum, causing user frustration.",
+  "instruction": "Ensure every interactive element has a touch target of at least 44x44 CSS pixels. Do not rely on the visible element size alone - the interactive area (padding + visible area) must meet the minimum.",
+  "rationale": "Apple HIG and Material Design both recommend 44-48px minimum touch targets. Users with larger fingers, reduced dexterity, or using the device one-handed need generous tap areas. Small targets increase error rates and user frustration disproportionately.",
+  "claimType": "research-backed",
+  "violations": [
+    "A mobile navigation with 24px-tall links that are densely packed with 4px gap between them.",
+    "A filter bar with 20x20px checkbox controls and small text labels where the tap zone is the checkbox alone.",
+    "Icon buttons (edit, delete, share) at 28x28px without padding extending the hit area to 44px."
+  ],
+  "controls": [
+    "Mobile navigation links with 48px height and at least 8px gap between interactive rows.",
+    "Filter controls with 44x44px touch targets using transparent padding around the visible checkbox and label association.",
+    "Icon buttons with visible icon at 24x24px but total touch target expanded to 44x44px through padding."
+  ],
+  "borderlineCases": [
+    "Interactive elements within a scrollable data table where increasing row height to 44px significantly reduces data density - may need careful tradeoff."
+  ],
+  "contextualExceptions": [
+    "Non-interactive elements (static text, decorative icons).",
+    "Interactive elements in a packed toolbar where the primary controls meet 44px and secondary controls are smaller but rarely used.",
+    "Map interfaces where the map pins themselves are small but respond to nearby taps."
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Interactive elements (buttons, links, inputs) with computed touch target area smaller than 44x44 CSS pixels",
+  "matcherProposal": "For interactive elements (a, button, input, select, [role=button]), compute the total area including padding. Check if width >= 44px AND height >= 44px. Flag any interactive element below either threshold. Exclude inline text links within paragraphs.",
+  "detectorLimitations": [
+    "Cannot detect touch targets created via JavaScript (custom gestures, SVG hit areas).",
+    "font-size-based targets may be responsive and change size.",
+    "Overlapping elements may have effective touch areas that differ from computed box model."
+  ],
+  "impact": "high",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Desktop-only interactive maps where touch is not the primary input.",
+    "Responsive interfaces that increase touch target size through media queries (detect at mobile breakpoints).",
+    "Interactive elements inside scrollable containers where the parent handles touch."
+  ],
+  "mitigationStrategy": "Apply only at mobile viewport breakpoints (<768px). Exclude inline text links. Allow suppression for data-dense interfaces with documented tradeoff.",
+  "fixturePlans": {
+    "violation": "A mobile form with 32px submit button, 28px icon buttons, 24px navigation links.",
+    "control": "Same mobile form with 48px submit button, 44px icon buttons via padding, 44px navigation links.",
+    "borderline": "A mobile data table with 36px row heights and touch-friendly checkboxes (44px) at the start of each row."
+  },
+  "status": "review-ready",
+  "cleanRoomAttestations": [
+    "Apple HIG (44px), Material Design (48px), WCAG 2.5.8 Target Size (proposed)."
+  ],
+  "overlapNotes": "Distinct from existing rules. No mobile-specific rule exists in the catalog."
+}

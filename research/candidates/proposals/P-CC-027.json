@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-027",
+  "proposedRuleId": "navigation.hamburger-plus-tabs",
+  "title": "Do not combine hamburger menus with bottom tab bars",
+  "category": "layout",
+  "relevantSurfaces": [
+    "mobile"
+  ],
+  "summary": "AI-generated mobile interfaces consistently include both a bottom tab bar AND a top-left hamburger menu, creating two competing navigation systems that users must learn to decode.",
+  "instruction": "Choose one primary navigation model for mobile. Either use bottom tabs for all top-level destinations or a hamburger/sidebar menu as the sole navigation. Avoid the 'tabs for four, hamburger for the rest' split that forces users to search two systems.",
+  "rationale": "The tabs + hamburger combination creates a navigation hybrid that users cannot predict. Some destinations live in tabs, others in the hamburger menu, with no consistent distinction. This forces users to check both systems for every destination, increasing cognitive load.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Bottom tab bar (4-5 tabs) coexisting with top-left hamburger icon",
+    "Primary destinations split arbitrarily between tabs and hamburger",
+    "Hamburger menu containing destinations the user expected to find in tabs",
+    "No visual indication of which navigation system contains which destination",
+    "Hamburger menu and bottom tabs on every screen simultaneously"
+  ],
+  "controls": [
+    "Bottom tabs only (no hamburger) when all destinations fit in 5 or fewer tabs",
+    "Hamburger menu only (no bottom tabs) when destinations exceed 5",
+    "Top tab navigation for content-category apps with 3-5 sections",
+    "Gesture navigation without persistent navigation UI elements"
+  ],
+  "borderlineCases": [
+    "Apps with 5 core tabs plus settings/help that genuinely belong in a hamburger"
+  ],
+  "contextualExceptions": [
+    "Platform conventions where both patterns are expected (certain legacy apps)"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A persistent bottom navigation bar with 4-5 items AND a hamburger icon in the top-left header simultaneously visible.",
+  "matcherProposal": "Detect the combination of a bottom-positioned tab bar (persistent element with icons) and a top-left hamburger icon (three horizontal lines) on the same view.",
+  "detectorLimitations": [
+    "Cannot assess whether the navigation split is intentional and well-communicated"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Apps with a clear and well-communicated distinction between tabs and hamburger content",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a usability concern when both patterns are present, suggesting a unified navigation model.",
+  "fixturePlans": {
+    "violation": "Mobile app with Home, Search, Activity, Profile bottom tabs and a hamburger menu containing 'Settings', 'Help', 'About', 'Logout'.",
+    "control": "Mobile app with Home, Search, Activity, Profile, Settings bottom tabs \u2014 no hamburger menu.",
+    "borderline": "App with 5 core tabs and properly communicated hamburger for secondary items only, with clear labels."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to mobile-nav.five-tab-default (P-CC-014) but addresses the specific dual-navigation anti-pattern."
+}

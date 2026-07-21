@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-011",
+  "proposedRuleId": "empty-states.illustration-cta-default",
+  "title": "Do not default to illustrated empty states",
+  "category": "layout",
+  "relevantSurfaces": [
+    "product-app"
+  ],
+  "summary": "AI-generated empty states consistently use a centered line-art illustration above a 'Nothing here yet' headline, subdued subtext, and a 'Get started' CTA \u2014 treating emptiness as decoration opportunity rather than guidance moment.",
+  "instruction": "Treat empty states as guidance opportunities, not decoration slots. Replace generic illustrations with precise next-step instructions, sample data previews, or contextual onboarding that helps the user populate the space.",
+  "rationale": "The illustration-first empty state prioritizes decoration over direction. Users encountering an empty state need to understand what happened and what to do next \u2014 a cute illustration and generic message delay that understanding.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Centered line-art or geometric illustration as the primary visual",
+    "'Nothing here yet', 'No data', or 'This page is empty' headline",
+    "Subdued subtext that describes the emptiness rather than the next action",
+    "Primary filled 'Get started' or 'Add your first X' CTA button",
+    "Same empty state format regardless of brand tone or user context"
+  ],
+  "controls": [
+    "Task-oriented empty state with numbered next steps",
+    "Sample/preview data shown instead of blank space",
+    "Contextual guidance that explains why the state is empty and how to change it",
+    "Empty state that integrates with onboarding flow"
+  ],
+  "borderlineCases": [
+    "Consumer apps where playful empty states match the brand personality"
+  ],
+  "contextualExceptions": [
+    "Splash-style first-run experiences where illustration sets the tone"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "A centered container with an illustration/graphic, a heading-level text indicating absence, a paragraph of explanatory text, and a primary call-to-action button.",
+  "matcherProposal": "Detect a centered layout containing an image/illustration, a heading with emptiness keywords ('no data', 'nothing here', 'empty', 'no items'), and a primary button.",
+  "detectorLimitations": [
+    "Cannot determine if the illustration serves a genuine brand purpose"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "low",
+  "falsePositiveScenarios": [
+    "Branded illustration style that is part of a deliberate design system",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Flag as a suggestion to evaluate whether the illustration helps the user or just fills space.",
+  "fixturePlans": {
+    "violation": "Centered empty state with line-art illustration, 'Nothing here yet' headline, 'Start by adding your first item' subtext, 'Get Started' button.",
+    "control": "Empty state with sample data preview, numbered steps, 'Here's what to do first' guidance.",
+    "borderline": "Consumer app with brand-mascot illustration as part of personality."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Not covered by existing rules."
+}

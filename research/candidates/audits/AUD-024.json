@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-024",
+  "component": "profile-cards",
+  "recurringPattern": "Circular avatar (often with a status dot overlay), name in bold, role/title in subdued text, location or meta info in smaller type, and action buttons (Message, Follow, Connect) in outlined style. Card has rounded corners, white background, subtle shadow.",
+  "designHarm": "The profile card pattern mirrors social media regardless of context — an enterprise directory, a team page, and a dating app get the same layout. The avatar-as-primary-element communicates that appearance matters most, which may be inappropriate for professional contexts. The action button row presumes relationships before users have context to decide.",
+  "legitimateExceptions": ["Social platforms where profile discovery is the core interaction", "Team directory pages where quick-contact is the primary task"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard profile card with avatar + actions", "Text-only profile card for professional directories", "Expanded profile layout with context before actions"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-024"],
+  "originalObservations": [
+    "AI-generated profile cards always use circular avatars even for contexts where photos aren't available (generating generic placeholder faces).",
+    "The online status dot is always a small green circle overlaid at the bottom-right of the avatar.",
+    "Action buttons are always outlined/secondary style rather than letting the user explore the profile first."
+  ]
+}

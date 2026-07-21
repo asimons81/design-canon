@@ -1,0 +1,20 @@
+{
+  "auditId": "AUD-017",
+  "component": "onboarding",
+  "recurringPattern": "Horizontal swipeable carousel of 3-4 screens, each with a full-width illustration at top, a bold headline, a short description paragraph, and a 'Next' button. The final screen replaces 'Next' with 'Get Started'. Dot indicators at the bottom show progress.",
+  "designHarm": "The carousel onboarding pattern forces users through a linear narrative that the product could demonstrate interactively. Users skip through these screens to reach the app, absorbing nothing. The illustration-on-top pattern creates visual priority for decoration over information. Each screen's message is diluted by the template format.",
+  "legitimateExceptions": ["Consumer apps where the core value proposition needs narrative explanation", "Regulated apps that must present specific disclosures before first use"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard 4-screen onboarding carousel", "Interactive onboarding where users configure preferences instead of swiping", "Progressive disclosure onboarding that reveals features in-context"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-017"],
+  "originalObservations": [
+    "AI-generated onboarding always creates exactly 3 or 4 slides regardless of the product's complexity.",
+    "The first slide is always a general 'Welcome' or 'Introducing X' slide.",
+    "Illustrations are always abstract and decorative, rarely demonstrating actual product UI.",
+    "The dot indicators are always filled circles in the brand color for the active dot."
+  ]
+}

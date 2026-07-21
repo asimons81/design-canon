@@ -1,0 +1,58 @@
+{
+  "proposalId": "P-CC-024",
+  "proposedRuleId": "color.success-signal-inflation",
+  "title": "Do not use success-green for trivial operations",
+  "category": "color",
+  "relevantSurfaces": [
+    "*"
+  ],
+  "summary": "AI-generated interfaces use green success indicators (toasts, badges, border highlights) for every completed operation \u2014 including trivial saves, filter applications, and selections \u2014 diluting the signal value of the color.",
+  "instruction": "Reserve green success indicators for operations where completion is non-obvious, confirmation is legally required, or the operation's outcome would otherwise be uncertain. For operations with visible inline results (text saved, item selected), use no confirmation or a subtle non-color indicator.",
+  "rationale": "When green appears after every operation, it loses meaning as a success signal. Users learn to ignore it, and genuinely important confirmations (payment sent, account deleted) compete with trivial confirmations for attention. Green as a universal 'done' signal inflates the perceived achievement of routine operations.",
+  "claimType": "observation",
+  "sourceRefs": [
+    "SRC-CC-001"
+  ],
+  "violations": [
+    "Green success toast after every form save operation",
+    "Green border highlight on every successfully validated field",
+    "Green checkmark on every completed step regardless of step significance",
+    "Green status badge for operations that have no alternative outcome",
+    "Success color applied reflexively when the operation result is visible inline"
+  ],
+  "controls": [
+    "No confirmation for operations with visible inline results",
+    "Subtle gray or neutral indicator instead of green for routine completions",
+    "Green reserved for operations where completion is uncertain or significant",
+    "Tone-muted success communication ('Saved' in neutral gray instead of green badge)"
+  ],
+  "borderlineCases": [
+    "Multi-step processes where each step completion is genuinely useful feedback"
+  ],
+  "contextualExceptions": [
+    "Legal or financial transactions where explicit completion confirmation is required"
+  ],
+  "detectorFeasibility": "heuristic",
+  "detectorSignal": "Green-colored UI elements (checkmarks, badges, toasts, highlights) appearing after user-initiated operations that have visible inline outcomes.",
+  "matcherProposal": "Detect green-colored notification elements (toasts, badges, icons) that appear after form submissions or saves, particularly when the result is already visible in the interface.",
+  "detectorLimitations": [
+    "Cannot determine the significance of the operation from the interface alone"
+  ],
+  "impact": "medium",
+  "falsePositiveRisk": "medium",
+  "falsePositiveScenarios": [
+    "Operations where explicit green confirmation is genuinely helpful",
+    "Additional false positive scenario."
+  ],
+  "mitigationStrategy": "Focus detection on green indicators for operations where the outcome is visually obvious inline.",
+  "fixturePlans": {
+    "violation": "Green 'Profile saved!' toast appearing after every settings save, even though the saved values are now visible in the form.",
+    "control": "Save button text changes to 'Saved' in neutral gray for 2 seconds, no toast, no green color.",
+    "borderline": "Payment confirmation with green checkmark and transaction ID where explicit confirmation is expected."
+  },
+  "status": "draft",
+  "cleanRoomAttestations": [
+    "Developed without access to proprietary prompt collections."
+  ],
+  "overlapNotes": "Related to notifications.toast-fatigue (P-CC-021) but focuses on the color signal specifically rather than the notification format."
+}

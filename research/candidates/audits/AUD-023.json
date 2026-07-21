@@ -1,0 +1,20 @@
+{
+  "auditId": "AUD-023",
+  "component": "notification-toasts",
+  "recurringPattern": "Small rounded rectangle (usually green for success, red for error, blue for info, yellow for warning) appearing top-right or top-center, sliding in with a brief animation, containing an icon + short message + optional dismiss X, auto-dismissing after 3-5 seconds.",
+  "designHarm": "The toast notification has become the default for every system message regardless of urgency or user attention requirements. Success toasts (green) appear for every saved-change operation, training users to ignore them. The auto-dismiss timing is universally 3-5 seconds regardless of message complexity, leaving slower readers with half-read messages. The position (top-right) competes with browser native notifications and is outside typical reading patterns.",
+  "legitimateExceptions": ["Passive confirmations for non-critical operations ('Draft saved')", "Temporary status updates that don't require user action"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard toast notification with auto-dismiss", "Persistent banner for action-required messages", "Inline success state replacing the trigger element instead of a toast"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-023"],
+  "originalObservations": [
+    "AI-generated notification systems always use the four-color toast system (green/red/blue/yellow).",
+    "The slide-in animation is always from the top-right with a 300ms ease-out.",
+    "Auto-dismiss is always set to ~3 seconds regardless of message length.",
+    "Success toasts appear for every save/update operation, creating notification fatigue."
+  ]
+}

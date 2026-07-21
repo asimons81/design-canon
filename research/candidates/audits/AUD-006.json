@@ -1,0 +1,19 @@
+{
+  "auditId": "AUD-006",
+  "component": "navigation",
+  "recurringPattern": "Horizontal top nav bar with company logo left, four center links, and 'Sign In' + 'Get Started' (filled + outline) buttons right. Sticky header with a white/semi-transparent background, subtle bottom border or blur.",
+  "designHarm": "The logo-home-about-features-pricing-signup pattern makes every AI-generated site feel like a startup template. Users cannot distinguish brands when navigation structure is identical. The dual-button (Sign In/Get Started) implies permission hierarchy that may not be real.",
+  "legitimateExceptions": ["Standard marketing sites where the sign-in/get-started distinction is real (logged-in user vs prospect)", "Multi-product sites requiring a universal navigation shell"],
+  "coveredByExistingRule": false,
+  "existingRuleIds": [],
+  "suggestsBroaderCandidate": true,
+  "suggestsNarrowerCandidate": false,
+  "possibleFixtures": ["Standard startup nav: logo + 4 links + 2 buttons", "Expressive nav that breaks the template: no 'Get Started', off-center branding, unexpected link labels"],
+  "confidenceLevel": "high",
+  "sourceRecords": ["SRC-CC-006"],
+  "originalObservations": [
+    "AI-generated marketing sites universally use the logo-left + links-center + dual-buttons-right pattern.",
+    "The link labels are nearly always Home, Features, Pricing, and About or Contact.",
+    "The 'Sign In' button is always outline/secondary, 'Get Started' is always filled/primary."
+  ]
+}
