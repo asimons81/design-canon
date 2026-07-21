@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { access, readFile, realpath, stat } from 'node:fs/promises';
+import { open, readFile, realpath } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { sha256 } from './lib.js';
@@ -28,16 +28,24 @@ export async function resolveBrowserExecutable(browserExecutablePath, {
   if (!isInside(pinnedRootRealPath, executableRealPath)) {
     throw new Error(`Browser executable must remain beneath '${pinnedRootRealPath}'.`);
   }
-  const info = await stat(executableRealPath);
-  if (!info.isFile()) throw new Error('Browser executable is not a regular file.');
-  await access(executableRealPath, constants.R_OK | constants.X_OK);
+  const executable = await open(executableRealPath, constants.O_RDONLY);
+  let info;
+  let executableBytes;
+  try {
+    info = await executable.stat();
+    if (!info.isFile()) throw new Error('Browser executable is not a regular file.');
+    if ((info.mode & 0o111) === 0) throw new Error('Browser executable is not executable.');
+    executableBytes = await executable.readFile();
+  } finally {
+    await executable.close();
+  }
   const version = await playwrightVersion();
   if (version !== PINNED_PLAYWRIGHT_VERSION) {
     throw new Error(`Playwright version '${version}' does not match '${PINNED_PLAYWRIGHT_VERSION}'.`);
   }
   return {
     executableRealPath,
-    executableSha256: sha256(await readFile(executableRealPath)),
+    executableSha256: sha256(executableBytes),
     executableDirectory: dirname(executableRealPath),
     pinnedRootRealPath,
     playwrightVersion: version
