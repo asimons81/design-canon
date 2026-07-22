@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   launchPinnedChromium,
   resolveBrowserExecutable
@@ -15,12 +16,22 @@ import { captureRun } from '../research/benchmark/harness/capture.js';
 import { writeJson } from '../research/benchmark/harness/lib.js';
 
 const browserExecutablePath = process.env.DESIGN_CANON_BROWSER_EXECUTABLE;
+const bootstrapPath = fileURLToPath(new URL('../scripts/bootstrap-b000-wsl.sh', import.meta.url));
 
 async function temp(t, prefix = 'dc-browser-repair-') {
   const path = await mkdtemp(join(tmpdir(), prefix));
   t.after(() => rm(path, { recursive: true, force: true }));
   return path;
 }
+
+test('B000 WSL bootstrap pins the measured head and exact Chromium identity', async () => {
+  const script = await readFile(bootstrapPath, 'utf8');
+  assert.match(script, /HANDOFF_HEAD="9dcb12d831d0583f6f5e6ce974525be0b22c95e9"/);
+  assert.match(script, /CHROMIUM_SHA256="670ba079b75107746ba41abad131180a31a7c7219aa1bd4061fb471f4535d541"/);
+  assert.match(script, /--version \| awk '\{print \$NF\}'/);
+  assert.doesNotMatch(script, /--version \| awk '\{print \$2\}'/);
+  assert.match(script, /Chromium SHA-256 mismatch/);
+});
 
 test('explicit pinned browser identity and capture readiness are reproducible', {
   skip: !browserExecutablePath
