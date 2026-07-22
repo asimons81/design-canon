@@ -7,7 +7,7 @@
   <a href="https://github.com/asimons81/design-canon/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/asimons81/design-canon/test.yml?branch=main&style=for-the-badge&label=build" alt="Build status" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/asimons81/design-canon?style=for-the-badge" alt="MIT License" /></a>
   <img src="https://img.shields.io/static/v1?label=Node.js&message=20%2B&color=339933&style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js 20 or newer" />
-  <img src="https://img.shields.io/static/v1?label=runtime%20deps&message=zero&color=2563EB&style=for-the-badge" alt="Zero runtime dependencies" />
+  <img src="https://img.shields.io/static/v1?label=required%20runtime%20deps&message=zero&color=2563EB&style=for-the-badge" alt="Zero required runtime dependencies" />
 </p>
 
 <h1 align="center">Design Canon</h1>
@@ -30,31 +30,45 @@ AI agents can generate polished frontend code quickly, but they often converge o
 
 A giant markdown file can nudge the model, but it creates four new problems:
 
-- irrelevant context consumes tokens and dilutes important rules
-- universal bans confuse taste with dogma
-- prose rules cannot prove they were followed
-- the system cannot learn from explicit user preferences
+- irrelevant context consumes tokens and dilutes important rules;
+- universal bans confuse taste with dogma;
+- prose rules cannot prove they were followed;
+- the system cannot learn from explicit user preferences.
 
-Design Canon separates rules, profiles, compilation, linting, visual review, and taste memory.
+Design Canon separates rules, profiles, compilation, linting, browser-assisted evidence, future visual review, and future taste memory.
 
 ## Working Alpha
 
-The repository already includes:
+The repository includes:
 
-- atomic, scoped design rules with rationale and verification
-- profiles for marketing pages, product applications, and editorial layouts
-- compilation to `DESIGN.md`, `SKILL.md`, or general agent instructions
-- a zero-runtime-dependency linter for mechanical heuristics
-- project-local, rationale-required suppressions that preserve evidence
-- safe dry-run installation and uninstall adapters for AGENTS.md, Codex, Hermes, Claude Code, Cursor, and Windsurf
-- an installable Agent Skill for Codex, Hermes Agent, Claude Code, Cursor, and compatible tools
-- tests and an intentionally terrible example fixture
+- atomic, scoped design rules with rationale and verification;
+- profiles for marketing pages, product applications, and editorial layouts;
+- compilation to `DESIGN.md`, `SKILL.md`, or general agent instructions;
+- dependency-free static linting for bounded source heuristics;
+- optional browser-assisted linting for rendered text contrast and touch-target size;
+- project-local, rationale-required suppressions that preserve evidence;
+- safe dry-run installation and uninstall adapters for AGENTS.md, Codex, Hermes, Claude Code, Cursor, and Windsurf;
+- an installable Agent Skill for compatible coding agents;
+- hardened benchmark and local capture infrastructure;
+- regression, package, dependency, browser, and security gates.
 
-## Quick Start
+Playwright is an optional dependency used only for browser-assisted analysis. Static compilation, linting, configuration, and adapter workflows do not require it.
+
+## Release Status
+
+`v0.1.0-alpha.1` exists as an immutable source tag. The npm package and matching GitHub Release are not considered complete until their public records, integrity values, dist-tags, and clean installation are independently verified.
+
+This maintenance work occurs after the alpha.1 tag. The next public package candidate is therefore `0.1.0-alpha.2`; the existing tag will not be moved or reused.
+
+Use the source checkout instructions below until npm publication is confirmed. See the [authoritative release-status ledger](https://github.com/asimons81/design-canon/blob/main/docs/RELEASE_STATUS.md) for the exact boundary.
+
+## Quick Start from Source
 
 ```bash
 git clone https://github.com/asimons81/design-canon.git
 cd design-canon
+npm ci --ignore-scripts
+npm run check
 npm test
 
 node ./bin/design-canon.js compile \
@@ -70,6 +84,17 @@ Available profiles:
 ```bash
 node ./bin/design-canon.js profiles
 ```
+
+The default lint mode is `static`. To require browser-assisted analysis from a source checkout, install Chromium explicitly and select browser mode:
+
+```bash
+npx playwright install chromium
+node ./bin/design-canon.js lint ./path/to/site \
+  --profile marketing \
+  --mode browser
+```
+
+`auto` mode uses browser analysis when the optional Playwright and Chromium capability is available; otherwise it preserves static results and reports browser analysis as skipped. `browser` mode fails when the capability is unavailable.
 
 ## Install into an Agent
 
@@ -90,7 +115,7 @@ node ./bin/design-canon.js init . \
   --write
 ```
 
-Targets include `agents`, `codex`, `hermes`, `claude`, `cursor`, and `windsurf`. See [`docs/ADAPTERS.md`](docs/ADAPTERS.md) for file locations, scope behavior, safety guarantees, and uninstall commands.
+Targets include `agents`, `codex`, `hermes`, `claude`, `cursor`, and `windsurf`. See [`docs/ADAPTERS.md`](docs/ADAPTERS.md) for command contexts, file locations, scope behavior, safety guarantees, and uninstall commands.
 
 ## Justified Exceptions
 
@@ -128,12 +153,14 @@ See [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) for the complete contract.
 | Prompt bundle | Design Canon |
 |---|---|
 | One enormous context file | Compiles only relevant rules |
-| Blanket style bans | Contextual profiles and overrides |
-| Advice only | Static lint plus planned visual evidence |
-| No verification contract | Every rule can define checks |
+| Blanket style bans | Contextual profiles and justified exceptions |
+| Advice only | Static and browser-assisted mechanical evidence |
+| No verification contract | Every enforceable rule defines observable checks |
 | Same taste for everyone | Planned project-local preference memory |
 | Unclear provenance | Versioned, reviewable, open rule packs |
-| “Looks better” claims | Planned paired benchmarks |
+| “Looks better” claims | Frozen benchmark protocol with explicit claim boundaries |
+
+The subjective visual judge and project taste memory remain planned. Browser-assisted mechanical checks are already implemented and should not be confused with a model-based visual verdict.
 
 ## Benchmark Status
 
@@ -147,17 +174,19 @@ See [`research/benchmark/calibration/B000-PHASE2-RUNNER.md`](research/benchmark/
 
 ```text
 bin/                    CLI entry point
-src/                    compiler, selector, linter, and adapters
+src/                    compiler, selector, linter, browser analysis, adapters
 rules/                  atomic design-policy catalog
 profiles/               surface-specific rule selection
 schema/                 open JSON schemas
 skills/design-canon/    portable Agent Skill
-examples/sloppy/        violation fixture
-tests/                  regression tests
-docs/ARCHITECTURE.md    system design
+examples/               examples and controlled fixtures
+tests/                  regression and integration tests
+docs/README.md          documentation map
+docs/RELEASE_STATUS.md  source tag, GitHub Release, and npm state
+docs/ARCHITECTURE.md    current and planned system layers
 docs/CONFIGURATION.md   configuration and suppression contract
 docs/ADAPTERS.md        safe agent installation and uninstall
-ROADMAP.md              path to visual QA, benchmarks, and taste memory
+ROADMAP.md              completed work and remaining milestones
 ```
 
 ## Philosophy
