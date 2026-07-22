@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const cli = fileURLToPath(new URL('../bin/design-canon.js', import.meta.url));
+const packageJsonPath = fileURLToPath(new URL('../package.json', import.meta.url));
 
 function run(args) {
   return new Promise((resolve, reject) => {
@@ -32,8 +33,9 @@ function run(args) {
 
 test('version is package-driven', async () => {
   const result = await run(['--version']);
+  const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8'));
   assert.equal(result.code, 0);
-  assert.match(result.stdout, /^0\.1\.0-alpha\.0\s*$/);
+  assert.equal(result.stdout.trim(), packageJson.version);
 });
 
 test('profiles command discovers available profiles', async () => {
