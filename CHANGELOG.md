@@ -4,6 +4,8 @@ All notable changes are documented here.
 
 ## Unreleased
 
+## 0.1.0-alpha.1 - 2026-07-21
+
 ### Added
 
 - Added project-local `design-canon.config.json` support.
