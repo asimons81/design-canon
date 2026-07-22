@@ -44,10 +44,10 @@ An `E404` from `npm view` means the unscoped name is not currently published. If
 From the exact tagged release commit, publish the prerelease under `next`:
 
 ```bash
-npm publish --access public --tag next
+NPM_CONFIG_PROVENANCE=false npm publish --access public --tag next
 ```
 
-A local first publication cannot receive npm provenance because provenance requires a supported cloud CI runner. Do not claim provenance for this bootstrap publication.
+The explicit override is required because `package.json` requests provenance by default, while a local first publication cannot receive npm provenance. Provenance requires a supported cloud CI runner. Do not claim provenance for this bootstrap publication.
 
 Immediately after the package exists, configure the repository workflow as its trusted publisher. npm 11.15 or newer is required:
 
