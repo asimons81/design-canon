@@ -4,6 +4,19 @@ All notable changes are documented here.
 
 ## Unreleased
 
+### Documentation
+
+- Added an authoritative release-status ledger that separates source tags, GitHub Releases, npm publication, and provenance.
+- Added a documentation map and repository-maintenance runbook.
+- Corrected stale B000 checklist and benchmark-harness status language after the successful r2 calibration.
+- Clarified the boundary between implemented browser-assisted mechanical analysis and the planned subjective visual-review system.
+- Updated source-based command examples so unpublished npm instructions are not presented as available.
+
+### Maintenance
+
+- Added dependency-free internal Markdown link verification to the repository check.
+- Documented short-lived branch cleanup and immutable release-tag policy.
+
 ## 0.1.0-alpha.1 - 2026-07-21
 
 ### Added
