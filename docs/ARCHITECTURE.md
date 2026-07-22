@@ -10,7 +10,7 @@ Design Canon separates design knowledge from agent prompts.
 4. **Static linter**: scans source files for detectable anti-patterns and accessibility failures. Results are heuristics with evidence.
 5. **Visual judge**: planned screenshot-based review with structured findings and before/after evidence.
 6. **Taste memory**: planned local preference profile learned from explicit approvals and rejections, with decay and project isolation.
-7. **Benchmark harness**: planned paired evaluations that compare agent output with and without a canon under fixed tasks and rubrics.
+7. **Benchmark harness**: implemented fail-closed calibration infrastructure for fixed prompts, isolated agent execution, usage accounting, local capture, lint, accessibility, and immutable evidence. The full paired benchmark campaign and blind comparison remain planned.
 
 ## Design Principles
 
@@ -20,6 +20,7 @@ Design Canon separates design knowledge from agent prompts.
 - **Agent-agnostic**: support open instruction formats rather than binding the project to one model vendor.
 - **Clean-room implementation**: learn from public behavior and open standards without copying unlicensed proprietary prompt files.
 - **Human authority**: lint and visual scores inform judgment; they do not replace it.
+- **Explicit spend boundaries**: provider-backed research is opt-in, budgeted, and separate from normal local product use.
 
 ## Proposed Visual Review Contract
 
