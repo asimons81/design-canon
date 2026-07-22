@@ -2,6 +2,20 @@
 
 Design Canon can install compiled profile guidance into supported project instruction formats without overwriting user-owned content.
 
+## Command context
+
+From a source checkout, use the repository CLI explicitly:
+
+```bash
+node ./bin/design-canon.js init . \
+  --profile product-app \
+  --target agents
+```
+
+After a public npm version is independently verified, the installed `design-canon` command or an exact-version `npx design-canon@<version>` invocation can be used instead. Do not assume the npm package exists because a source tag exists. Check [`RELEASE_STATUS.md`](RELEASE_STATUS.md).
+
+The examples below use the source-checkout command so they work in the current repository state.
+
 ## Safety contract
 
 - `init` and `uninstall` are dry-run previews by default.
@@ -12,26 +26,37 @@ Design Canon can install compiled profile guidance into supported project instru
 - Uninstall deletes a standalone file only when it is marked as Design Canon-owned.
 - Writes use a temporary file in the destination directory followed by an atomic rename.
 - Re-running the same command is idempotent.
+- The adapter does not contact a model provider or install third-party agent software.
 
 ## Commands
 
+Preview an installation:
+
 ```bash
-design-canon init [path] \
+node ./bin/design-canon.js init [path] \
   --profile marketing|product-app|editorial \
   --target agents|codex|hermes|claude|cursor|windsurf
 ```
 
-Preview is the default. Add `--write` after reviewing the output:
+Add `--write` only after reviewing the output:
 
 ```bash
-design-canon init . --profile product-app --target agents --write
+node ./bin/design-canon.js init . \
+  --profile product-app \
+  --target agents \
+  --write
 ```
 
-Remove only Design Canon-managed content:
+Preview removal of only Design Canon-managed content:
 
 ```bash
-design-canon uninstall . --target agents
-design-canon uninstall . --target agents --write
+node ./bin/design-canon.js uninstall . --target agents
+```
+
+Apply the reviewed removal:
+
+```bash
+node ./bin/design-canon.js uninstall . --target agents --write
 ```
 
 ## Targets
@@ -46,7 +71,10 @@ Use this portable target when one file should serve multiple AGENTS.md-aware too
 
 Writes the same managed `AGENTS.md` format with target-specific provenance. Codex applies `AGENTS.md` by directory scope, with deeper files taking precedence for their subtrees.
 
-Official reference: https://github.com/openai/codex/blob/main/docs/agents_md.md
+Official references:
+
+- https://openai.com/index/introducing-codex/
+- https://openai.com/index/unrolling-the-codex-agent-loop/
 
 ### `hermes`
 
@@ -63,11 +91,11 @@ Creates:
 
 User-authored Claude instructions remain outside the managed block. Claude Code supports `@path` imports and resolves relative imports from the file containing the import.
 
-Official reference: https://code.claude.com/docs/en/memory
+Official reference: https://docs.anthropic.com/en/docs/claude-code/memory
 
 ### `cursor`
 
-Creates `.cursor/rules/design-canon.mdc` with current project-rule frontmatter:
+Creates `.cursor/rules/design-canon.mdc` with project-rule frontmatter:
 
 ```yaml
 ---

@@ -6,6 +6,8 @@ This is the canonical benchmark protocol for the first clean-room monolith-versu
 
 The protocol structure, generic baseline, catalog freeze, benchmark briefs, profiles, conditions, repetition count, and randomization seed are committed before official results are inspected. Official runs remain blocked until the exact model, agent, tokenizer, context window, capture stack, accessibility stack, and execution budgets are pinned in a new protocol-manifest commit.
 
+The nonofficial B000 r2 calibration completed with a `GO` recommendation for the runner and evidence pipeline. B000 is excluded from this protocol, did not satisfy official admission, did not select a winner, and did not authorize B001-B015.
+
 The older three-condition methodology proposal is historical design material. It is not the execution contract for this study.
 
 ## Claim boundary
@@ -131,8 +133,8 @@ Blind evaluators compare randomized outputs without condition labels, prompts, s
 - Publish raw anonymized results and the analysis script.
 - Do not collapse the study into one unsupported magic score.
 
-## Tonight's boundary
+## Current repository boundary
 
-This repository can freeze the protocol, generate deterministic artifacts, create the 180-run plan, initialize run directories, validate manifests, create blinded assignments, and generate reports without spending model tokens.
+This repository can freeze the protocol, generate deterministic artifacts, create the 180-run plan, initialize run directories, validate manifests, create blinded assignments, capture local evidence, and generate reports without spending model tokens.
 
-Actual model execution and independent human votes are intentionally deferred until their providers, costs, versions, and recruitment plan are chosen explicitly.
+Actual B001-B015 model execution and independent human votes remain deferred until their providers, exact call count, costs, versions, admission change, and recruitment plan are chosen explicitly. Generating or initializing plan artifacts does not authorize provider calls.
