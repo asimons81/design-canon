@@ -45,12 +45,25 @@ Every detector pull request must include:
 
 Avoid catastrophic backtracking, whole-repository catchalls, and rules that silently read generated output or dependencies.
 
+## Benchmark Requirements
+
+Benchmark code must be reviewable without spending money or contacting a model provider.
+
+- CI and pull-request tests must use fixtures, fake CLIs, or provider-free probes.
+- Live provider calls require separate, explicit user authorization with the exact attempt count and a reviewed spend estimate.
+- Attempt IDs are immutable and must never be overwritten or reused.
+- Failed evidence remains failed; do not relabel, repair in place, or infer a winner from incomplete calibration data.
+- Do not commit `.benchmark/`, transcripts, screenshots, generated run source, authentication material, or machine-local evidence.
+- Bootstrap scripts that modify users, packages, permissions, or sudoers must fail closed, pin external identities, and clearly state that they require a dedicated environment.
+
 ## Pull Requests
 
 Keep changes focused. Update `CHANGELOG.md` for user-visible behavior. Complete the pull-request checklist and include screenshots when generated guidance changes visual output.
+
+Resolve or explicitly supersede every blocking review thread before marking a pull request ready. Keep measured execution heads distinct from later documentation-only or maintenance commits.
 
 Open an issue before adding a broad aesthetic prohibition. Contextual defaults should not become universal dogma by accident.
 
 ## Security
 
-Read `SECURITY.md` before contributing executable adapters, rule loading, source traversal, CI, publishing, or third-party integrations.
+Read `SECURITY.md` before contributing executable adapters, rule loading, source traversal, CI, publishing, benchmark tooling, or third-party integrations.

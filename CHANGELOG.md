@@ -11,6 +11,17 @@ All notable changes are documented here.
 - Added JSON reporting for suppressed findings and unused exceptions.
 - Added a public configuration schema and configuration guide.
 
+### Research
+
+- Added a fail-closed, nonofficial B000 Codex calibration runner with immutable attempt manifests, isolated agent execution, lossless JSONL evidence, exact three-file source validation, binary-safe Git diffs, browser-network denial, viewport capture, lint, accessibility, and artifact hashing.
+- Completed the B000 r2 calibration at measured execution head `9dcb12d831d0583f6f5e6ce974525be0b22c95e9`: all four frozen A/B/D/C conditions completed with zero retries and a final `GO` recommendation for the runner.
+- Preserved failed r1 evidence as immutable and excluded it from r2 totals and claims. B001-B015 remain unexecuted and require separate authorization and budgeting.
+
+### Fixed
+
+- Corrected the dedicated WSL bootstrap to parse multi-word Chromium version output, verify the exact pinned Chromium SHA-256, and bind to the measured handoff head.
+- Removed a legacy helper that could appear to validate hand-authored network-isolation booleans; live evidence must be machine-generated, attempt-bound, and hash-verifiable.
+
 ### Security
 
 - Added strict catalog, profile, and configuration validation.
@@ -31,6 +42,7 @@ All notable changes are documented here.
 ### Documentation
 
 - Added hardened contribution, security, and release procedures.
+- Updated benchmark documentation to distinguish completed calibration from optional, separately funded benchmark execution.
 
 ## 0.1.0-alpha.0
 

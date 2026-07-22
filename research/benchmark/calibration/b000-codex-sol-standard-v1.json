@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "calibrationId": "b000-codex-sol-standard-v1",
   "status": "phase-1-frozen-phase-2-pending",
+  "runnerContractAmendment": "research/benchmark/calibration/B000-RUNNER-CONTRACT-AMENDMENT-2.md",
   "official": false,
   "claimEligible": false,
   "purpose": "Validate the Codex execution runner, isolation, accounting, capture, and failure-preservation pipeline before admitting any B001-B015 output.",
@@ -22,9 +23,9 @@
   "candidateRuntime": {
     "provider": "OpenAI",
     "agentFramework": "Codex CLI",
-    "minimumCodexCliVersion": "0.144.0",
-    "exactCodexCliVersion": null,
-    "modelAlias": "gpt-5.6",
+    "minimumCodexCliVersion": "0.144.4",
+    "exactCodexCliVersion": "0.144.4",
+    "modelAlias": "gpt-5.6-sol",
     "modelDisplayName": "GPT-5.6 Sol",
     "resolvedModelIdentifier": null,
     "reasoningEffort": "medium",
@@ -36,7 +37,10 @@
     "userExecPolicyRules": "ignored",
     "sessionPersistence": "ephemeral",
     "sandbox": "workspace-write",
-    "approvalPolicy": "never"
+    "approvalPolicy": "never",
+    "skillsInstructions": "disabled",
+    "skillsIncludeInstructions": false,
+    "skillMcpDependencyInstall": false
   },
   "candidateBudgets": {
     "wallClockSecondsPerRun": 1200,
@@ -64,6 +68,7 @@
   },
   "requiredRawEvidence": [
     "codex --version output",
+    "codex --help output",
     "codex exec --help output",
     "effective command arguments with secrets redacted",
     "raw Codex JSONL event stream",

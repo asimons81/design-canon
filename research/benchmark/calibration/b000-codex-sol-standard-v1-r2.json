@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "calibrationId": "b000-codex-sol-standard-v1-r2",
+  "status": "repair-frozen-r2-uninitialized",
+  "runnerContractAmendment": "research/benchmark/calibration/B000-RUNNER-CONTRACT-AMENDMENT-3.md",
+  "priorCalibration": {
+    "calibrationId": "b000-codex-sol-standard-v1",
+    "manifest": "research/benchmark/calibration/b000-codex-sol-standard-v1.json",
+    "executionHead": "3e4bc44888efcc42a716a74f88e1f9112b856fa7",
+    "classification": "immutable-inadmissible-infrastructure-failure",
+    "measuredTotalsIncluded": false
+  },
+  "protocolV1GitTree": "3e2ff4d734a055c4a00e91019f5c5d225eda1630",
+  "official": false,
+  "claimEligible": false,
+  "purpose": "Repeat the nonofficial B000 infrastructure calibration only after the r1 evidence and orchestration defects are repaired and independently admitted.",
+  "brief": {
+    "benchmarkId": "B000",
+    "path": "research/benchmark/calibration/B000-calibration-shakedown.md",
+    "profile": "marketing"
+  },
+  "conditions": ["A", "B", "C", "D"],
+  "executionOrderSeed": "design-canon-b000-sol-calibration-v1:B000-r1",
+  "expectedExecutionOrder": ["A", "B", "D", "C"],
+  "runs": [
+    { "runId": "B000-A-r2", "condition": "A", "executionOrder": 1 },
+    { "runId": "B000-B-r2", "condition": "B", "executionOrder": 2 },
+    { "runId": "B000-D-r2", "condition": "D", "executionOrder": 3 },
+    { "runId": "B000-C-r2", "condition": "C", "executionOrder": 4 }
+  ],
+  "candidateRuntime": {
+    "provider": "OpenAI",
+    "agentFramework": "Codex CLI",
+    "exactCodexCliVersion": "0.144.4",
+    "modelAlias": "gpt-5.6-sol",
+    "modelDisplayName": "GPT-5.6 Sol",
+    "resolvedModelIdentifier": null,
+    "reasoningEffort": "medium",
+    "reasoningLabel": "Standard",
+    "serviceTier": "default",
+    "fastMode": false,
+    "maxMode": false,
+    "webSearch": "disabled",
+    "userConfig": "ignored",
+    "userExecPolicyRules": "ignored",
+    "sessionPersistence": "ephemeral",
+    "sandbox": "workspace-write",
+    "approvalPolicy": "never",
+    "skillsInstructions": "disabled",
+    "skillsIncludeInstructions": false,
+    "skillMcpDependencyInstall": false,
+    "apps": "disabled",
+    "browserUse": "disabled",
+    "computerUse": "disabled",
+    "imageGeneration": "disabled",
+    "plugins": "disabled",
+    "mcpServers": "none"
+  },
+  "candidateBudgets": {
+    "wallClockSecondsPerRun": 1200,
+    "processKillGraceSeconds": 30,
+    "maximumToolActionsPerRun": 80,
+    "automaticRetries": 0,
+    "modelControlPlaneNetwork": "OpenAI service transport only",
+    "workspaceCommandNetwork": "blocked",
+    "browserCaptureNetwork": "blocked",
+    "packageInstallation": "forbidden",
+    "allowedWorkspaceFiles": ["index.html", "styles.css", "script.js"]
+  },
+  "browser": {
+    "pinnedRoot": "/opt/dcbench/ms-playwright",
+    "playwrightVersion": "1.61.1",
+    "chromiumVersion": "149.0.7827.55",
+    "explicitExecutableRequired": true,
+    "preProviderCaptureReadinessRequired": true
+  },
+  "isolation": {
+    "freshWorkspacePerRun": true,
+    "workspaceOutsideRepository": true,
+    "freshGitRepositoryPerRun": true,
+    "parentProjectInstructionsAllowed": false,
+    "projectAgentsFilesAllowed": false,
+    "mcpServersAllowed": false,
+    "pluginsAllowed": false,
+    "skillsAllowed": false,
+    "crossRunStateAllowed": false,
+    "priorRunOutputsVisible": false,
+    "conditionLabelsVisibleToModel": false
+  },
+  "guidanceGenerator": {
+    "sameAsPriorCalibration": true,
+    "briefAndGuidanceAdaptedFromR1OutputQuality": false
+  },
+  "initializationGate": {
+    "futureLiveR2AuthorizationRequired": true,
+    "reviewedRepairHeadRequired": true,
+    "r1LockVerificationRequired": true,
+    "protocolV1TreeVerificationRequired": true,
+    "realAttemptsInitialized": false
+  }
+}

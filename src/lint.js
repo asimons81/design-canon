@@ -97,7 +97,8 @@ export async function lintPath({
   profile: requestedProfile = null,
   configPath = null,
   referenceDate = new Date(),
-  mode: requestedMode = null
+  mode: requestedMode = null,
+  browserExecutablePath = null
 }) {
   const catalog = await loadCatalog();
   const loadedConfig = await loadConfig(configPath, { catalog, referenceDate });
@@ -293,7 +294,7 @@ export async function lintPath({
 
   // Browser-assisted analysis when mode is auto or browser
   if (effectiveLintMode === 'auto' || effectiveLintMode === 'browser') {
-    const capability = await detectBrowserCapability();
+    const capability = await detectBrowserCapability({ executablePath: browserExecutablePath });
     const resolved = resolveMode(effectiveLintMode, capability);
 
     if (resolved.skipped) {
@@ -337,7 +338,8 @@ export async function lintPath({
           operationTimeout: browserConfig.operationTimeout,
           javaScriptEnabled: browserConfig.javaScriptEnabled,
           colorScheme: browserConfig.colorScheme,
-          scanRoot: process.cwd()
+          scanRoot: process.cwd(),
+          executablePath: browserExecutablePath
         });
 
         const htmlFiles = files.filter(

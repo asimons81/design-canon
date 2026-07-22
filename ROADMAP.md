@@ -17,23 +17,26 @@ Design Canon is a local-first, open-source design-policy runtime. It will not re
 
 ## v0.2: Make Adoption Frictionless
 
-- [ ] `design-canon init` with project detection and safe dry-run preview
-- [ ] Agent adapters for Hermes Agent, Codex, Claude Code, Cursor, Windsurf, and generic `AGENTS.md`
-- [ ] Config validation and migration commands
-- [ ] Install and uninstall documentation for every supported adapter
+- [x] `design-canon init` with safe dry-run preview
+- [x] Agent adapters for Hermes Agent, Codex, Claude Code, Cursor, Windsurf, and generic `AGENTS.md`
+- [x] Strict configuration validation
+- [ ] Configuration migration commands
+- [x] Install and uninstall documentation for every supported adapter
 - [ ] Clean tarball installation tests on Windows, macOS, Linux, and WSL
 - [ ] First provenance-backed npm prerelease
 - [ ] Three reproducible before-and-after demonstrations
 
 ## v0.3: Prove the Upgrade
 
-- [ ] Fixed, brand-neutral benchmark briefs and golden fixtures
-- [ ] Reproducible run manifest with prompt, model, commit, environment, tokens, and timing
+- [ ] Fixed, brand-neutral benchmark briefs and golden fixtures for the full suite
+- [x] Reproducible run manifest with prompt, model, commit, environment, tokens, and timing
 - [ ] Paired runs with no guidance, monolithic guidance, and compiled Design Canon policy
-- [ ] Local screenshot capture at desktop and mobile viewports
-- [ ] Accessibility and lint evidence attached to each run
+- [x] Local screenshot capture at desktop and mobile viewports
+- [x] Accessibility and lint evidence attached to each run
 - [ ] Blind human-comparison workflow
 - [ ] Static benchmark report generated entirely from committed artifacts
+
+The nonofficial B000 calibration is complete with a `GO` recommendation for the runner. It validated execution isolation, browser-network denial, capture, lint, accessibility, Git diff evidence, and artifact hashing. B000 is claim-ineligible and did not select a winner. B001-B015 remain unexecuted and require separate authorization and budgeting.
 
 ## v0.4: The Canon Can See
 

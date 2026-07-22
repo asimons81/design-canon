@@ -135,6 +135,14 @@ See [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) for the complete contract.
 | Unclear provenance | Versioned, reviewable, open rule packs |
 | “Looks better” claims | Planned paired benchmarks |
 
+## Benchmark Status
+
+The repository includes a hardened benchmark harness, but the public benchmark campaign has not been run. The nonofficial B000 calibration completed successfully across four frozen conditions and validated runner isolation, capture, network denial, and artifact integrity. B000 is claim-ineligible and did not select a winner.
+
+B001-B015 remain unexecuted. Any provider-backed benchmark run requires separate user authorization, an exact call count, and a reviewed spend estimate. Normal installation, compilation, linting, and agent-adapter workflows do not invoke a model provider.
+
+See [`research/benchmark/calibration/B000-PHASE2-RUNNER.md`](research/benchmark/calibration/B000-PHASE2-RUNNER.md) for the calibration record and safety boundaries.
+
 ## Repository Map
 
 ```text

@@ -32,6 +32,8 @@ The core project:
 - exposes evidence for mechanical findings
 - publishes only an explicit package allowlist
 - runs dependency, static-analysis, packaging, and test gates in CI
+- keeps live benchmark execution behind explicit environment and CLI authorization gates
+- requires machine-generated, attempt-bound isolation evidence rather than trusting caller-supplied claims
 
 Users should:
 
@@ -40,7 +42,20 @@ Users should:
 - inspect executable adapters before enabling them
 - never allow rule packs to request secrets or unrelated command execution
 - run untrusted packs in a sandbox with least privilege
+- treat `scripts/bootstrap-b000-wsl.sh` as privileged research infrastructure and run it only in a dedicated Ubuntu WSL2 environment
+- authenticate benchmark agents interactively instead of copying credential files between users or machines
+- approve provider-backed benchmark calls only after reviewing the exact call count and expected spend
+
+## Benchmark Evidence
+
+Benchmark evidence, transcripts, screenshots, generated source, and authentication material are not package assets.
+
+- `.benchmark/` must remain ignored and untracked.
+- Authentication-file contents must never be printed, hashed, archived, transferred, or added to reports.
+- Local evidence should be private to the runner account and excluded from public pull requests.
+- Immutable attempt IDs must never be overwritten or silently reused.
+- A failed attempt remains failed even when later capture or reporting steps succeed.
 
 ## Secrets
 
-Never place secrets, tokens, private source code, or personal data in issues, fixtures, rule packs, screenshots, or generated reports.
+Never place secrets, tokens, private source code, personal data, authentication files, or sensitive machine metadata in issues, fixtures, rule packs, screenshots, generated reports, or committed benchmark artifacts.

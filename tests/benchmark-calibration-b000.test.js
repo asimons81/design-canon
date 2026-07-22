@@ -69,8 +69,8 @@ test('B000 pins the requested Sol Standard Codex settings', async () => {
     },
     {
       framework: 'Codex CLI',
-      minimumVersion: '0.144.0',
-      model: 'gpt-5.6',
+      minimumVersion: '0.144.4',
+      model: 'gpt-5.6-sol',
       display: 'GPT-5.6 Sol',
       effort: 'medium',
       label: 'Standard',
@@ -84,8 +84,10 @@ test('B000 pins the requested Sol Standard Codex settings', async () => {
       approval: 'never'
     }
   );
-  assert.equal(calibration.candidateRuntime.exactCodexCliVersion, null);
+  assert.equal(calibration.candidateRuntime.exactCodexCliVersion, '0.144.4');
   assert.equal(calibration.candidateRuntime.resolvedModelIdentifier, null);
+  assert.equal(calibration.candidateRuntime.skillsIncludeInstructions, false);
+  assert.equal(calibration.candidateRuntime.skillMcpDependencyInstall, false);
 });
 
 test('B000 budget and isolation policy fail closed', async () => {
@@ -168,4 +170,18 @@ test('runner contract requires safe noninteractive Codex execution', async () =>
     assert.match(contract, new RegExp(required.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
   assert.match(contract, /Do not use `--dangerously-bypass-approvals-and-sandbox`, `--yolo`/);
+});
+
+test('runner amendment pins the canonical model and removes model-visible skills', async () => {
+  const amendment = await readFile(
+    repositoryPath('research', 'benchmark', 'calibration', 'B000-RUNNER-CONTRACT-AMENDMENT-2.md'),
+    'utf8'
+  );
+  for (const required of [
+    'gpt-5.6-sol',
+    'skills.include_instructions=false',
+    'skill_mcp_dependency_install',
+    'Runtime-created Codex skill cache files may exist',
+    'does not modify protocol v1'
+  ]) assert.ok(amendment.includes(required), required);
 });
