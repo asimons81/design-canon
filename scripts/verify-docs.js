@@ -120,9 +120,8 @@ const packageJson = JSON.parse(await readFile(resolve(ROOT, 'package.json'), 'ut
 const releaseStatus = await readFile(resolve(ROOT, 'docs/RELEASE_STATUS.md'), 'utf8');
 const readme = await readFile(resolve(ROOT, 'README.md'), 'utf8');
 
-assert.match(
-  releaseStatus,
-  new RegExp(`Package manifest[^\n]*\\\`${packageJson.version.replaceAll('.', '\\.') }\\\``),
+assert.ok(
+  releaseStatus.includes(`| Package manifest | \`${packageJson.version}\``),
   'Release status must name the current package manifest version.'
 );
 assert.match(readme, /docs\/RELEASE_STATUS\.md/, 'README must link to the authoritative release status.');
