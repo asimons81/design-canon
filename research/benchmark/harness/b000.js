@@ -274,18 +274,3 @@ export async function validateAndCopySource({ workspace, workspaceRoot, runDirec
   })));
   return { ...validation, fileHashes };
 }
-
-export function assertNetworkIsolationEvidence(evidence) {
-  const required = [
-    ['codexServiceTransportAvailable', true],
-    ['workspaceCommandEgressBlocked', true],
-    ['browserPageEgressBlocked', true]
-  ];
-  for (const [field, expected] of required) {
-    if (evidence?.[field] !== expected) throw new Error(`Network-isolation evidence missing or failed: ${field}`);
-  }
-  if (!evidence.workspaceEnforcement || !evidence.browserEnforcement) {
-    throw new Error('Network isolation must record independent workspace and browser enforcement methods.');
-  }
-  return { ...evidence, valid: true };
-}
