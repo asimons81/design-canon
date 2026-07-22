@@ -30,13 +30,18 @@ const REQUIRED_REPOSITORY_FILES = [
   '.github/workflows/test.yml',
   '.github/workflows/codeql.yml',
   '.github/workflows/dependency-review.yml',
+  '.github/workflows/publish.yml',
   'CONTRIBUTING.md',
   'SECURITY.md',
+  'docs/README.md',
+  'docs/RELEASE_STATUS.md',
+  'docs/MAINTENANCE.md',
   'docs/CONFIGURATION.md',
   'docs/ADAPTERS.md',
   'docs/RELEASING.md',
   'examples/config/design-canon.config.json',
   'schema/config.schema.json',
+  'scripts/verify-docs.js',
   'package-lock.json'
 ];
 
@@ -53,6 +58,7 @@ assert.deepEqual(packageJson.files, REQUIRED_PACKAGE_FILES);
 assert.equal(packageJson.repository?.url, 'git+https://github.com/asimons81/design-canon.git');
 assert.equal(packageJson.bin?.['design-canon'], './bin/design-canon.js');
 assert.equal(packageJson.exports?.['./config-schema'], './schema/config.schema.json');
+assert.equal(packageJson.scripts?.check, 'node ./scripts/verify-repository.js && node ./scripts/verify-docs.js');
 assert.equal(packageJson.scripts?.prepack, 'npm run check && npm test');
 
 assert.equal(packageLock.name, packageJson.name);
@@ -71,7 +77,7 @@ const workflowDirectory = '.github/workflows';
 const workflowFiles = (await readdir(workflowDirectory))
   .filter((name) => name.endsWith('.yml') || name.endsWith('.yaml'))
   .sort();
-assert.ok(workflowFiles.length >= 3, 'Expected test, CodeQL, and dependency-review workflows.');
+assert.ok(workflowFiles.length >= 4, 'Expected test, CodeQL, dependency-review, and publish workflows.');
 
 for (const workflowFile of workflowFiles) {
   const path = join(workflowDirectory, workflowFile);
