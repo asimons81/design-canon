@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  assertB000R2InitializationAdmission, assertNetworkIsolationEvidence, createOpaqueWorkspace, initializeB000, loadB000Calibration,
+  assertB000R2InitializationAdmission, createOpaqueWorkspace, initializeB000, loadB000Calibration,
   prepareB000Guidance, validateAndCopySource, validateWorkspace, verifyB000Order
 } from '../research/benchmark/harness/b000.js';
 import {
@@ -15,6 +15,7 @@ import { buildB000CalibrationReport } from '../research/benchmark/harness/calibr
 import {
   EMPTY_USAGE, executeJsonlProcess, finalizeExecutionManifest, normalizeJsonl
 } from '../research/benchmark/harness/execution-state.js';
+import { validateIsolationEvidenceHash } from '../research/benchmark/harness/isolation.js';
 import { REPOSITORY_ROOT, sha256, stableStringify } from '../research/benchmark/harness/lib.js';
 
 const fake = fileURLToPath(new URL('./fixtures/fake-codex.js', import.meta.url));
@@ -155,13 +156,15 @@ test('acceptance 13: added and missing files invalidate source before capture', 
   }
 });
 
-test('acceptance 14: independent network controls are mandatory', () => {
-  assert.throws(() => assertNetworkIsolationEvidence({ codexServiceTransportAvailable: true }), /workspaceCommand/);
-  const evidence = assertNetworkIsolationEvidence({
-    codexServiceTransportAvailable: true, workspaceCommandEgressBlocked: true,
-    browserPageEgressBlocked: true, workspaceEnforcement: 'OS sandbox probe', browserEnforcement: 'Playwright routing probe'
-  });
-  assert.equal(evidence.valid, true);
+test('acceptance 14: unsigned hand-authored network claims are rejected', () => {
+  const unsignedClaims = {
+    codexServiceTransportAvailable: true,
+    workspaceCommandEgressBlocked: true,
+    browserPageEgressBlocked: true,
+    workspaceEnforcement: 'claimed OS sandbox probe',
+    browserEnforcement: 'claimed Playwright routing probe'
+  };
+  assert.throws(() => validateIsolationEvidenceHash(unsignedClaims), /hash mismatch/);
 });
 
 test('acceptance 16: capture status cannot erase an execution failure', () => {
