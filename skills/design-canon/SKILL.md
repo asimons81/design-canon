@@ -9,6 +9,8 @@ description: Compiles and enforces task-specific design rules for frontend plann
 
 Use this skill when the task creates, redesigns, or reviews a user interface. Do not load the entire rule catalog blindly. Select the closest profile and compile only the relevant canon.
 
+Do not use benchmark or calibration scripts during normal design work. Design Canon's compilation, linting, and agent-adapter workflows are local and do not require provider-backed evaluation.
+
 ## Procedure
 
 1. Classify the surface as `marketing`, `product-app`, or `editorial`.
@@ -25,7 +27,10 @@ Use this skill when the task creates, redesigns, or reviews a user interface. Do
 
 - A heuristic match is a review trigger, not proof of bad design.
 - Do not ban a technique globally when the context justifies it.
+- Respect the project's existing brand, design system, accessibility requirements, and user decisions.
 - Do not copy a third-party design file or branded system without checking its license.
+- Do not alter agent instruction files unless the user explicitly asks. Use `design-canon init` in preview mode first and apply changes only after review.
+- Do not install dependencies, invoke paid providers, or run benchmark scripts without explicit user authorization.
 - Do not declare the interface complete without reviewing rendered output.
 
 ## Verification
