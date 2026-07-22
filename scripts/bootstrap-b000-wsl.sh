@@ -8,9 +8,10 @@ CODEX_VERSION="0.144.4"
 PLAYWRIGHT_VERSION="1.61.1"
 CHROMIUM_REVISION="1228"
 CHROMIUM_VERSION="149.0.7827.55"
+CHROMIUM_SHA256="670ba079b75107746ba41abad131180a31a7c7219aa1bd4061fb471f4535d541"
 REPOSITORY_URL="https://github.com/asimons81/design-canon.git"
 BRANCH="implementation/b000-codex-sol-runner"
-HANDOFF_HEAD="cf58e190caf01c67e3cc8e5b85a9729d5d871e79"
+HANDOFF_HEAD="9dcb12d831d0583f6f5e6ce974525be0b22c95e9"
 
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "bootstrap-b000-wsl: run as root" >&2
@@ -59,9 +60,14 @@ case "${browser_real_path}" in
   /opt/dcbench/ms-playwright/*) ;;
   *) echo "bootstrap-b000-wsl: Chromium escaped the pinned root" >&2; exit 1 ;;
 esac
-browser_reported_version="$("${browser_real_path}" --version | awk '{print $2}')"
+browser_reported_version="$("${browser_real_path}" --version | awk '{print $NF}')"
 if [[ "${browser_reported_version}" != "${CHROMIUM_VERSION}" ]]; then
   echo "bootstrap-b000-wsl: Chromium version mismatch" >&2
+  exit 1
+fi
+browser_sha256="$(sha256sum "${browser_real_path}" | awk '{print $1}')"
+if [[ "${browser_sha256}" != "${CHROMIUM_SHA256}" ]]; then
+  echo "bootstrap-b000-wsl: Chromium SHA-256 mismatch" >&2
   exit 1
 fi
 
@@ -112,7 +118,7 @@ install -d -o dcbench-runner -g dcbench-runner -m 0700 "${evidence}"
   printf 'head=%s\n' "${actual_head}"
   printf 'node_archive_sha256=%s\n' "${NODE_SHA256}"
   printf 'browser_executable=%s\n' "${browser_real_path}"
-  printf 'browser_executable_sha256=%s\n' "$(sha256sum "${browser_real_path}" | awk '{print $1}')"
+  printf 'browser_executable_sha256=%s\n' "${browser_sha256}"
   printf 'playwright_version=%s\n' "${PLAYWRIGHT_VERSION}"
   printf 'chromium_version=%s\n' "${browser_reported_version}"
 } > "${evidence}/bootstrap-metadata.txt"
