@@ -31,8 +31,11 @@ test('ADR-002 fixes the execution-mode contract', async () => {
 test('ADR-002 pins optional Playwright consistently with package metadata', async () => {
   const text = await readAdr();
   const pkg = JSON.parse(await readFile(PACKAGE_PATH, 'utf8'));
-  assert.equal(pkg.optionalDependencies?.playwright, '1.61.1');
-  assert.match(text, /Playwright `1\.61\.1`/);
+  const version = pkg.optionalDependencies?.playwright;
+  assert.ok(version, 'package.json must pin an optional playwright version');
+  // Escape dots for the regex so 1.62.0 matches the literal ADR text.
+  const escaped = version.replace(/\./g, '\\.');
+  assert.match(text, new RegExp(`Playwright \`${escaped}\``));
   assert.match(text, /npx playwright install chromium/);
 });
 
