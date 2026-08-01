@@ -15,7 +15,7 @@ A broad static approximation would create deterministic output without trustwort
 
 ## Decision
 
-Design Canon remains static-first and adds an **optional browser-assisted capability** using Playwright `1.61.1` with Chromium.
+Design Canon remains static-first and adds an **optional browser-assisted capability** using Playwright `1.62.0` with Chromium.
 
 This ADR authorizes shared infrastructure only. Production rules must not launch their own browser, bypass lifecycle or security controls, or reinterpret operational failures as accessibility violations. The foundation shipped in PR #19 without adding contrast, touch targets, framework builds, arbitrary server startup, or public-site crawling.
 
@@ -50,7 +50,7 @@ Path traversal outside the scan root is rejected.
 
 ## Runtime and Lifecycle
 
-Playwright `1.61.1` with Chromium is selected because it provides isolated contexts, deterministic viewports, computed styles, geometry, request interception, timeouts, and mature CI support.
+Playwright `1.62.0` with Chromium is selected because it provides isolated contexts, deterministic viewports, computed styles, geometry, request interception, timeouts, and mature CI support.
 
 A lint operation must:
 
@@ -177,7 +177,7 @@ Existing supression syntax, rationale, scope, expiry, and unused-suppression rep
 
 ## Packaging and CI
 
-Playwright is pinned as the exact optional dependency `1.61.1`; it is not mandatory for static users. Chromium binaries are not bundled in the npm tarball. Browser setup is explicit:
+Playwright is pinned as the exact optional dependency `1.62.0`; it is not mandatory for static users. Chromium binaries are not bundled in the npm tarball. Browser setup is explicit:
 
 ```bash
 npx playwright install chromium
@@ -252,7 +252,7 @@ PR #19 resolved and tested the previously reserved decisions:
 
 - CLI: `--mode static|auto|browser`
 - config: `browser.mode`, `viewport`, `javaScriptEnabled`, `colorScheme`, `concurrency`, `pageTimeout`, and `operationTimeout`
-- optional dependency: exact `playwright` version `1.61.1`
+- optional dependency: exact `playwright` version `1.62.0`
 - Chromium setup: `npx playwright install chromium`
 - browser-unavailable exit code: `3` in required browser mode
 - analysis statuses: `confirmed`, `indeterminate`, `skipped`, and `failed`
