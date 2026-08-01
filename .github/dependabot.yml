@@ -13,6 +13,13 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    ignore:
+      # Benchmark harness (research/benchmark) pins playwright + chromium
+      # revision + SHA256 for reproducible B000 runs. A playwright bump
+      # changes the chromium build (1228 -> 1234) and breaks the pin
+      # contract by design. Bump deliberately, not via dependabot.
+      - dependency-name: "playwright"
+      - dependency-name: "playwright-core"
 
   - package-ecosystem: github-actions
     directory: /
