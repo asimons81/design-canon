@@ -1,6 +1,6 @@
 # Release Status
 
-Last verified: 2026-07-21 (America/Chicago)
+Last verified: 2026-08-01 (America/Chicago)
 
 This file is the repository source of truth for release state. A Git tag, a GitHub Release, and an npm publication are separate events. Do not describe one as proof that the others completed.
 
@@ -8,11 +8,11 @@ This file is the repository source of truth for release state. A Git tag, a GitH
 
 | Surface | Status | Evidence |
 |---|---|---|
-| Package manifest | `0.1.0-alpha.1` | `package.json` and `package-lock.json` agree |
-| Source tag | Complete | `v0.1.0-alpha.1` points to `d46eb8ecd4e3e4ca872799f959ced66edf53b31e` |
+| Package manifest | `0.1.0-alpha.2` (prep branch `release/0.1.0-alpha.2`) | `package.json` and `package-lock.json` agree |
+| Source tag | `v0.1.0-alpha.1` immutable; `v0.1.0-alpha.2` NOT yet tagged | alpha.1 points to `d46eb8ecd4e3e4ca872799f959ced66edf53b31e` |
 | GitHub Release | Incomplete until independently verified | A pushed tag alone does not create or publish a GitHub Release |
-| npm package | Incomplete until independently verified | Do not advertise `npm install design-canon` until the registry entry and clean install are verified |
-| Trusted publishing workflow | Implemented, not sufficient by itself | `.github/workflows/publish.yml` runs only when a GitHub Release is published |
+| npm package | `0.1.0-alpha.1` published; alpha.2 NOT published | Bootstrap boundary requires interactive maintainer 2FA publication first |
+| Trusted publishing workflow | Implemented, not sufficient by itself | `.github/workflows/publish.yml` runs only when a GitHub Release is published; requires `NPM_TOKEN` secret (not yet configured) |
 | Public announcement | Not authorized | Announce only after the package, dist-tag, integrity, and clean install are verified |
 
 The `v0.1.0-alpha.1` tag is immutable historical source state. Do not move, delete, or reuse it. This maintenance pass occurs after that tag, so the next public package candidate should be `0.1.0-alpha.2` rather than retroactively changing alpha.1.

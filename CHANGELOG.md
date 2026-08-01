@@ -2,7 +2,7 @@
 
 All notable changes are documented here.
 
-## Unreleased
+## 0.1.0-alpha.2 - 2026-08-01
 
 ### Documentation
 
@@ -16,6 +16,9 @@ All notable changes are documented here.
 
 - Added dependency-free internal Markdown link verification to the repository check.
 - Documented short-lived branch cleanup and immutable release-tag policy.
+- Fixed hardcoded Playwright version in the ADR-002 consistency test (now derived from package.json).
+- Bumped codeql-action init+analyze to v4.37.3 together (CodeQL requires a single version across steps).
+- Pinned actions/checkout to v7.0.1.
 
 ## 0.1.0-alpha.1 - 2026-07-21
 
